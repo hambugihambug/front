@@ -1,0 +1,19 @@
+.activity-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.activity-item {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--light-color);
+}
+
+.activity-time {
+    font-size: 0.8rem;
+    color: var(--gray-color);
+}
+
+.activity-description {
+    margin-top: 0.25rem;
+    color: var(--dark-color);
+}

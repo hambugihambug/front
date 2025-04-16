@@ -1,0 +1,21 @@
+.alerts-container {
+    margin-top: 1rem;
+}
+
+.alert-item {
+    padding: 1rem;
+    border-bottom: 1px solid var(--light-color);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.alert-title {
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.alert-time {
+    color: var(--gray-color);
+    font-size: 0.9rem;
+}
