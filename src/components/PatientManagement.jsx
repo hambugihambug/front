@@ -8,7 +8,7 @@ const initialFormState = {
     patient_age: '',
     patient_height: '',
     patient_weight: '',
-    patient_blood: 'A',
+    patient_blood: '',
     guardian_id: '',
     bed_id: '',
     patientCrte_id: '',
