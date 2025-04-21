@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Thermometer, Droplets, Plus, PenSquare, Users, AlertTriangle, Clock } from 'lucide-react';
+import { Thermometer, Droplets, PenSquare, Users, AlertTriangle, Clock } from 'lucide-react';
 import '../styles/components/RoomManagement.css';
 
 const API_BASE_URL = 'http://localhost:3000';
@@ -164,12 +164,6 @@ const RoomManagement = () => {
                 <div className="room-list-section">
                     <div className="section-header">
                         <h2>병실 목록</h2>
-                        <div className="header-actions">
-                            <button className="action-button">
-                                <Plus size={16} />
-                                <span>병실 추가</span>
-                            </button>
-                        </div>
                     </div>
 
                     <div className="floor-tabs">

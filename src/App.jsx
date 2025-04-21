@@ -10,6 +10,7 @@ import EnvironmentalData from './components/EnvironmentalData';
 import Notifications from './components/Notifications';
 import RoomDetail from './components/RoomDetail';
 import Schedule from './components/Schedule';
+import Home from './components/Home';
 import './App.css';
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
                 <Navbar />
                 <main className="main-content">
                     <Routes>
+                        <Route path="/" element={<Home />} />
                         <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/rooms" element={<RoomManagement />} />
                         <Route path="/rooms/:roomName" element={<RoomDetail />} />

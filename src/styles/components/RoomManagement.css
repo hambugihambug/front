@@ -91,17 +91,15 @@
 }
 
 .section-header {
-    padding: 20px;
-    border-bottom: 1px solid #e2e8f0;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    margin-bottom: 15px;
 }
 
 .section-header h2 {
-    font-size: 16px;
+    margin: 0;
+    font-size: 18px;
     font-weight: 600;
-    color: #1e293b;
 }
 
 .header-actions {
@@ -111,24 +109,33 @@
 
 .action-button {
     padding: 8px 16px;
-    color: rgb(25, 72, 144);
+    background-color: var(--primary-color, #4a55a2);
+    color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 4px;
     font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
 }
 
 .action-button:hover {
-    background: rgb(209, 209, 209);
+    background-color: var(--primary-dark, #3a4580);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .action-button.small {
-    padding: 4px 12px;
+    padding: 6px 14px;
+    min-width: 80px;
     font-size: 13px;
+}
+
+.add-room-btn {
+    margin-left: auto;
 }
 
 .floor-tabs {
