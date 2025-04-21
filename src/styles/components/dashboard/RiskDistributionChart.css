@@ -1,0 +1,17 @@
+.risk-chart-container {
+    height: 300px;
+    padding: 1rem;
+}
+
+.risk-legend {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    justify-content: center;
+}
+
+.risk-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
