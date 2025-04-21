@@ -1,0 +1,394 @@
+.schedule-container {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.schedule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.schedule-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #1e293b;
+}
+
+.add-button {
+    background-color: #0066cc;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.add-button:hover {
+    background-color: #0052a3;
+}
+
+.schedule-grid {
+    display: grid;
+    gap: 16px;
+}
+
+.schedule-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+}
+
+.schedule-card-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.schedule-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.schedule-icon {
+    background-color: rgba(0, 102, 204, 0.1);
+    padding: 8px;
+    border-radius: 50%;
+    color: #0066cc;
+}
+
+.schedule-details h3 {
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.schedule-details p {
+    color: #64748b;
+    font-size: 14px;
+}
+
+.schedule-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.action-button {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    color: #64748b;
+    border-radius: 4px;
+}
+
+.action-button:hover {
+    background-color: #f1f5f9;
+}
+
+.dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.dialog-content {
+    background-color: white;
+    padding: 24px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 500px;
+    margin: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    animation: slideIn 0.3s ease-out;
+    transform-origin: center;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.dialog-header {
+    margin-bottom: 24px;
+}
+
+.dialog-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #475569;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.form-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    background-color: white;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.time-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.button-cancel {
+    padding: 10px 20px;
+    border: 1px solid #e2e8f0;
+    background-color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #475569;
+    transition: all 0.2s;
+}
+
+.button-cancel:hover {
+    background-color: #f1f5f9;
+}
+
+.button-submit {
+    padding: 10px 20px;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.button-submit:hover {
+    background-color: #1d4ed8;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.calendar-nav {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.calendar-nav button {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.calendar-nav button:hover {
+    background-color: #f1f5f9;
+}
+
+.calendar {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.calendar-weekday {
+    text-align: center;
+    padding: 10px;
+    font-weight: bold;
+}
+
+/* 토요일 스타일 */
+.calendar-weekday:nth-child(7) {
+    color: #2563eb; /* 파란색 */
+}
+
+/* 일요일 스타일 */
+.calendar-weekday:first-child {
+    color: #dc2626; /* 빨간색 */
+}
+
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.calendar-day {
+    border: 1px solid #e2e8f0;
+    min-height: 120px;
+    padding: 8px;
+}
+
+.calendar-day.other {
+    background-color: #f8fafc;
+}
+
+.day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.day-number {
+    font-weight: 500;
+}
+
+.add-schedule-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #0066cc;
+    font-size: 16px;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.add-schedule-btn:hover {
+    background-color: rgba(0, 102, 204, 0.1);
+}
+
+.day-schedules {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.day-schedule {
+    background-color: #f0f9ff;
+    padding: 4px;
+    border-radius: 4px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.schedule-time {
+    color: #0066cc;
+    font-weight: 500;
+    margin-right: 4px;
+}
+
+.schedule-title {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.schedule-actions {
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.day-schedule:hover .schedule-actions {
+    opacity: 1;
+}
+
+.schedule-actions button {
+    background: none;
+    border: none;
+    padding: 2px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+/* 토요일 날짜 스타일 */
+.calendar-day:nth-child(7n) .day-number {
+    color: #2563eb; /* 파란색 */
+}
+
+/* 일요일 날짜 스타일 */
+.calendar-day:nth-child(7n + 1) .day-number {
+    color: #dc2626; /* 빨간색 */
+}

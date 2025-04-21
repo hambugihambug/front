@@ -9,6 +9,7 @@ import FallIncidents from './components/FallIncidents';
 import EnvironmentalData from './components/EnvironmentalData';
 import Notifications from './components/Notifications';
 import RoomDetail from './components/RoomDetail';
+import Schedule from './components/Schedule';
 import './App.css';
 
 function App() {
@@ -35,7 +36,7 @@ function App() {
                 <Navbar />
                 <main className="main-content">
                     <Routes>
-                        <Route path="/" element={<Dashboard />} />
+                        <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/rooms" element={<RoomManagement />} />
                         <Route path="/rooms/:roomName" element={<RoomDetail />} />
                         <Route path="/patients" element={<PatientManagement />} />
@@ -43,6 +44,7 @@ function App() {
                         <Route path="/fall-incidents" element={<FallIncidents />} />
                         <Route path="/environmental" element={<EnvironmentalData />} />
                         <Route path="/notifications" element={<Notifications />} />
+                        <Route path="/schedule" element={<Schedule />} />
                     </Routes>
                 </main>
             </div>

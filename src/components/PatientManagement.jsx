@@ -50,8 +50,8 @@ const PatientManagement = () => {
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [showFilterModal, setShowFilterModal] = useState(false);
     const [selectedPatient, setSelectedPatient] = useState(null);
-    const [newPatient, setNewPatient] = useState(initialFormState);
     const [editingPatient, setEditingPatient] = useState(null);
+    const [newPatient, setNewPatient] = useState(initialFormState);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -64,13 +64,10 @@ const PatientManagement = () => {
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedPatients, setSelectedPatients] = useState([]);
-
-    // 통계 데이터 (실제로는 API에서 가져와야 함)
-    const [stats] = useState({
+    const [stats, setStats] = useState({
         totalPatients: {
             value: '127명',
             description: '전체 환자',
-            change: '+3명',
         },
         newPatients: {
             value: '12명',
@@ -105,6 +102,13 @@ const PatientManagement = () => {
             const response = await axios.get(`${API_BASE_URL}/patients`);
             if (response.data.code === 0) {
                 setPatients(response.data.data);
+                setStats((prev) => ({
+                    ...prev,
+                    totalPatients: {
+                        ...prev.totalPatients,
+                        value: `${response.data.totalCount}명`,
+                    },
+                }));
             } else {
                 setError('환자 정보를 불러오는데 실패했습니다.');
             }
@@ -202,14 +206,22 @@ const PatientManagement = () => {
         }
     };
 
-    const openEditForm = (patient) => {
-        setEditingPatient({ ...patient });
-        setShowEditForm(true);
-    };
-
     const openDetailView = (patient) => {
         setSelectedPatient(patient);
         setShowDetailModal(true);
+    };
+
+    const openEditForm = (patient) => {
+        // DB에서 가져온 생년월일을 YYYY-MM-DD 형식으로 변환하고 하루를 더함
+        const formattedBirthDate = patient.patient_age
+            ? new Date(new Date(patient.patient_age).getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+            : '';
+
+        setEditingPatient({
+            ...patient,
+            patient_age: formattedBirthDate,
+        });
+        setShowEditForm(true);
     };
 
     const handleFilterChange = (e) => {
@@ -630,10 +642,7 @@ const PatientManagement = () => {
                                         name="patient_name"
                                         value={editingPatient.patient_name}
                                         onChange={(e) =>
-                                            setEditingPatient({
-                                                ...editingPatient,
-                                                patient_name: e.target.value,
-                                            })
+                                            setEditingPatient({ ...editingPatient, patient_name: e.target.value })
                                         }
                                         required
                                     />
@@ -645,10 +654,7 @@ const PatientManagement = () => {
                                         name="patient_age"
                                         value={editingPatient.patient_age}
                                         onChange={(e) =>
-                                            setEditingPatient({
-                                                ...editingPatient,
-                                                patient_age: e.target.value,
-                                            })
+                                            setEditingPatient({ ...editingPatient, patient_age: e.target.value })
                                         }
                                         required
                                     />
@@ -660,10 +666,7 @@ const PatientManagement = () => {
                                         name="patient_height"
                                         value={editingPatient.patient_height}
                                         onChange={(e) =>
-                                            setEditingPatient({
-                                                ...editingPatient,
-                                                patient_height: e.target.value,
-                                            })
+                                            setEditingPatient({ ...editingPatient, patient_height: e.target.value })
                                         }
                                         required
                                     />
@@ -675,10 +678,7 @@ const PatientManagement = () => {
                                         name="patient_weight"
                                         value={editingPatient.patient_weight}
                                         onChange={(e) =>
-                                            setEditingPatient({
-                                                ...editingPatient,
-                                                patient_weight: e.target.value,
-                                            })
+                                            setEditingPatient({ ...editingPatient, patient_weight: e.target.value })
                                         }
                                         required
                                     />
@@ -689,10 +689,7 @@ const PatientManagement = () => {
                                         name="patient_blood"
                                         value={editingPatient.patient_blood}
                                         onChange={(e) =>
-                                            setEditingPatient({
-                                                ...editingPatient,
-                                                patient_blood: e.target.value,
-                                            })
+                                            setEditingPatient({ ...editingPatient, patient_blood: e.target.value })
                                         }
                                         required
                                     >
@@ -710,10 +707,7 @@ const PatientManagement = () => {
                                         name="guardian_id"
                                         value={editingPatient.guardian_id || ''}
                                         onChange={(e) =>
-                                            setEditingPatient({
-                                                ...editingPatient,
-                                                guardian_id: e.target.value,
-                                            })
+                                            setEditingPatient({ ...editingPatient, guardian_id: e.target.value })
                                         }
                                     />
                                 </div>
@@ -724,40 +718,9 @@ const PatientManagement = () => {
                                         name="bed_id"
                                         value={editingPatient.bed_id || ''}
                                         onChange={(e) =>
-                                            setEditingPatient({
-                                                ...editingPatient,
-                                                bed_id: e.target.value,
-                                            })
+                                            setEditingPatient({ ...editingPatient, bed_id: e.target.value })
                                         }
                                     />
-                                </div>
-                                <div className="form-group profile-image-group">
-                                    <label>프로필 사진</label>
-                                    <div className="profile-upload-container">
-                                        <div className="profile-preview">
-                                            {editingPatient.profile_image ? (
-                                                <img
-                                                    src={editingPatient.profile_image}
-                                                    alt="프로필 미리보기"
-                                                    className="profile-preview-image"
-                                                />
-                                            ) : (
-                                                <div className="profile-placeholder">
-                                                    <UserPlus size={32} />
-                                                </div>
-                                            )}
-                                        </div>
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={(e) => handleImageUpload(e, setEditingPatient)}
-                                            className="profile-input"
-                                            id="profile-edit-upload"
-                                        />
-                                        <label htmlFor="profile-edit-upload" className="profile-upload-button">
-                                            사진 업로드
-                                        </label>
-                                    </div>
                                 </div>
                             </div>
                             <div className="modal-footer">

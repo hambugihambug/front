@@ -1,102 +1,61 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Thermometer, Droplets, Clock, AlertTriangle } from 'lucide-react'; // 아이콘 추가
+import '../styles/components/EnvironmentalData.css';
+
+const API_BASE_URL = 'http://localhost:3000';
 
 const EnvironmentalData = () => {
     const [environmentalData, setEnvironmentalData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedRoom, setSelectedRoom] = useState('all');
-
-    // 더미 환경 데이터
-    const mockEnvData = [
-        {
-            id: 1,
-            roomId: 1,
-            roomNumber: '101',
-            timestamp: '2025-04-11T08:30:00',
-            temperature: 23.5,
-            humidity: 45,
-            status: '정상',
-        },
-        {
-            id: 2,
-            roomId: 2,
-            roomNumber: '102',
-            timestamp: '2025-04-11T08:30:00',
-            temperature: 22.1,
-            humidity: 42,
-            status: '정상',
-        },
-        {
-            id: 3,
-            roomId: 3,
-            roomNumber: '103',
-            timestamp: '2025-04-11T08:30:00',
-            temperature: 24.2,
-            humidity: 50,
-            status: '정상',
-        },
-        {
-            id: 4,
-            roomId: 5,
-            roomNumber: '201',
-            timestamp: '2025-04-11T08:30:00',
-            temperature: 22.8,
-            humidity: 46,
-            status: '정상',
-        },
-        {
-            id: 5,
-            roomId: 6,
-            roomNumber: '202',
-            timestamp: '2025-04-11T08:30:00',
-            temperature: 22.5,
-            humidity: 44,
-            status: '정상',
-        },
-        {
-            id: 6,
-            roomId: 7,
-            roomNumber: '203',
-            timestamp: '2025-04-11T08:30:00',
-            temperature: 29.1,
-            humidity: 38,
-            status: '경고',
-        },
-        {
-            id: 7,
-            roomId: 8,
-            roomNumber: '204',
-            timestamp: '2025-04-11T08:30:00',
-            temperature: 23.2,
-            humidity: 47,
-            status: '정상',
-        },
-    ];
-
-    // 사용 가능한 병실 목록
-    const rooms = [...new Set(mockEnvData.map((item) => item.roomNumber))];
+    const [rooms, setRooms] = useState([]);
 
     useEffect(() => {
-        // 목업 데이터 로드 시뮬레이션
-        const loadEnvironmentalData = () => {
+        const fetchEnvironmentalData = async () => {
             try {
                 setLoading(true);
-                setEnvironmentalData(mockEnvData);
-            } catch (error) {
-                console.error('Error loading environmental data:', error);
-                setError('환경 데이터를 로드하는 데 문제가 발생했습니다. 나중에 다시 시도해 주세요.');
+                const response = await axios.get(`${API_BASE_URL}/environmental-data`);
+                const data = response.data.data || response.data;
+
+                setEnvironmentalData(data);
+
+                // 병실 이름 목록 (roomName 기준)
+                const uniqueRooms = [...new Set(data.map((item) => item.roomName))];
+                setRooms(uniqueRooms);
+                setError(null);
+            } catch (err) {
+                console.error('환경 데이터 로드 오류:', err);
+                setError('환경 데이터를 로드하는 데 문제가 발생했습니다.');
             } finally {
                 setLoading(false);
             }
         };
 
-        loadEnvironmentalData();
+        fetchEnvironmentalData();
+        const intervalId = setInterval(fetchEnvironmentalData, 60000);
+        return () => clearInterval(intervalId);
     }, []);
 
     const filteredData =
-        selectedRoom === 'all'
-            ? environmentalData
-            : environmentalData.filter((item) => item.roomNumber === selectedRoom);
+        selectedRoom === 'all' ? environmentalData : environmentalData.filter((item) => item.roomName === selectedRoom);
+
+    const getStatusColor = (status) => {
+        return status === '경고' ? '#ffebee' : '#e8f5e9';
+    };
+
+    const getTemperatureColor = (temp) => {
+        if (temp > 26) return '#ff5252'; // 높은 온도
+        if (temp < 20) return '#2979ff'; // 낮은 온도
+        return '#4caf50'; // 정상 온도
+    };
+
+    const getHumidityColor = (humidity) => {
+        if (humidity > 60) return '#2979ff'; // 높은 습도
+        if (humidity < 40) return '#ffa000'; // 낮은 습도
+        return '#4caf50'; // 정상 습도
+    };
 
     if (loading) {
         return (
@@ -120,94 +79,115 @@ const EnvironmentalData = () => {
     }
 
     return (
-        <div>
-            <h1>환경 데이터</h1>
+        <div className="environmental-data-container">
+            <h1 className="page-title">환경 모니터링</h1>
+            <p className="page-description">병실 온도 및 습도 모니터링 현황</p>
 
-            <div className="card">
-                <div className="card-header">
-                    <h2 className="card-title">현재 환경 상태</h2>
-                    <div>
-                        <label htmlFor="room-filter" className="form-label">
-                            병실 선택:{' '}
-                        </label>
-                        <select
-                            id="room-filter"
-                            className="form-select"
-                            value={selectedRoom}
-                            onChange={(e) => setSelectedRoom(e.target.value)}
-                        >
-                            <option value="all">모든 병실</option>
-                            {rooms.map((room) => (
-                                <option key={room} value={room}>
-                                    {room}호
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-                <div className="card-content">
-                    <div className="env-data-grid">
-                        {filteredData.map((item) => (
-                            <div key={item.id} className="card env-data-card">
-                                <h3 className="card-title">{item.roomNumber}호</h3>
-                                <div className="env-data-icon">🌡️</div>
-                                <div className="env-data-value">{item.temperature}°C</div>
-                                <div className="env-data-unit">온도</div>
-                                <div className="env-data-range">적정 범위: 20-26°C</div>
-
-                                <div className="env-data-icon">💧</div>
-                                <div className="env-data-value">{item.humidity}%</div>
-                                <div className="env-data-unit">습도</div>
-                                <div className="env-data-range">적정 범위: 40-60%</div>
-
-                                <div
-                                    className={`env-data-status ${
-                                        item.status === '경고' ? 'text-danger' : 'text-success'
-                                    }`}
-                                >
-                                    상태: {item.status}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+            <div className="filter-container">
+                <label htmlFor="room-filter" className="filter-label">
+                    병실 선택:
+                </label>
+                <select
+                    id="room-filter"
+                    className="filter-select"
+                    value={selectedRoom}
+                    onChange={(e) => setSelectedRoom(e.target.value)}
+                >
+                    <option value="all">모든 병실</option>
+                    {rooms.map((room) => (
+                        <option key={room} value={room}>
+                            {room}호
+                        </option>
+                    ))}
+                </select>
             </div>
 
-            <div className="card">
-                <div className="card-header">
-                    <h2 className="card-title">환경 데이터 기록</h2>
-                </div>
-                <div className="card-content">
-                    <div className="table-container">
-                        <table className="data-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>병실</th>
-                                    <th>시간</th>
-                                    <th>온도</th>
-                                    <th>습도</th>
-                                    <th>상태</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredData.map((item) => (
-                                    <tr key={item.id}>
-                                        <td>{item.id}</td>
-                                        <td>{item.roomNumber}호</td>
-                                        <td>{new Date(item.timestamp).toLocaleString('ko-KR')}</td>
-                                        <td>{item.temperature}°C</td>
-                                        <td>{item.humidity}%</td>
-                                        <td>
-                                            <span className={item.status === '경고' ? 'text-danger' : 'text-success'}>
-                                                {item.status}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+            <div className="env-cards-container">
+                {filteredData.map((item) => (
+                    <div
+                        key={item.roomId}
+                        className="env-card"
+                        style={{
+                            backgroundColor: getStatusColor(item.status),
+                            borderLeft: `4px solid ${item.status === '경고' ? '#f44336' : '#4caf50'}`,
+                        }}
+                    >
+                        <div className="env-card-header">
+                            <h2 className="env-card-title">{item.roomName}호</h2>
+                            <span className={`env-card-status ${item.status === '경고' ? 'warning' : 'normal'}`}>
+                                {item.status === '경고' ? <AlertTriangle size={16} /> : null} {item.status}
+                            </span>
+                        </div>
+
+                        <div className="env-card-body">
+                            <div className="env-metric">
+                                <div className="env-metric-icon">
+                                    <Thermometer size={24} color={getTemperatureColor(item.temperature)} />
+                                </div>
+                                <div className="env-metric-details">
+                                    <div
+                                        className="env-metric-value"
+                                        style={{ color: getTemperatureColor(item.temperature) }}
+                                    >
+                                        {item.temperature}°C
+                                    </div>
+                                    <div className="env-metric-label">온도</div>
+                                    <div className="env-metric-range">적정: 20-26°C</div>
+                                </div>
+                            </div>
+
+                            <div className="env-metric">
+                                <div className="env-metric-icon">
+                                    <Droplets size={24} color={getHumidityColor(item.humidity)} />
+                                </div>
+                                <div className="env-metric-details">
+                                    <div
+                                        className="env-metric-value"
+                                        style={{ color: getHumidityColor(item.humidity) }}
+                                    >
+                                        {item.humidity}%
+                                    </div>
+                                    <div className="env-metric-label">습도</div>
+                                    <div className="env-metric-range">적정: 40-60%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="env-card-footer">
+                            <Clock size={14} />
+                            <span>최근 업데이트: {new Date().toLocaleTimeString()}</span>
+                        </div>
                     </div>
+                ))}
+            </div>
+
+            <div className="env-history-section">
+                <h2 className="section-title">환경 데이터 기록</h2>
+                <div className="table-container">
+                    <table className="data-table">
+                        <thead>
+                            <tr>
+                                <th>병실</th>
+                                <th>온도</th>
+                                <th>습도</th>
+                                <th>상태</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredData.map((item) => (
+                                <tr key={`table-${item.roomId}`}>
+                                    <td>{item.roomName}호</td>
+                                    <td>{item.temperature}°C</td>
+                                    <td>{item.humidity}%</td>
+                                    <td>
+                                        <span className={item.status === '경고' ? 'warning-text' : 'normal-text'}>
+                                            {item.status}
+                                        </span>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
