@@ -16,7 +16,7 @@ const EnvironmentalData = () => {
         const fetchEnvironmentalData = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get(`${API_BASE_URL}/environmental-data`);
+                const response = await axios.get(`${API_BASE_URL}/environmental`);
                 const data = response.data.data || response.data;
 
                 setEnvironmentalData(data);
