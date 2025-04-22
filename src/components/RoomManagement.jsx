@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Thermometer, Droplets, PenSquare, Users, AlertTriangle, Clock } from 'lucide-react';
+import { Thermometer, Droplets, PenSquare, Users, AlertTriangle, Clock, X, User } from 'lucide-react';
 import '../styles/components/RoomManagement.css';
 
 const API_BASE_URL = 'http://localhost:3000';
@@ -14,6 +14,8 @@ const RoomManagement = () => {
     const [selectedFloor, setSelectedFloor] = useState('1');
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [activeTab, setActiveTab] = useState('상세정보');
+    const [selectedPatient, setSelectedPatient] = useState(null);
+    const [showPatientDetailModal, setShowPatientDetailModal] = useState(false);
 
     // 통계 데이터 (실제로는 API에서 가져와야 함)
     const [stats] = useState({
@@ -65,6 +67,18 @@ const RoomManagement = () => {
         } catch (err) {
             console.error('Error fetching room details:', err);
             setError('병실 정보를 불러오는데 실패했습니다.');
+        }
+    };
+
+    const fetchPatientDetail = async (patientId) => {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/patients/${patientId}`);
+            if (response.data.code === 0) {
+                setSelectedPatient(response.data.data);
+                setShowPatientDetailModal(true);
+            }
+        } catch (error) {
+            console.error('환자 정보 조회 실패:', error);
         }
     };
 
@@ -276,30 +290,44 @@ const RoomManagement = () => {
                                         <thead>
                                             <tr>
                                                 <th>이름</th>
-                                                <th>나이</th>
-                                                <th>낙상 위험도</th>
                                                 <th>침대</th>
-                                                <th>담당 간호사</th>
                                                 <th>상세정보</th>
                                                 <th>환자 배정</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>김환자</td>
-                                                <td>65</td>
-                                                <td>
-                                                    <span className="risk-badge high">높음</span>
-                                                </td>
-                                                <td>1</td>
-                                                <td>미배정</td>
-                                                <td>
-                                                    <button className="link-button">상세정보</button>
-                                                </td>
-                                                <td>
-                                                    <button className="action-button small">배정</button>
-                                                </td>
-                                            </tr>
+                                            {selectedRoom.patients && selectedRoom.patients.length > 0 ? (
+                                                selectedRoom.patients.map((patient) => (
+                                                    <tr key={patient.patient_id}>
+                                                        <td>{patient.patient_name}</td>
+                                                        <td>{patient.bed_id}</td>
+                                                        <td>
+                                                            <button
+                                                                className="link-button"
+                                                                onClick={() => fetchPatientDetail(patient.patient_id)}
+                                                            >
+                                                                상세정보
+                                                            </button>
+                                                        </td>
+                                                        <td>
+                                                            <button
+                                                                className="action-button small"
+                                                                onClick={() =>
+                                                                    handlePatientAssignment(patient.patient_id)
+                                                                }
+                                                            >
+                                                                재배정
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            ) : (
+                                                <tr>
+                                                    <td colSpan="4" className="empty-message">
+                                                        배정된 환자가 없습니다.
+                                                    </td>
+                                                </tr>
+                                            )}
                                         </tbody>
                                     </table>
                                 </div>
@@ -308,6 +336,72 @@ const RoomManagement = () => {
                     </div>
                 )}
             </div>
+
+            {/* 환자 상세정보 모달 추가 */}
+            {showPatientDetailModal && selectedPatient && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h2>환자 상세정보</h2>
+                            <button className="close-button" onClick={() => setShowPatientDetailModal(false)}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="patient-detail-content">
+                            <div className="profile-section">
+                                <div className="profile-image-large">
+                                    {selectedPatient.profile_image ? (
+                                        <img
+                                            src={selectedPatient.profile_image}
+                                            alt={`${selectedPatient.patient_name}의 프로필`}
+                                            className="profile-image"
+                                        />
+                                    ) : (
+                                        <div className="profile-placeholder large">
+                                            <User size={48} />
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="profile-info">
+                                    <h3>{selectedPatient.patient_name}</h3>
+                                    <p>환자 ID: {selectedPatient.patient_id}</p>
+                                </div>
+                            </div>
+                            <div className="patient-details">
+                                <div className="detail-row">
+                                    <span className="detail-label">이름:</span>
+                                    <span className="detail-value">{selectedPatient.patient_name}</span>
+                                </div>
+                                <div className="detail-row">
+                                    <span className="detail-label">나이:</span>
+                                    <span className="detail-value">{selectedPatient.age}세</span>
+                                </div>
+                                <div className="detail-row">
+                                    <span className="detail-label">키:</span>
+                                    <span className="detail-value">{selectedPatient.patient_height}cm</span>
+                                </div>
+                                <div className="detail-row">
+                                    <span className="detail-label">몸무게:</span>
+                                    <span className="detail-value">{selectedPatient.patient_weight}kg</span>
+                                </div>
+                                <div className="detail-row">
+                                    <span className="detail-label">혈액형:</span>
+                                    <span className="detail-value">{selectedPatient.patient_blood}형</span>
+                                </div>
+                                <div className="detail-row">
+                                    <span className="detail-label">침대 번호:</span>
+                                    <span className="detail-value">{selectedPatient.bed_id || '-'}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button className="submit-button" onClick={() => setShowPatientDetailModal(false)}>
+                                확인
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

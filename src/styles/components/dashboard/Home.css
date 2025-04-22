@@ -362,3 +362,30 @@
     color: rgb(25, 72, 144);
     margin-top: auto;
 }
+
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+}
+
+.weather-widget {
+    background-color: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.temperature {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.weather {
+    color: #64748b;
+}
