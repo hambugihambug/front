@@ -30,17 +30,17 @@ const API_BASE_URL = 'http://localhost:3000';
 
 const initialFormState = {
     patient_name: '',
-    patient_age: '',
+    patient_birth: '',
     patient_height: '',
     patient_weight: '',
     patient_blood: '',
+    patient_img: null,
+    patient_memo: '',
+    patient_medic: '',
+    patient_status: 'active',
     guardian_id: '',
     bed_id: '',
-    profile_image: null,
-    patientCrte_id: '',
-    patientCrte_dt: '',
-    patientUpte_id: '',
-    patientUpte_dt: '',
+    medications: [],
 };
 
 const PatientManagement = () => {
@@ -96,12 +96,13 @@ const PatientManagement = () => {
         });
     };
 
+    // fetchPatients 함수 수정
     const fetchPatients = async () => {
         try {
             setLoading(true);
             const response = await axios.get(`${API_BASE_URL}/patients`);
             if (response.data.code === 0) {
-                setPatients(response.data.data);
+                setPatients(response.data.data); // data[0] 제거
                 setStats((prev) => ({
                     ...prev,
                     totalPatients: {
@@ -124,30 +125,33 @@ const PatientManagement = () => {
         fetchPatients();
     }, []);
 
+    // handleAddPatient 함수 수정
     const handleAddPatient = async (e) => {
         e.preventDefault();
         try {
-            // guardian_id와 bed_id가 빈 문자열이면 null로 설정
+            setLoading(true);
+
             const patientData = {
-                patient_name: newPatient.patient_name,
-                patient_age: newPatient.patient_age,
-                patient_height: newPatient.patient_height,
-                patient_weight: newPatient.patient_weight,
-                patient_blood: newPatient.patient_blood,
-                guardian_id: newPatient.guardian_id || null, // 빈 문자열이면 null
-                bed_id: newPatient.bed_id || null, // 빈 문자열이면 null
+                ...newPatient,
+                patient_status: 'active',
+                guardian_id: newPatient.guardian_id || null,
+                bed_id: newPatient.bed_id || null,
+                medications: [], // 약물 정보 추가
             };
 
             const response = await axios.post(`${API_BASE_URL}/patients`, patientData);
 
-            if (response.status === 201) {
+            if (response.data.code === 0) {
                 await fetchPatients();
                 setNewPatient(initialFormState);
                 setShowAddForm(false);
+                alert('환자가 성공적으로 등록되었습니다.');
             }
         } catch (err) {
             console.error('Error adding patient:', err);
-            setError('환자 등록에 실패했습니다.');
+            alert(err.response?.data?.message || '환자 등록 중 오류가 발생했습니다.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -189,37 +193,61 @@ const PatientManagement = () => {
         });
     }, [patients, sortConfig]);
 
+    // handleEditPatient 함수 수정
     const handleEditPatient = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.put(`${API_BASE_URL}/patients/${editingPatient.patient_id}`, editingPatient);
+            setLoading(true);
+
+            const patientData = {
+                ...editingPatient,
+                patient_birth: editingPatient.patient_birth,
+                patient_status: editingPatient.patient_status || 'active',
+                medications: editingPatient.medications || [],
+            };
+
+            const response = await axios.put(`${API_BASE_URL}/patients/${editingPatient.patient_id}`, patientData);
+
             if (response.data.code === 0) {
-                setPatients(patients.map((p) => (p.patient_id === editingPatient.patient_id ? response.data.data : p)));
+                await fetchPatients();
                 setShowEditForm(false);
                 setEditingPatient(null);
+                alert('환자 정보가 성공적으로 수정되었습니다.');
             } else {
                 setError('환자 정보 수정에 실패했습니다.');
             }
         } catch (err) {
             console.error('Error updating patient:', err);
-            setError('환자 정보 수정에 실패했습니다.');
+            alert(err.response?.data?.message || '환자 정보 수정 중 오류가 발생했습니다.');
+        } finally {
+            setLoading(false);
         }
     };
 
-    const openDetailView = (patient) => {
-        setSelectedPatient(patient);
-        setShowDetailModal(true);
+    // openDetailView 함수 수정
+    const openDetailView = async (patient) => {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/patients/${patient.patient_id}`);
+            if (response.data.code === 0) {
+                setSelectedPatient(response.data.data);
+                setShowDetailModal(true);
+            }
+        } catch (err) {
+            console.error('Error fetching patient details:', err);
+            alert('환자 상세 정보를 불러오는데 실패했습니다.');
+        }
     };
 
     const openEditForm = (patient) => {
-        // DB에서 가져온 생년월일을 YYYY-MM-DD 형식으로 변환하고 하루를 더함
-        const formattedBirthDate = patient.patient_age
-            ? new Date(new Date(patient.patient_age).getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        // 생년월일 포맷팅 (patient_birth 또는 patient_age 필드 사용)
+        const birthField = patient.patient_birth || patient.patient_age;
+        const formattedBirthDate = birthField
+            ? new Date(new Date(birthField).getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]
             : '';
 
         setEditingPatient({
             ...patient,
-            patient_age: formattedBirthDate,
+            patient_birth: formattedBirthDate,
         });
         setShowEditForm(true);
     };
@@ -237,17 +265,18 @@ const PatientManagement = () => {
         }
     };
 
+    // 필터링 함수 수정
     const applyFilters = (patients) => {
         return patients.filter((patient) => {
-            const age = parseInt(patient.patient_age);
+            const age = patient.age; // TIMESTAMPDIFF로 계산된 나이 사용
             const matchesAge =
                 (!filters.ageRange.min || age >= parseInt(filters.ageRange.min)) &&
                 (!filters.ageRange.max || age <= parseInt(filters.ageRange.max));
             const matchesBlood = !filters.bloodType || patient.patient_blood === filters.bloodType;
             const matchesGuardian =
                 filters.hasGuardian === null ||
-                (filters.hasGuardian === true && patient.guardian_id) ||
-                (filters.hasGuardian === false && !patient.guardian_id);
+                (filters.hasGuardian === true && patient.guardian_tel) ||
+                (filters.hasGuardian === false && !patient.guardian_tel);
 
             return matchesAge && matchesBlood && matchesGuardian;
         });
@@ -383,8 +412,8 @@ const PatientManagement = () => {
                                     <label>생년월일</label>
                                     <input
                                         type="date"
-                                        name="patient_age"
-                                        value={newPatient.patient_age}
+                                        name="patient_birth"
+                                        value={newPatient.patient_birth}
                                         onChange={handleInputChange}
                                         required
                                     />
@@ -442,33 +471,37 @@ const PatientManagement = () => {
                                         onChange={handleInputChange}
                                     />
                                 </div>
-                                <div className="form-group profile-image-group">
-                                    <label>프로필 사진</label>
-                                    <div className="profile-upload-container">
-                                        <div className="profile-preview">
-                                            {newPatient.profile_image ? (
-                                                <img
-                                                    src={newPatient.profile_image}
-                                                    alt="프로필 미리보기"
-                                                    className="profile-preview-image"
-                                                />
-                                            ) : (
-                                                <div className="profile-placeholder">
-                                                    <UserPlus size={32} />
-                                                </div>
-                                            )}
-                                        </div>
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={(e) => handleImageUpload(e, setNewPatient)}
-                                            className="profile-input"
-                                            id="profile-upload"
-                                        />
-                                        <label htmlFor="profile-upload" className="profile-upload-button">
-                                            사진 업로드
-                                        </label>
-                                    </div>
+                                <div className="form-group">
+                                    <label>상태</label>
+                                    <select
+                                        name="patient_status"
+                                        value={newPatient.patient_status}
+                                        onChange={handleInputChange}
+                                    >
+                                        <option value="active">입원 중</option>
+                                        <option value="discharged">퇴원</option>
+                                        <option value="deceased">사망</option>
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label>이미지 URL</label>
+                                    <input
+                                        type="text"
+                                        name="patient_img"
+                                        value={newPatient.patient_img || ''}
+                                        onChange={handleInputChange}
+                                        placeholder="이미지 URL을 입력하세요"
+                                    />
+                                </div>
+                                <div className="form-group full-width">
+                                    <label>메모</label>
+                                    <textarea
+                                        name="patient_memo"
+                                        value={newPatient.patient_memo || ''}
+                                        onChange={handleInputChange}
+                                        rows="3"
+                                        placeholder="환자에 대한 메모를 입력하세요"
+                                    />
                                 </div>
                             </div>
                             <div className="modal-footer">
@@ -591,7 +624,7 @@ const PatientManagement = () => {
                             </div>
                             <div className="detail-row">
                                 <span className="detail-label">생년월일:</span>
-                                <span className="detail-value">{formatBirthDate(selectedPatient.patient_age)}</span>
+                                <span className="detail-value">{formatBirthDate(selectedPatient.patient_birth)}</span>
                             </div>
                             <div className="detail-row">
                                 <span className="detail-label">키:</span>
@@ -606,13 +639,27 @@ const PatientManagement = () => {
                                 <span className="detail-value">{selectedPatient.patient_blood}형</span>
                             </div>
                             <div className="detail-row">
-                                <span className="detail-label">보호자 ID:</span>
-                                <span className="detail-value">{selectedPatient.guardian_id || '-'}</span>
+                                <span className="detail-label">병실:</span>
+                                <span className="detail-value">{selectedPatient.room_name || '-'}</span>
                             </div>
                             <div className="detail-row">
                                 <span className="detail-label">침대 번호:</span>
-                                <span className="detail-value">{selectedPatient.bed_id || '-'}</span>
+                                <span className="detail-value">{selectedPatient.bed_num || '-'}</span>
                             </div>
+                            <div className="detail-row">
+                                <span className="detail-label">보호자 연락처:</span>
+                                <span className="detail-value">{selectedPatient.guardian_tel || '-'}</span>
+                            </div>
+                            <div className="detail-row">
+                                <span className="detail-label">상태:</span>
+                                <span className="detail-value">{selectedPatient.patient_status || 'active'}</span>
+                            </div>
+                            {selectedPatient.patient_memo && (
+                                <div className="detail-row">
+                                    <span className="detail-label">메모:</span>
+                                    <span className="detail-value">{selectedPatient.patient_memo}</span>
+                                </div>
+                            )}
                         </div>
                         <div className="modal-footer">
                             <button className="submit-button" onClick={() => setShowDetailModal(false)}>
@@ -651,10 +698,10 @@ const PatientManagement = () => {
                                     <label>생년월일</label>
                                     <input
                                         type="date"
-                                        name="patient_age"
-                                        value={editingPatient.patient_age}
+                                        name="patient_birth"
+                                        value={editingPatient.patient_birth}
                                         onChange={(e) =>
-                                            setEditingPatient({ ...editingPatient, patient_age: e.target.value })
+                                            setEditingPatient({ ...editingPatient, patient_birth: e.target.value })
                                         }
                                         required
                                     />
@@ -722,6 +769,44 @@ const PatientManagement = () => {
                                         }
                                     />
                                 </div>
+                                <div className="form-group">
+                                    <label>상태</label>
+                                    <select
+                                        name="patient_status"
+                                        value={editingPatient.patient_status || 'active'}
+                                        onChange={(e) =>
+                                            setEditingPatient({ ...editingPatient, patient_status: e.target.value })
+                                        }
+                                    >
+                                        <option value="active">입원 중</option>
+                                        <option value="discharged">퇴원</option>
+                                        <option value="deceased">사망</option>
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label>이미지 URL</label>
+                                    <input
+                                        type="text"
+                                        name="patient_img"
+                                        value={editingPatient.patient_img || ''}
+                                        onChange={(e) =>
+                                            setEditingPatient({ ...editingPatient, patient_img: e.target.value })
+                                        }
+                                        placeholder="이미지 URL을 입력하세요"
+                                    />
+                                </div>
+                                <div className="form-group full-width">
+                                    <label>메모</label>
+                                    <textarea
+                                        name="patient_memo"
+                                        value={editingPatient.patient_memo || ''}
+                                        onChange={(e) =>
+                                            setEditingPatient({ ...editingPatient, patient_memo: e.target.value })
+                                        }
+                                        rows="3"
+                                        placeholder="환자에 대한 메모를 입력하세요"
+                                    />
+                                </div>
                             </div>
                             <div className="modal-footer">
                                 <button type="button" className="cancel-button" onClick={() => setShowEditForm(false)}>
@@ -784,7 +869,8 @@ const PatientManagement = () => {
                             <th>생년월일</th>
                             <th>신체 정보</th>
                             <th>혈액형</th>
-                            <th>보호자</th>
+                            <th>병실/침대</th>
+                            <th>상태</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -806,9 +892,9 @@ const PatientManagement = () => {
                                     </td>
                                     <td>
                                         <div className="patient-avatar">
-                                            {patient.profile_image ? (
+                                            {patient.patient_img ? (
                                                 <img
-                                                    src={patient.profile_image}
+                                                    src={patient.patient_img}
                                                     alt={`${patient.patient_name}의 프로필`}
                                                     className="patient-avatar-image"
                                                 />
@@ -820,14 +906,29 @@ const PatientManagement = () => {
                                     <td>
                                         <span className="patient-name">{patient.patient_name}</span>
                                     </td>
-                                    <td>{formatBirthDate(patient.patient_age)}</td>
+                                    <td>{formatBirthDate(patient.patient_birth)}</td>
                                     <td>
                                         {patient.patient_height}cm / {patient.patient_weight}kg
                                     </td>
                                     <td>
                                         <span className="status-badge blood-type">{patient.patient_blood}형</span>
                                     </td>
-                                    <td>{patient.guardian_id || '-'}</td>
+                                    <td>{patient.room_name ? `${patient.room_name}호 / ${patient.bed_num}번` : '-'}</td>
+                                    <td>
+                                        <span
+                                            className={`status-badge ${
+                                                patient.patient_status === 'active' ? 'active' : 'inactive'
+                                            }`}
+                                        >
+                                            {patient.patient_status === 'active'
+                                                ? '입원중'
+                                                : patient.patient_status === 'discharged'
+                                                ? '퇴원'
+                                                : patient.patient_status === 'deceased'
+                                                ? '사망'
+                                                : '기타'}
+                                        </span>
+                                    </td>
                                     <td>
                                         <div className="action-buttons">
                                             <button className="action-button" onClick={() => openDetailView(patient)}>

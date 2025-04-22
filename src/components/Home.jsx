@@ -7,7 +7,7 @@ import '../styles/components/dashboard/Home.css';
 const Home = () => {
     const [weather, setWeather] = useState({
         temperature: 'N/A',
-        weather: '🌈 로딩중...',
+        weather: ' 로딩중...',
     });
 
     useEffect(() => {

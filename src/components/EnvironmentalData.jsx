@@ -22,9 +22,19 @@ const EnvironmentalData = () => {
             try {
                 setLoading(true);
                 const res = await axios.get(`${API_BASE_URL}/environmental`);
-                const data = res.data.data;
+                const data = res.data.data.map((room) => ({
+                    roomId: room.room_id,
+                    roomName: room.room_name,
+                    temperature: room.room_temp,
+                    humidity: room.humidity,
+                    totalBeds: room.total_beds,
+                    occupiedBeds: room.occupied_beds,
+                    status: room.status,
+                }));
+
                 setRoomsData(data);
-                // roomName 기반으로 1층부터 maxFloor까지 생성 (문자열에서 숫자 추출)
+
+                // roomName 기반으로 층수 계산
                 const floorNums = data.map((item) => {
                     const num = parseInt(item.roomName.replace(/[^0-9]/g, ''), 10);
                     return Math.floor(num / 100);
@@ -41,8 +51,41 @@ const EnvironmentalData = () => {
                 setLoading(false);
             }
         };
+
         fetchRooms();
+        // 1분마다 데이터 갱신
+        const interval = setInterval(fetchRooms, 60000);
+        return () => clearInterval(interval);
     }, []);
+
+    // 선택 병실 상세 정보 조회
+    useEffect(() => {
+        if (!selectedRoomId) return;
+
+        const fetchRoomDetail = async () => {
+            try {
+                const res = await axios.get(`${API_BASE_URL}/environmental/${selectedRoomId}`);
+                const roomDetail = res.data.data;
+
+                // 선택된 병실 정보 업데이트
+                setRoomsData((prev) =>
+                    prev.map((room) =>
+                        room.roomId === selectedRoomId
+                            ? {
+                                  ...room,
+                                  roomCapacity: roomDetail.room_capacity,
+                                  patients: roomDetail.patients,
+                              }
+                            : room
+                    )
+                );
+            } catch (err) {
+                console.error('Error fetching room detail:', err);
+            }
+        };
+
+        fetchRoomDetail();
+    }, [selectedRoomId]);
 
     // 선택 병실 24시간 이력 조회
     useEffect(() => {
@@ -127,6 +170,9 @@ const EnvironmentalData = () => {
                                         <Droplets size={14} className="metric-icon" />
                                         <span className="metric-value">{item.humidity}%</span>
                                     </div>
+                                </div>
+                                <div className="room-occupancy">
+                                    {item.occupiedBeds}/{item.totalBeds} 병상 사용중
                                 </div>
                             </li>
                         ))}

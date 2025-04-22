@@ -16,9 +16,7 @@ const RoomManagement = () => {
     const [activeTab, setActiveTab] = useState('상세정보');
     const [selectedPatient, setSelectedPatient] = useState(null);
     const [showPatientDetailModal, setShowPatientDetailModal] = useState(false);
-
-    // 통계 데이터 (실제로는 API에서 가져와야 함)
-    const [stats] = useState({
+    const [stats, setStats] = useState({
         totalBeds: {
             value: '150개',
             description: '전체 병상',
@@ -47,9 +45,43 @@ const RoomManagement = () => {
         try {
             setLoading(true);
             const response = await axios.get(`${API_BASE_URL}/rooms`);
-            setRooms(response.data);
+            if (response.data.code === 0) {
+                const roomsData = response.data.data.map((room) => ({
+                    ...room,
+                    room_humidity: room.room_humi, // room_humi를 room_humidity로 매핑
+                    current_patients: parseInt(room.occupied_beds) || 0,
+                }));
+                setRooms(roomsData);
+
+                // 통계 업데이트
+                const totalBeds = roomsData.reduce((sum, room) => sum + room.total_beds, 0);
+                const occupiedBeds = roomsData.reduce((sum, room) => sum + room.occupied_beds, 0);
+                const warningRooms = roomsData.filter((room) => room.room_temp > 26 || room.room_temp < 20).length;
+
+                setStats({
+                    totalBeds: {
+                        value: `${totalBeds}개`,
+                        description: '전체 병상',
+                    },
+                    occupiedBeds: {
+                        value: `${occupiedBeds}개`,
+                        description: '사용 중인 병상',
+                        change: `${((occupiedBeds / totalBeds) * 100).toFixed(1)}%`,
+                    },
+                    alerts: {
+                        value: `${warningRooms}실`,
+                        description: '현재 경고',
+                        change: warningRooms > 0 ? `+${warningRooms}건` : '0건',
+                    },
+                    temperature: {
+                        value: `${warningRooms}실`,
+                        description: '온도 주의',
+                    },
+                });
+            }
             setError(null);
         } catch (err) {
+            console.error('Error fetching rooms:', err);
             setError('병실 정보를 불러오는데 실패했습니다.');
         } finally {
             setLoading(false);
@@ -60,9 +92,29 @@ const RoomManagement = () => {
         try {
             const response = await axios.get(`${API_BASE_URL}/rooms/${roomName}`);
             if (response.data.code === 0) {
-                setSelectedRoom(response.data.data);
-            } else {
-                setError('병실 정보를 불러오는데 실패했습니다.');
+                const roomData = response.data.data;
+
+                // patients 문자열을 배열로 파싱
+                let patients = [];
+                if (roomData.patients) {
+                    // GROUP_CONCAT으로 받은 문자열을 파싱
+                    patients = roomData.patients
+                        .split(',')
+                        .map((item) => {
+                            try {
+                                return JSON.parse(item);
+                            } catch (e) {
+                                return null;
+                            }
+                        })
+                        .filter((p) => p !== null);
+                }
+
+                setSelectedRoom({
+                    ...roomData,
+                    room_humi: roomData.humidity, // 백엔드에서는 humidity로 오지만 프론트에서는 room_humi 사용
+                    patients: patients,
+                });
             }
         } catch (err) {
             console.error('Error fetching room details:', err);
@@ -74,7 +126,29 @@ const RoomManagement = () => {
         try {
             const response = await axios.get(`${API_BASE_URL}/patients/${patientId}`);
             if (response.data.code === 0) {
-                setSelectedPatient(response.data.data);
+                // 환자 정보에 추가 정보 요청
+                const patientData = response.data.data;
+
+                // 필요한 추가 정보가 없으면 API에서 가져오기
+                if (!patientData.patient_height || !patientData.patient_weight || !patientData.patient_status) {
+                    try {
+                        const detailResponse = await axios.get(`${API_BASE_URL}/patients/${patientId}/detail`);
+                        if (detailResponse.data.code === 0) {
+                            setSelectedPatient({
+                                ...patientData,
+                                ...detailResponse.data.data,
+                            });
+                        } else {
+                            setSelectedPatient(patientData);
+                        }
+                    } catch (error) {
+                        console.error('환자 상세 정보 조회 실패:', error);
+                        setSelectedPatient(patientData);
+                    }
+                } else {
+                    setSelectedPatient(patientData);
+                }
+
                 setShowPatientDetailModal(true);
             }
         } catch (error) {
@@ -112,6 +186,16 @@ const RoomManagement = () => {
 
     const handleDetailClick = (roomName) => {
         navigate(`/rooms/${roomName}`);
+    };
+
+    // 핸들러 함수 추가
+    const handlePatientAssignment = async (patientId) => {
+        try {
+            // TODO: 환자 재배정 로직 구현
+            console.log('Patient assignment:', patientId);
+        } catch (err) {
+            console.error('Error assigning patient:', err);
+        }
     };
 
     if (loading) {
@@ -214,7 +298,7 @@ const RoomManagement = () => {
                                         </div>
                                         <div className="info-row">
                                             <Droplets size={16} />
-                                            <span>습도: {room.room_humidity}%</span>
+                                            <span>습도: {room.room_humi}%</span> {/* room_humidity → room_humi */}
                                         </div>
                                         <div className="info-row">
                                             <Users size={16} />
@@ -267,9 +351,17 @@ const RoomManagement = () => {
                                         <h3>습도</h3>
                                         <div className="detail-value">
                                             <Droplets size={20} />
-                                            <span>{selectedRoom.room_humidity}%</span>
+                                            <span>{selectedRoom.room_humi}%</span>
                                         </div>
                                         <p className="detail-reference">기준: 60%</p>
+                                    </div>
+                                    <div className="detail-card">
+                                        <h3>병상 정보</h3>
+                                        <div className="bed-info">
+                                            <p>전체 병상: {selectedRoom.total_beds}개</p>
+                                            <p>사용 중: {selectedRoom.occupied_beds}개</p>
+                                            <p>남은 병상: {selectedRoom.total_beds - selectedRoom.occupied_beds}개</p>
+                                        </div>
                                     </div>
                                     <div className="detail-card">
                                         <h3>상태</h3>
@@ -290,7 +382,9 @@ const RoomManagement = () => {
                                         <thead>
                                             <tr>
                                                 <th>이름</th>
-                                                <th>침대</th>
+                                                <th>침대 번호</th>
+                                                <th>생년월일</th>
+                                                <th>혈액형</th>
                                                 <th>상세정보</th>
                                                 <th>환자 배정</th>
                                             </tr>
@@ -300,7 +394,13 @@ const RoomManagement = () => {
                                                 selectedRoom.patients.map((patient) => (
                                                     <tr key={patient.patient_id}>
                                                         <td>{patient.patient_name}</td>
-                                                        <td>{patient.bed_id}</td>
+                                                        <td>{patient.bed_num}번</td>
+                                                        <td>
+                                                            {patient.patient_birth
+                                                                ? new Date(patient.patient_birth).toLocaleDateString()
+                                                                : '-'}
+                                                        </td>
+                                                        <td>{patient.patient_blood || '-'}</td>
                                                         <td>
                                                             <button
                                                                 className="link-button"
@@ -323,13 +423,18 @@ const RoomManagement = () => {
                                                 ))
                                             ) : (
                                                 <tr>
-                                                    <td colSpan="4" className="empty-message">
+                                                    <td colSpan="6" className="empty-message">
                                                         배정된 환자가 없습니다.
                                                     </td>
                                                 </tr>
                                             )}
                                         </tbody>
                                     </table>
+                                    <div className="room-stats">
+                                        <p>전체 병상: {selectedRoom.total_beds}개</p>
+                                        <p>사용 중: {selectedRoom.occupied_beds}개</p>
+                                        <p>남은 병상: {selectedRoom.total_beds - selectedRoom.occupied_beds}개</p>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -337,7 +442,7 @@ const RoomManagement = () => {
                 )}
             </div>
 
-            {/* 환자 상세정보 모달 추가 */}
+            {/* 환자 상세정보 모달 */}
             {showPatientDetailModal && selectedPatient && (
                 <div className="modal-overlay">
                     <div className="modal-content">
@@ -350,9 +455,9 @@ const RoomManagement = () => {
                         <div className="patient-detail-content">
                             <div className="profile-section">
                                 <div className="profile-image-large">
-                                    {selectedPatient.profile_image ? (
+                                    {selectedPatient.patient_img ? (
                                         <img
-                                            src={selectedPatient.profile_image}
+                                            src={selectedPatient.patient_img}
                                             alt={`${selectedPatient.patient_name}의 프로필`}
                                             className="profile-image"
                                         />
@@ -373,26 +478,64 @@ const RoomManagement = () => {
                                     <span className="detail-value">{selectedPatient.patient_name}</span>
                                 </div>
                                 <div className="detail-row">
-                                    <span className="detail-label">나이:</span>
-                                    <span className="detail-value">{selectedPatient.age}세</span>
+                                    <span className="detail-label">생년월일:</span>
+                                    <span className="detail-value">
+                                        {selectedPatient.patient_birth
+                                            ? new Date(selectedPatient.patient_birth).toLocaleDateString()
+                                            : '-'}
+                                    </span>
                                 </div>
                                 <div className="detail-row">
                                     <span className="detail-label">키:</span>
-                                    <span className="detail-value">{selectedPatient.patient_height}cm</span>
+                                    <span className="detail-value">
+                                        {selectedPatient.patient_height ? `${selectedPatient.patient_height}cm` : '-'}
+                                    </span>
                                 </div>
                                 <div className="detail-row">
                                     <span className="detail-label">몸무게:</span>
-                                    <span className="detail-value">{selectedPatient.patient_weight}kg</span>
+                                    <span className="detail-value">
+                                        {selectedPatient.patient_weight ? `${selectedPatient.patient_weight}kg` : '-'}
+                                    </span>
                                 </div>
                                 <div className="detail-row">
                                     <span className="detail-label">혈액형:</span>
-                                    <span className="detail-value">{selectedPatient.patient_blood}형</span>
+                                    <span className="detail-value">
+                                        {selectedPatient.patient_blood ? `${selectedPatient.patient_blood}형` : '-'}
+                                    </span>
                                 </div>
                                 <div className="detail-row">
                                     <span className="detail-label">침대 번호:</span>
                                     <span className="detail-value">{selectedPatient.bed_id || '-'}</span>
                                 </div>
+                                <div className="detail-row">
+                                    <span className="detail-label">상태:</span>
+                                    <span className="detail-value">
+                                        {selectedPatient.patient_status === 'active'
+                                            ? '입원중'
+                                            : selectedPatient.patient_status === 'discharged'
+                                            ? '퇴원'
+                                            : selectedPatient.patient_status === 'deceased'
+                                            ? '사망'
+                                            : '-'}
+                                    </span>
+                                </div>
+                                <div className="detail-row">
+                                    <span className="detail-label">보호자 ID:</span>
+                                    <span className="detail-value">{selectedPatient.guardian_id || '-'}</span>
+                                </div>
                             </div>
+                            {selectedPatient.patient_memo && (
+                                <div className="patient-memo">
+                                    <h4>메모</h4>
+                                    <p>{selectedPatient.patient_memo}</p>
+                                </div>
+                            )}
+                            {selectedPatient.patient_medic && (
+                                <div className="patient-memo medication">
+                                    <h4>투약 정보</h4>
+                                    <p>{selectedPatient.patient_medic}</p>
+                                </div>
+                            )}
                         </div>
                         <div className="modal-footer">
                             <button className="submit-button" onClick={() => setShowPatientDetailModal(false)}>

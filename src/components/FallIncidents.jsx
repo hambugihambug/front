@@ -33,123 +33,36 @@ const FallIncidents = () => {
     const [error, setError] = useState(null);
     const [statsTab, setStatsTab] = useState('일간');
 
-    // 모든 통계 데이터 및 사고 정보 로드
     useEffect(() => {
         const fetchAllData = async () => {
             try {
                 if (loading) {
-                    setLoading(true); // 초기 로딩
+                    setLoading(true);
                 } else {
-                    setDataLoading(true); // 탭 변경 시 데이터만 로딩
+                    setDataLoading(true);
                 }
-
-                // 기간 파라미터 전달
-                const periodParam = statsTab;
 
                 // 낙상 사고 목록 조회
                 const incidentsResponse = await axios.get(`${API_BASE_URL}/fall-incidents`);
 
-                // 시간대별 통계 데이터 조회 (기간 파라미터 전달)
-                const statsResponse = await axios
-                    .get(`${API_BASE_URL}/fall-incidents/stats`, {
-                        params: { period: periodParam },
-                    })
-                    .catch((err) => {
-                        console.warn('시간대별 통계 API 오류:', err);
-                        // API 오류 시 임시 데이터
-                        return {
-                            data: {
-                                code: 0,
-                                data: [
-                                    { hour: '0시-2시', count: 2 },
-                                    { hour: '3시-5시', count: 3 },
-                                    { hour: '6시-8시', count: 5 },
-                                    { hour: '9시-11시', count: 4 },
-                                    { hour: '12시-14시', count: 7 },
-                                    { hour: '15시-17시', count: 9 },
-                                    { hour: '18시-20시', count: 6 },
-                                    { hour: '21시-23시', count: 4 },
-                                ],
-                            },
-                        };
-                    });
-
-                // 병실별 통계 데이터 조회 (기간 파라미터 전달)
-                const roomStatsResponse = await axios
-                    .get(`${API_BASE_URL}/fall-incidents/room-stats`, {
-                        params: { period: periodParam },
-                    })
-                    .catch((err) => {
-                        console.warn('병실별 통계 API 오류:', err);
-                        // API 오류 시 임시 데이터
-                        return {
-                            data: {
-                                code: 0,
-                                data: [
-                                    { roomName: '101호 (02)', count: 0, percentage: 0 },
-                                    { roomName: '102호 (25)', count: 2, percentage: 67 },
-                                    { roomName: '103호 (12)', count: 1, percentage: 33 },
-                                    { roomName: '104호 (12)', count: 0, percentage: 0 },
-                                ],
-                            },
-                        };
-                    });
-
-                // 요약 통계 데이터 조회
-                const summaryResponse = await axios.get(`${API_BASE_URL}/fall-incidents/summary`).catch((err) => {
-                    console.warn('요약 통계 API 오류:', err);
-                    // API 오류 시 임시 데이터
-                    return {
-                        data: {
-                            code: 0,
-                            data: {
-                                todayCount: 3,
-                                yesterdayCount: 2,
-                                responseTime: '2분 34초',
-                                accuracy: '94.5%',
-                                accuracyChange: '+2.3%',
-                            },
-                        },
-                    };
-                });
+                // 시간대별 통계 데이터 조회
+                const statsResponse = await axios.get(`${API_BASE_URL}/fall-incidents/stats`);
 
                 // 데이터 설정
                 if (incidentsResponse?.data?.code === 0) {
-                    setIncidents(incidentsResponse.data.data || []);
+                    setIncidents(incidentsResponse.data.data);
                 }
 
                 if (statsResponse?.data?.code === 0) {
-                    setHourlyStats(statsResponse.data.data || []);
-                }
+                    setHourlyStats(statsResponse.data.data);
 
-                if (roomStatsResponse?.data?.code === 0) {
-                    const roomData = roomStatsResponse.data.data || [];
-                    console.log('병실별 통계 데이터:', roomData);
+                    // 병실별 통계 계산
+                    const roomData = processRoomStats(incidentsResponse.data.data);
+                    setRoomStats(roomData);
 
-                    // 비율이 없는 경우 계산
-                    const processedData = roomData.map((room) => {
-                        // percentage가 없거나 0인 경우, count에 기반하여 계산
-                        if (room.percentage === undefined || room.percentage === null) {
-                            const totalCount = roomData.reduce((sum, r) => sum + (r.count || 0), 0);
-                            const percentage = totalCount > 0 ? Math.round((room.count / totalCount) * 100) : 0;
-                            return { ...room, percentage };
-                        }
-                        return room;
-                    });
-
-                    setRoomStats(processedData);
-                }
-
-                if (summaryResponse?.data?.code === 0) {
-                    setSummaryStats(
-                        summaryResponse.data.data || {
-                            todayCount: 0,
-                            yesterdayCount: 0,
-                            responseTime: '0분 0초',
-                            accuracy: '0%',
-                            accuracyChange: '0%',
-                        }
-                    );
+                    // 요약 통계 계산
+                    const summary = calculateSummaryStats(incidentsResponse.data.data);
+                    setSummaryStats(summary);
                 }
 
                 setError(null);
@@ -163,7 +76,51 @@ const FallIncidents = () => {
         };
 
         fetchAllData();
-    }, [statsTab]); // 탭이 변경될 때 데이터 다시 로드
+    }, [statsTab]);
+
+    // 병실별 통계 처리 함수
+    const processRoomStats = (incidents) => {
+        const roomCounts = incidents.reduce((acc, incident) => {
+            const roomName = incident.room_name;
+            if (!acc[roomName]) {
+                acc[roomName] = { count: 0, roomName };
+            }
+            if (incident.accident_YN === 'Y') {
+                acc[roomName].count++;
+            }
+            return acc;
+        }, {});
+
+        const roomStats = Object.values(roomCounts);
+        const totalIncidents = roomStats.reduce((sum, room) => sum + room.count, 0);
+
+        return roomStats.map((room) => ({
+            ...room,
+            percentage: totalIncidents > 0 ? Math.round((room.count / totalIncidents) * 100) : 0,
+        }));
+    };
+
+    // 요약 통계 계산 함수
+    const calculateSummaryStats = (incidents) => {
+        const today = new Date().toDateString();
+        const yesterday = new Date(Date.now() - 86400000).toDateString();
+
+        const todayIncidents = incidents.filter(
+            (i) => new Date(i.accident_date).toDateString() === today && i.accident_YN === 'Y'
+        ).length;
+
+        const yesterdayIncidents = incidents.filter(
+            (i) => new Date(i.accident_date).toDateString() === yesterday && i.accident_YN === 'Y'
+        ).length;
+
+        return {
+            todayCount: todayIncidents,
+            yesterdayCount: yesterdayIncidents,
+            responseTime: '2분 34초', // 임시 데이터
+            accuracy: '95%', // 임시 데이터
+            accuracyChange: '+2.3%', // 임시 데이터
+        };
+    };
 
     // 시간대별 통계에서 최대값 계산
     const maxHourlyCount = useMemo(() => {
@@ -447,6 +404,7 @@ const FallIncidents = () => {
                                         <th>환자 정보</th>
                                         <th>발생 일시</th>
                                         <th>사고 여부</th>
+                                        <th>병실</th>
                                         <th>상세정보</th>
                                     </tr>
                                 </thead>
@@ -461,11 +419,14 @@ const FallIncidents = () => {
                                             <td>
                                                 <span
                                                     className={`status-badge ${
-                                                        incident.accident_YN === 1 ? '높음' : '정상'
+                                                        incident.accident_YN === 'Y' ? '높음' : '정상'
                                                     }`}
                                                 >
-                                                    {incident.accident_YN === 1 ? '발생' : '미발생'}
+                                                    {incident.accident_YN === 'Y' ? '발생' : '미발생'}
                                                 </span>
+                                            </td>
+                                            <td>
+                                                {incident.room_name} ({incident.bed_num})
                                             </td>
                                             <td>
                                                 <button className="link-button">상세정보</button>
