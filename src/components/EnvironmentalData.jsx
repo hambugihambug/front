@@ -161,18 +161,20 @@ const EnvironmentalData = () => {
                                     />
                                     <span className="room-name">{item.roomName}호</span>
                                 </div>
-                                <div className="room-item-metrics">
-                                    <div className="room-metric">
-                                        <Thermometer size={14} className="metric-icon" />
-                                        <span className="metric-value">{item.temperature}°C</span>
+                                <div className="room-item-details-group">
+                                    <div className="room-item-metrics">
+                                        <div className="room-metric">
+                                            <Thermometer size={14} className="metric-icon" />
+                                            <span className="metric-value">{item.temperature}°C</span>
+                                        </div>
+                                        <div className="room-metric">
+                                            <Droplets size={14} className="metric-icon" />
+                                            <span className="metric-value">{item.humidity}%</span>
+                                        </div>
                                     </div>
-                                    <div className="room-metric">
-                                        <Droplets size={14} className="metric-icon" />
-                                        <span className="metric-value">{item.humidity}%</span>
+                                    <div className="room-occupancy">
+                                        {item.occupiedBeds}/{item.totalBeds}
                                     </div>
-                                </div>
-                                <div className="room-occupancy">
-                                    {item.occupiedBeds}/{item.totalBeds} 병상 사용중
                                 </div>
                             </li>
                         ))}

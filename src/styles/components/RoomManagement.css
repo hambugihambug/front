@@ -93,7 +93,10 @@
 .section-header {
     display: flex;
     align-items: center;
-    margin-bottom: 15px;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 .section-header h2 {
@@ -108,11 +111,11 @@
 }
 
 .action-button {
-    padding: 8px 16px;
+    padding: 8px 20px !important;
     background-color: var(--primary-color, #4a55a2);
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     font-size: 14px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -120,6 +123,12 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
+    line-height: 1;
+    white-space: nowrap;
+    height: auto;
+    min-height: 36px;
+    box-sizing: border-box;
+    min-width: max-content;
 }
 
 .action-button:hover {
@@ -654,4 +663,16 @@
 
 .submit-button:hover {
     background-color: #0d60c9;
+}
+
+.action-button span,
+.room-detail-section .section-header .action-button span {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.action-button svg,
+.room-detail-section .section-header .action-button svg {
+    flex-shrink: 0;
+    vertical-align: middle;
 }
