@@ -93,27 +93,10 @@ const RoomManagement = () => {
             const response = await axios.get(`${API_BASE_URL}/rooms/${roomName}`);
             if (response.data.code === 0) {
                 const roomData = response.data.data;
-
-                // patients 문자열을 배열로 파싱
-                let patients = [];
-                if (roomData.patients) {
-                    // GROUP_CONCAT으로 받은 문자열을 파싱
-                    patients = roomData.patients
-                        .split(',')
-                        .map((item) => {
-                            try {
-                                return JSON.parse(item);
-                            } catch (e) {
-                                return null;
-                            }
-                        })
-                        .filter((p) => p !== null);
-                }
-
+                // 이미 백엔드에서 JSON 파싱이 완료된 데이터가 옴
                 setSelectedRoom({
                     ...roomData,
-                    room_humi: roomData.humidity, // 백엔드에서는 humidity로 오지만 프론트에서는 room_humi 사용
-                    patients: patients,
+                    patients: roomData.patients || [],
                 });
             }
         } catch (err) {
@@ -382,7 +365,7 @@ const RoomManagement = () => {
                                         <thead>
                                             <tr>
                                                 <th>이름</th>
-                                                <th>침대 번호</th>
+                                                <th>병상</th>
                                                 <th>생년월일</th>
                                                 <th>혈액형</th>
                                                 <th>상세정보</th>
@@ -394,7 +377,7 @@ const RoomManagement = () => {
                                                 selectedRoom.patients.map((patient) => (
                                                     <tr key={patient.patient_id}>
                                                         <td>{patient.patient_name}</td>
-                                                        <td>{patient.bed_num}번</td>
+                                                        <td>{patient.bed_num}</td>
                                                         <td>
                                                             {patient.patient_birth
                                                                 ? new Date(patient.patient_birth).toLocaleDateString()
@@ -430,11 +413,6 @@ const RoomManagement = () => {
                                             )}
                                         </tbody>
                                     </table>
-                                    <div className="room-stats">
-                                        <p>전체 병상: {selectedRoom.total_beds}개</p>
-                                        <p>사용 중: {selectedRoom.occupied_beds}개</p>
-                                        <p>남은 병상: {selectedRoom.total_beds - selectedRoom.occupied_beds}개</p>
-                                    </div>
                                 </div>
                             )}
                         </div>
