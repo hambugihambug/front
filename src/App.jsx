@@ -11,6 +11,7 @@ import Notifications from './components/Notifications';
 import RoomDetail from './components/RoomDetail';
 import Schedule from './components/Schedule';
 import Home from './components/Home';
+import PatientDetail from './components/PatientDetail';
 import './App.css';
 
 function App() {
@@ -42,6 +43,7 @@ function App() {
                         <Route path="/rooms" element={<RoomManagement />} />
                         <Route path="/rooms/:roomName" element={<RoomDetail />} />
                         <Route path="/patients" element={<PatientManagement />} />
+                        <Route path="/patients/:id" element={<PatientDetail />} />
                         <Route path="/beds" element={<BedManagement />} />
                         <Route path="/fall-incidents" element={<FallIncidents />} />
                         <Route path="/environmental" element={<EnvironmentalData />} />
