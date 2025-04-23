@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
-import { Thermometer, Droplets, Clock, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Thermometer, Droplets, Clock, AlertTriangle, CheckCircle, Bed } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import '../styles/components/EnvironmentalData.css';
 
@@ -11,7 +11,7 @@ const EnvironmentalData = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [floors, setFloors] = useState([]);
-    const [selectedFloor, setSelectedFloor] = useState('all');
+    const [selectedFloor, setSelectedFloor] = useState('1');
     const [selectedRoomId, setSelectedRoomId] = useState(null);
     const [metric, setMetric] = useState('temperature');
     const [historyData, setHistoryData] = useState([]);
@@ -41,8 +41,21 @@ const EnvironmentalData = () => {
                 });
                 const maxFloor = Math.max(...floorNums);
                 setFloors(Array.from({ length: maxFloor }, (_, i) => (i + 1).toString()));
-                setSelectedFloor('all');
-                if (data.length > 0) setSelectedRoomId(data[0].roomId);
+
+                // Set initial selected room ID based on the default floor ('1')
+                if (data.length > 0 && !selectedRoomId) {
+                    // Check if selectedRoomId is null
+                    const firstFloorRooms = data.filter((room) => {
+                        const num = parseInt(room.roomName.replace(/[^0-9]/g, ''), 10);
+                        return !isNaN(num) && Math.floor(num / 100).toString() === '1'; // Default to floor '1'
+                    });
+                    if (firstFloorRooms.length > 0) {
+                        setSelectedRoomId(firstFloorRooms[0].roomId);
+                    } else if (data.length > 0) {
+                        // Fallback: select the very first room if floor 1 has no rooms
+                        setSelectedRoomId(data[0].roomId);
+                    }
+                }
                 setError(null);
             } catch (err) {
                 console.error(err);
@@ -101,26 +114,74 @@ const EnvironmentalData = () => {
         fetchHistory();
     }, [selectedRoomId]);
 
+    // 선택된 층 또는 상태(roomName 기반 또는 status 기반)만 필터링
+    const filteredRooms = useMemo(() => {
+        if (!roomsData || roomsData.length === 0) return []; // 데이터 없으면 빈 배열
+
+        if (selectedFloor === 'all') {
+            return roomsData; // 모든 층
+        }
+
+        if (selectedFloor === 'warning') {
+            // '경고' 상태인 병실만 필터링
+            return roomsData.filter((item) => item.status === '경고');
+        }
+
+        // 특정 층 필터링 (기존 로직)
+        return roomsData.filter((item) => {
+            const num = parseInt(item.roomName.replace(/[^0-9]/g, ''), 10);
+            if (isNaN(num)) return false;
+            return Math.floor(num / 100).toString() === selectedFloor;
+        });
+    }, [roomsData, selectedFloor]);
+
     if (loading) return <div className="loading-container">로딩 중...</div>;
     if (error) return <div className="error-message">{error}</div>;
 
     const selectedRoom = roomsData.find((r) => r.roomId === selectedRoomId);
-    if (!selectedRoom) return <div className="error-message">병실을 찾을 수 없습니다.</div>;
+    if (!selectedRoom && roomsData.length > 0) {
+        // Attempt to select the first room of the filtered list if available
+        if (filteredRooms.length > 0 && !selectedRoomId) {
+            setSelectedRoomId(filteredRooms[0].roomId);
+            // This state update will trigger a re-render, so maybe return loading or placeholder?
+            return <div className="loading-container">병실 정보 로딩 중...</div>;
+        }
+        // If still no selected room (e.g., filter result is empty), show message
+        else if (!selectedRoomId) {
+            return (
+                <div className="main-detail">
+                    <div className="error-message">사이드바에서 병실을 선택하세요.</div>
+                </div>
+            );
+        }
+        // If selectedRoomId exists but room not found (edge case), show error
+        else {
+            return (
+                <div className="main-detail">
+                    <div className="error-message">선택된 병실 정보를 찾을 수 없습니다.</div>
+                </div>
+            );
+        }
+    }
+    // Handle case where roomsData is initially empty or fetch failed silently
+    else if (!selectedRoom && roomsData.length === 0 && !loading) {
+        return (
+            <div className="main-detail">
+                <div className="error-message">표시할 병실 데이터가 없습니다.</div>
+            </div>
+        );
+    }
+    // Add a check for selectedRoom again after potential update or if initial was null
+    else if (!selectedRoom) {
+        // It might still be loading the details for the first selected room
+        return <div className="loading-container">병실 상세 정보 로딩 중...</div>;
+    }
 
     const currentValue = selectedRoom[metric];
     const statusColor = selectedRoom.status === '경고' ? 'warning' : 'normal';
     // 레벨바 범위
     const range = metric === 'temperature' ? { min: 18, max: 32 } : { min: 20, max: 80 };
     const widthPercent = ((currentValue - range.min) / (range.max - range.min)) * 100;
-
-    // 선택된 층(roomName 기반)만 필터링
-    const filteredRooms =
-        selectedFloor === 'all'
-            ? roomsData
-            : roomsData.filter((item) => {
-                  const num = parseInt(item.roomName.replace(/[^0-9]/g, ''), 10);
-                  return Math.floor(num / 100).toString() === selectedFloor;
-              });
 
     return (
         <div className="environmental-data-page">
@@ -139,6 +200,7 @@ const EnvironmentalData = () => {
                             className="floor-select"
                         >
                             <option value="all">모든 층</option>
+                            <option value="warning">경고</option>
                             {floors.map((floor) => (
                                 <option key={floor} value={floor}>
                                     {floor}층
@@ -147,37 +209,50 @@ const EnvironmentalData = () => {
                         </select>
                     </div>
                     <ul className="room-list">
-                        {filteredRooms.map((item) => (
-                            <li
-                                key={item.roomId}
-                                className={`room-item ${item.roomId === selectedRoomId ? 'active' : ''}`}
-                                onClick={() => setSelectedRoomId(item.roomId)}
-                            >
-                                <div className="room-item-header">
-                                    <span
-                                        className={`status-dot ${
-                                            item.status === '경고' ? 'warning-dot' : 'normal-dot'
-                                        }`}
-                                    />
-                                    <span className="room-name">{item.roomName}호</span>
-                                </div>
-                                <div className="room-item-details-group">
-                                    <div className="room-item-metrics">
-                                        <div className="room-metric">
-                                            <Thermometer size={14} className="metric-icon" />
-                                            <span className="metric-value">{item.temperature}°C</span>
-                                        </div>
-                                        <div className="room-metric">
-                                            <Droplets size={14} className="metric-icon" />
-                                            <span className="metric-value">{item.humidity}%</span>
-                                        </div>
-                                    </div>
-                                    <div className="room-occupancy">
-                                        {item.occupiedBeds}/{item.totalBeds}
-                                    </div>
-                                </div>
+                        {filteredRooms.length === 0 ? (
+                            <li className="room-list-placeholder">
+                                {selectedFloor === 'all'
+                                    ? '표시할 병실이 없습니다.'
+                                    : selectedFloor === 'warning'
+                                    ? '경고 상태인 병실이 없습니다.'
+                                    : `${selectedFloor}층에 병실이 없습니다.`}
                             </li>
-                        ))}
+                        ) : (
+                            filteredRooms.map((item) => (
+                                <li
+                                    key={item.roomId}
+                                    className={`room-item ${item.roomId === selectedRoomId ? 'active' : ''}`}
+                                    onClick={() => setSelectedRoomId(item.roomId)}
+                                >
+                                    <div className="room-item-header">
+                                        <span
+                                            className={`status-dot ${
+                                                item.status === '경고' ? 'warning-dot' : 'normal-dot'
+                                            }`}
+                                        />
+                                        <span className="room-name">{item.roomName}호</span>
+                                    </div>
+                                    <div className="room-item-details-group">
+                                        <div className="room-item-metrics">
+                                            <div className="room-metric">
+                                                <Thermometer size={14} className="metric-icon" />
+                                                <span className="metric-value">{item.temperature}°C</span>
+                                            </div>
+                                            <div className="room-metric">
+                                                <Droplets size={14} className="metric-icon" />
+                                                <span className="metric-value">{item.humidity}%</span>
+                                            </div>
+                                        </div>
+                                        <div className="room-occupancy">
+                                            <Bed size={14} className="metric-icon" />
+                                            <span className="metric-value">
+                                                {item.occupiedBeds}/{item.totalBeds}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                            ))
+                        )}
                     </ul>
                 </div>
 
