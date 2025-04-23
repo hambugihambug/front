@@ -36,11 +36,9 @@ const initialFormState = {
     patient_blood: '',
     patient_img: null,
     patient_memo: '',
-    patient_medic: '',
-    patient_status: 'active',
+    patient_status: '무위험군', // 기본값 수정
     guardian_id: '',
     bed_id: '',
-    medications: [],
 };
 
 const PatientManagement = () => {
@@ -133,10 +131,9 @@ const PatientManagement = () => {
 
             const patientData = {
                 ...newPatient,
-                patient_status: 'active',
+                patient_status: newPatient.patient_status || '무위험군', // 'active' 대신 '무위험군' 사용
                 guardian_id: newPatient.guardian_id || null,
                 bed_id: newPatient.bed_id || null,
-                medications: [], // 약물 정보 추가
             };
 
             const response = await axios.post(`${API_BASE_URL}/patients`, patientData);
@@ -318,6 +315,19 @@ const PatientManagement = () => {
         }
     };
 
+    const getStatusClass = (status) => {
+        switch (status) {
+            case '고위험군':
+                return 'high-risk';
+            case '저위험군':
+                return 'low-risk';
+            case '무위험군':
+                return 'no-risk';
+            default:
+                return '';
+        }
+    };
+
     if (loading) {
         return (
             <div className="dashboard-container">
@@ -478,9 +488,9 @@ const PatientManagement = () => {
                                         value={newPatient.patient_status}
                                         onChange={handleInputChange}
                                     >
-                                        <option value="active">입원 중</option>
-                                        <option value="discharged">퇴원</option>
-                                        <option value="deceased">사망</option>
+                                        <option value="고위험군">고위험군</option>
+                                        <option value="저위험군">저위험군</option>
+                                        <option value="무위험군">무위험군</option>
                                     </select>
                                 </div>
                                 <div className="form-group">
@@ -778,9 +788,9 @@ const PatientManagement = () => {
                                             setEditingPatient({ ...editingPatient, patient_status: e.target.value })
                                         }
                                     >
-                                        <option value="active">입원 중</option>
-                                        <option value="discharged">퇴원</option>
-                                        <option value="deceased">사망</option>
+                                        <option value="고위험군">고위험군</option>
+                                        <option value="저위험군">저위험군</option>
+                                        <option value="무위험군">무위험군</option>
                                     </select>
                                 </div>
                                 <div className="form-group">
@@ -915,18 +925,8 @@ const PatientManagement = () => {
                                     </td>
                                     <td>{patient.room_name ? `${patient.room_name}호 / ${patient.bed_num}번` : '-'}</td>
                                     <td>
-                                        <span
-                                            className={`status-badge ${
-                                                patient.patient_status === 'active' ? 'active' : 'inactive'
-                                            }`}
-                                        >
-                                            {patient.patient_status === 'active'
-                                                ? '입원중'
-                                                : patient.patient_status === 'discharged'
-                                                ? '퇴원'
-                                                : patient.patient_status === 'deceased'
-                                                ? '사망'
-                                                : '기타'}
+                                        <span className={`status-badge ${getStatusClass(patient.patient_status)}`}>
+                                            {patient.patient_status}
                                         </span>
                                     </td>
                                     <td>

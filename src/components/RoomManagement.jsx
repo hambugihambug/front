@@ -339,14 +339,6 @@ const RoomManagement = () => {
                                         <p className="detail-reference">기준: 60%</p>
                                     </div>
                                     <div className="detail-card">
-                                        <h3>병상 정보</h3>
-                                        <div className="bed-info">
-                                            <p>전체 병상: {selectedRoom.total_beds}개</p>
-                                            <p>사용 중: {selectedRoom.occupied_beds}개</p>
-                                            <p>남은 병상: {selectedRoom.total_beds - selectedRoom.occupied_beds}개</p>
-                                        </div>
-                                    </div>
-                                    <div className="detail-card">
                                         <h3>상태</h3>
                                         <div
                                             className={`status-indicator ${getRoomStatus(

@@ -159,7 +159,7 @@ const RoomDetail = () => {
                                 <thead>
                                     <tr>
                                         <th>환자명</th>
-                                        <th>나이</th>
+                                        <th>생년월일</th>
                                         <th>혈액형</th>
                                         <th>침상 번호</th>
                                         <th>상태</th>
@@ -169,7 +169,7 @@ const RoomDetail = () => {
                                     {room.patients.map((patient) => (
                                         <tr key={patient.patient_id}>
                                             <td>{patient.patient_name}</td>
-                                            <td>{patient.patient_age}세</td>
+                                            <td>{patient.patient_birth}</td>
                                             <td>{patient.patient_blood}형</td>
                                             <td>{patient.bed_id}</td>
                                             <td>
