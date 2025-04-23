@@ -1,0 +1,73 @@
+.patient-detail-container {
+    @apply p-6 bg-gray-100 min-h-screen;
+}
+
+.detail-header {
+    @apply flex items-center justify-between mb-6;
+}
+
+.back-button {
+    @apply flex items-center text-gray-600 hover:text-gray-800 transition;
+}
+
+.medical-record {
+    @apply grid grid-cols-1 lg:grid-cols-3 gap-6; /* 3등분 레이아웃 */
+}
+
+.left-panel {
+    @apply bg-white p-6 rounded-lg shadow-md col-span-1; /* 1/3 차지 */
+}
+
+.right-panel {
+    @apply bg-white p-6 rounded-lg shadow-md col-span-2; /* 2/3 차지 */
+}
+
+.patient-basic-info,
+.vital-signs,
+.hospital-info,
+.guardian-info {
+    @apply mb-6;
+}
+
+.patient-basic-info h3,
+.vital-signs h3,
+.hospital-info h3,
+.guardian-info h3 {
+    @apply text-lg font-semibold mb-4;
+}
+
+.info-row {
+    @apply flex justify-between mb-2 text-gray-700;
+}
+
+.body-diagram {
+    @apply mb-6;
+}
+
+.body-image {
+    @apply relative;
+}
+
+.body-image img {
+    @apply w-full rounded-lg;
+}
+
+.clickable-areas .symptom-marker {
+    @apply absolute w-4 h-4 bg-red-500 rounded-full cursor-pointer;
+}
+
+.status {
+    @apply font-semibold;
+}
+
+.status.occupied {
+    @apply text-blue-500;
+}
+
+.status.available {
+    @apply text-green-500;
+}
+
+.status.maintenance {
+    @apply text-yellow-500;
+}

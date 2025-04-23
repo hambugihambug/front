@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { User, ArrowLeft } from 'lucide-react';
+import '../styles/components/PatientDetail.css'; // CSS 파일 경로를 맞춰주세요
 
 const API_BASE_URL = 'http://localhost:3000';
 
