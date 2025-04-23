@@ -1,0 +1,323 @@
+/* DashboardPage CSS */
+.dashboard-page {
+    padding: 16px;
+    background-color: #f8fafc;
+    min-height: 100vh;
+}
+
+.dashboard-header {
+    margin-bottom: 32px;
+}
+
+.dashboard-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #1e293b;
+}
+
+.dashboard-subtitle {
+    font-size: 14px;
+    color: #64748b;
+}
+
+/* Alert Banner */
+.alert-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #fee2e2;
+    background-color: #fef2f2;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+}
+.alert-banner .alert-icon {
+    font-size: 20px;
+    color: #dc2626;
+}
+.alert-banner .alert-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #dc2626;
+}
+.alert-banner .alert-text {
+    flex: 1;
+    color: #991b1b;
+}
+.alert-banner .alert-action {
+    background: none;
+    border: none;
+    color: #dc2626;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+/* Stats Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+}
+@media (min-width: 640px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (min-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.stat-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.stat-card .stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+.stat-card .stat-title {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+}
+.stat-card .stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+.stat-card .stat-change {
+    font-size: 12px;
+    color: #dc2626;
+}
+.stat-card .stat-change.positive {
+    color: #16a34a;
+}
+
+/* Monitoring Section */
+.monitoring-section {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    padding: 24px;
+    margin-bottom: 32px;
+}
+.monitoring-section .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 16px;
+}
+.room-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+.room-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+.room-card:hover {
+    transform: translateY(-2px);
+}
+.room-card .room-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+.room-card .room-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+}
+.room-card .status-badge {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+.status-badge.정상 {
+    background-color: #dcfce7;
+    color: #166534;
+}
+.status-badge.중간 {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+.status-badge.높음 {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.room-card .room-info {
+    font-size: 14px;
+    color: #64748b;
+}
+.room-card .room-info .info-row {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Chart Section reuse RiskDistributionChart styles */
+
+/* Dashboard Layout */
+.main-grid {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    gap: 24px;
+}
+.main-left,
+.main-right {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* 오늘의 활동 & 바로가기 */
+.activity-section,
+.shortcut-section {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    padding: 24px;
+}
+.activity-section .section-title,
+.shortcut-section .section-title {
+    margin-bottom: 16px;
+}
+.shortcut-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+/* Floor Tabs */
+.floor-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+.floor-tab {
+    padding: 8px 16px;
+    background-color: #f3f4f6;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #4b5563;
+    font-weight: 500;
+    transition: background-color 0.2s, color 0.2s;
+}
+.floor-tab:hover {
+    background-color: #e5e7eb;
+}
+.floor-tab.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Pagination in RoomGrid */
+.pagination-controls button {
+    padding: 4px 8px;
+    background: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+.pagination-controls button:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+/* Override UI Card background to white */
+.dashboard-page .bg-card {
+    background-color: #fff !important;
+}
+
+/* 개선된 버튼 스타일 */
+.dashboard-page .btn,
+.dashboard-page .btn-small,
+.dashboard-page .floor-tab,
+.dashboard-page .tab {
+    background-color: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    color: #374151;
+    font-weight: 500;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+.dashboard-page .btn:hover,
+.dashboard-page .btn-small:hover,
+.dashboard-page .floor-tab:hover,
+.dashboard-page .tab:hover {
+    background-color: #f3f4f6;
+}
+
+/* 활성 탭 / 버튼 */
+.dashboard-page .tab.active,
+.dashboard-page .floor-tab.active {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+}
+
+/* 작은 버튼 padding 조정 */
+.dashboard-page .btn-small {
+    padding: 4px 8px;
+    font-size: 0.875rem;
+}
+
+/* Chart tabs styling */
+.chart-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px; /* summary 위 간격 */
+}
+.tab {
+    font-size: 0.75rem; /* 버튼 크기 축소 */
+    padding: 4px 8px;
+}
+
+/* Falls summary spacing */
+.falls-summary {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+/* ActiveAlerts expand btn transparent override */
+.expand-btn {
+    background: transparent !important;
+    border: none !important;
+    padding: 4px;
+}
+
+/* RoomGrid single card center */
+.room-grid.single {
+    justify-items: center;
+}
+.room-grid.single .room-card {
+    max-width: 280px;
+    width: 100%;
+}

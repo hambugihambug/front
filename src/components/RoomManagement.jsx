@@ -48,38 +48,43 @@ const RoomManagement = () => {
             if (response.data.code === 0) {
                 const roomsData = response.data.data.map((room) => ({
                     ...room,
-                    room_humidity: room.room_humi, // room_humi를 room_humidity로 매핑
+                    room_humidity: room.room_humi,
                     current_patients: parseInt(room.occupied_beds) || 0,
+                    total_beds: parseInt(room.total_beds) || 0,
+                    occupied_beds: parseInt(room.occupied_beds) || 0,
                 }));
                 setRooms(roomsData);
 
-                // 통계 업데이트
-                const totalBeds = roomsData.reduce((sum, room) => sum + room.total_beds, 0);
-                const occupiedBeds = roomsData.reduce((sum, room) => sum + room.occupied_beds, 0);
+                const totalBeds = roomsData.reduce((sum, room) => sum + (Number(room.total_beds) || 0), 0);
+                const occupiedBeds = roomsData.reduce((sum, room) => sum + (Number(room.occupied_beds) || 0), 0);
                 const warningRooms = roomsData.filter((room) => room.room_temp > 26 || room.room_temp < 20).length;
 
-                setStats({
+                const percentage = totalBeds > 0 ? ((occupiedBeds / totalBeds) * 100).toFixed(1) : '0.0';
+
+                setStats((prevStats) => ({
+                    ...prevStats,
                     totalBeds: {
+                        ...prevStats.totalBeds,
                         value: `${totalBeds}개`,
-                        description: '전체 병상',
                     },
                     occupiedBeds: {
+                        ...prevStats.occupiedBeds,
                         value: `${occupiedBeds}개`,
-                        description: '사용 중인 병상',
-                        change: `${((occupiedBeds / totalBeds) * 100).toFixed(1)}%`,
+                        change: `${percentage}%`,
                     },
                     alerts: {
+                        ...prevStats.alerts,
                         value: `${warningRooms}실`,
-                        description: '현재 경고',
                         change: warningRooms > 0 ? `+${warningRooms}건` : '0건',
                     },
                     temperature: {
+                        ...prevStats.temperature,
                         value: `${warningRooms}실`,
-                        description: '온도 주의',
                     },
-                });
+                }));
+            } else {
+                setError(response.data.message || '병실 정보를 불러오는데 실패했습니다.');
             }
-            setError(null);
         } catch (err) {
             console.error('Error fetching rooms:', err);
             setError('병실 정보를 불러오는데 실패했습니다.');
@@ -93,7 +98,6 @@ const RoomManagement = () => {
             const response = await axios.get(`${API_BASE_URL}/rooms/${roomName}`);
             if (response.data.code === 0) {
                 const roomData = response.data.data;
-                // 이미 백엔드에서 JSON 파싱이 완료된 데이터가 옴
                 setSelectedRoom({
                     ...roomData,
                     patients: roomData.patients || [],
@@ -109,10 +113,8 @@ const RoomManagement = () => {
         try {
             const response = await axios.get(`${API_BASE_URL}/patients/${patientId}`);
             if (response.data.code === 0) {
-                // 환자 정보에 추가 정보 요청
                 const patientData = response.data.data;
 
-                // 필요한 추가 정보가 없으면 API에서 가져오기
                 if (!patientData.patient_height || !patientData.patient_weight || !patientData.patient_status) {
                     try {
                         const detailResponse = await axios.get(`${API_BASE_URL}/patients/${patientId}/detail`);

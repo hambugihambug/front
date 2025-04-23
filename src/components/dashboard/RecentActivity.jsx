@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Shield, UserPlus, AlertTriangle } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Skeleton } from '../ui/skeleton';
@@ -52,6 +53,7 @@ const mockActivities = [
 ];
 
 export default function RecentActivity() {
+    const navigate = useNavigate();
     const [activities] = useState(mockActivities);
     const [isLoading] = useState(false);
 
@@ -147,7 +149,7 @@ export default function RecentActivity() {
                 )}
             </div>
             <div className="mt-6">
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full hover:bg-gray-100" onClick={() => navigate('/notifications')}>
                     모두 보기
                 </Button>
             </div>

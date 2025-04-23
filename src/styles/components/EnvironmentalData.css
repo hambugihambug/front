@@ -189,8 +189,9 @@
 
 .room-item {
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
+    gap: 8px;
     padding: 10px;
     border-radius: 6px;
     cursor: pointer;
@@ -222,7 +223,6 @@
 }
 
 .room-name {
-    flex: 1;
     font-weight: 500;
 }
 
@@ -475,27 +475,37 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 8px;
+    flex-shrink: 0;
+}
+
+.room-item-details-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
 }
 
 .room-item-metrics {
     display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 4px;
+    gap: 5px;
 }
 
 .room-metric {
     display: flex;
     align-items: center;
     gap: 4px;
+    font-size: 13px;
+    color: #555;
 }
 
 .metric-icon {
-    color: #666;
+    color: #888;
 }
 
-.metric-value {
-    font-size: 14px;
-    color: #333;
+.room-occupancy {
+    font-size: 13px;
+    color: #555;
+    white-space: nowrap;
+    text-align: right;
+    flex-shrink: 0;
 }

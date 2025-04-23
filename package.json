@@ -14,8 +14,7 @@
         "@emotion/styled": "^11.14.0",
         "@mui/icons-material": "^7.0.2",
         "@mui/material": "^7.0.2",
-        "@react-three/drei": "^10.0.6",
-        "@react-three/fiber": "^9.1.2",
+        "@radix-ui/react-slot": "^1.2.0",
         "axios": "^1.8.4",
         "chart.js": "^4.4.9",
         "class-variance-authority": "^0.7.0",
@@ -29,7 +28,6 @@
         "recharts": "^2.12.2",
         "tailwind-merge": "^2.0.0",
         "tailwindcss-animate": "^1.0.7",
-        "three": "^0.175.0",
         "wouter": "^2.12.1"
     },
     "devDependencies": {
