@@ -1,85 +1,96 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { Skeleton } from '../ui/skeleton';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
-// 임시 데이터
-const mockWeekData = [
-    { name: '월', fallsDetected: 2 },
-    { name: '화', fallsDetected: 1 },
-    { name: '수', fallsDetected: 3 },
-    { name: '목', fallsDetected: 0 },
-    { name: '금', fallsDetected: 2 },
-    { name: '토', fallsDetected: 1 },
-    { name: '일', fallsDetected: 0 },
-];
-
-const mockMonthData = [
-    { name: '1주', fallsDetected: 8 },
-    { name: '2주', fallsDetected: 6 },
-    { name: '3주', fallsDetected: 10 },
-    { name: '4주', fallsDetected: 9 },
-];
-
-const mockYearData = [
-    { name: '1월', fallsDetected: 30 },
-    { name: '2월', fallsDetected: 28 },
-    { name: '3월', fallsDetected: 32 },
-    { name: '4월', fallsDetected: 25 },
-    { name: '5월', fallsDetected: 22 },
-    { name: '6월', fallsDetected: 18 },
-    { name: '7월', fallsDetected: 20 },
-    { name: '8월', fallsDetected: 15 },
-    { name: '9월', fallsDetected: 22 },
-    { name: '10월', fallsDetected: 26 },
-    { name: '11월', fallsDetected: 30 },
-    { name: '12월', fallsDetected: 32 },
-];
+const API_BASE_URL = 'http://localhost:3001';
 
 export default function FallsChart() {
-    const [timeRange, setTimeRange] = useState('year');
-    const [isLoading] = useState(false); // 로딩 상태 관리
+    const [timeRange, setTimeRange] = useState('daily');
+    const [chartData, setChartData] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // 시간 범위에 따라 다른 데이터 사용
-    const getData = (range) => {
-        switch (range) {
-            case 'week':
-                return mockWeekData;
-            case 'month':
-                return mockMonthData;
-            case 'year':
-            default:
-                return mockYearData;
+    useEffect(() => {
+        async function loadChart() {
+            setIsLoading(true);
+            try {
+                // fetch all incidents
+                const res = await fetch(`${API_BASE_URL}/fall-incidents`);
+                const json = await res.json();
+                const all = json.data || [];
+                let data = [];
+                const now = new Date();
+                if (timeRange === 'daily') {
+                    // hourly stats via API
+                    const r = await fetch(`${API_BASE_URL}/fall-incidents/stats`);
+                    const js = await r.json();
+                    data = js.data.map(d => ({ name: `${d.hour}`, fallsDetected: d.count }));
+                } else if (timeRange === 'weekly') {
+                    // fixed order Mon-Sun
+                    const days = ['월','화','수','목','금','토','일'];
+                    const counts = days.reduce((obj, day) => { obj[day] = 0; return obj; }, {});
+                    all.filter(f => f.accident_YN === "Y").forEach(f => {
+                        const d = new Date(f.accident_date);
+                        const names = ['일','월','화','수','목','금','토'];
+                        const key = names[d.getDay()];
+                        if (counts[key] !== undefined) counts[key]++;
+                    });
+                    data = days.map(name => ({ name, fallsDetected: counts[name] }));
+                } else if (timeRange === 'monthly') {
+                    // group by week numbers for current month
+                    const month = now.getMonth(), year=now.getFullYear();
+                    const daysInMonth = new Date(year, month+1,0).getDate();
+                    const weeks = Math.ceil(daysInMonth/7);
+                    const counts = {};
+                    for (let w=1;w<=weeks;w++) counts[`주${w}`]=0;
+                    all.filter(f=>f.accident_YN==="Y").forEach(f=>{
+                        const d = new Date(f.accident_date);
+                        if (d.getMonth()===month && d.getFullYear()===year) {
+                            const weekNum = Math.floor((d.getDate()-1)/7)+1;
+                            counts[`주${weekNum}`]++;
+                        }
+                    });
+                    data = Object.entries(counts).map(([name, fallsDetected])=>({ name, fallsDetected }));
+                }
+                console.log('FallsChart 데이터:', data);
+                setChartData(data);
+            } catch (e) {
+                console.error(e);
+                setError(e);
+            } finally {
+                setIsLoading(false);
+            }
         }
-    };
-
-    const data = getData(timeRange);
+        loadChart();
+    }, [timeRange]);
 
     return (
         <Card className="overflow-hidden">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardHeader className="p-4">
                 <CardTitle className="text-lg font-medium">기간별 낙상 현황</CardTitle>
-                <Select value={timeRange} onValueChange={setTimeRange}>
-                    <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="기간 선택" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="week">이번 주</SelectItem>
-                        <SelectItem value="month">이번 달</SelectItem>
-                        <SelectItem value="year">올해</SelectItem>
-                    </SelectContent>
-                </Select>
             </CardHeader>
+            <CardContent className="p-4">
+                {/* 기간 선택 탭 */}
+                <div className="chart-tabs">
+                    <button className={timeRange==='daily'?'btn-small tab active':'btn-small tab'} onClick={()=>setTimeRange('daily')}>일간</button>
+                    <button className={timeRange==='weekly'?'btn-small tab active':'btn-small tab'} onClick={()=>setTimeRange('weekly')}>주간</button>
+                    <button className={timeRange==='monthly'?'btn-small tab active':'btn-small tab'} onClick={()=>setTimeRange('monthly')}>월간</button>
+                </div>
+            </CardContent>
             <CardContent className="p-0">
                 {isLoading ? (
                     <div className="flex items-center justify-center p-6 h-[300px]">
                         <Skeleton className="w-full h-[250px]" />
                     </div>
-                ) : data ? (
+                ) : error ? (
+                    <div className="flex items-center justify-center p-6 h-[300px]">
+                        <p className="text-red-500">차트 로딩 오류</p>
+                    </div>
+                ) : (
                     <div className="h-[300px] w-full p-4">
                         <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                            <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="name" />
                                 <YAxis allowDecimals={false} />
@@ -89,14 +100,14 @@ export default function FallsChart() {
                                     type="monotone"
                                     dataKey="fallsDetected"
                                     name="낙상 감지"
-                                    stroke="#3B82F6"
-                                    strokeWidth={2}
-                                    activeDot={{ r: 8 }}
+                                    stroke="#f56565"
+                                    strokeWidth={5}
+                                    dot={{ r: 4 }}
                                 />
                             </LineChart>
                         </ResponsiveContainer>
                     </div>
-                ) : null}
+                )}
             </CardContent>
         </Card>
     );

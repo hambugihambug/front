@@ -1,7 +1,6 @@
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { ResponsiveContainer, PieChart, Pie, Cell, Legend, Tooltip } from 'recharts';
-import { Skeleton } from '../ui/skeleton';
+import React, { useState } from 'react';
+import { Card, CardHeader, CardContent, Typography, Box, Skeleton } from '@mui/material';
+import { ResponsiveContainer, PieChart, Pie, Cell, Legend, Tooltip, Label } from 'recharts';
 
 // 임시 데이터 유지
 const mockData = [
@@ -12,51 +11,76 @@ const mockData = [
 
 export default function RiskDistributionChart() {
     const [data] = useState(mockData);
-    const [isLoading] = useState(false);
-    const [error] = useState(null);
+    const isLoading = false;
+    const error = null;
 
     const COLORS = ['#10B981', '#F59E0B', '#EF4444'];
 
+    // 데이터 총합 계산
+    const total = data.reduce((sum, item) => sum + item.value, 0);
+
     return (
-        <Card className="overflow-hidden">
-            <CardHeader className="pb-2">
-                <CardTitle className="text-lg font-medium">환자 위험도 분포</CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
+        <Card sx={{ boxShadow: 3, borderRadius: 2 }}>
+            <CardHeader
+                title={<Typography variant="h5" fontWeight={500}>환자 위험도 분포</Typography>}
+            />
+            <CardContent>
                 {isLoading ? (
-                    <div className="flex items-center justify-center p-6 h-[300px]">
-                        <Skeleton className="w-full h-[250px]" />
-                    </div>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 300, p: 2 }}>
+                        <Skeleton variant="rectangular" width="100%" height={250} />
+                    </Box>
                 ) : error ? (
-                    <div className="flex items-center justify-center p-6 h-[300px]">
-                        <p className="text-red-500">차트 데이터 로딩 오류</p>
-                    </div>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 300, p: 2 }}>
+                        <Typography color="error">차트 데이터 로딩 오류</Typography>
+                    </Box>
                 ) : data ? (
-                    <div className="h-[300px] w-full p-4">
+                    <Box sx={{ height: 300, position: 'relative', p: 2 }}>
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
                                 <Pie
                                     data={data}
                                     cx="50%"
                                     cy="50%"
-                                    labelLine={false}
-                                    outerRadius={80}
-                                    fill="#8884d8"
+                                    innerRadius={60}
+                                    outerRadius={100}
+                                    paddingAngle={4}
                                     dataKey="value"
-                                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                    isAnimationActive={true}
+                                    labelLine={false}
                                 >
                                     {data.map((entry, index) => (
                                         <Cell
                                             key={`cell-${index}`}
                                             fill={entry.color || COLORS[index % COLORS.length]}
+                                            stroke="#fff"
+                                            strokeWidth={2}
                                         />
                                     ))}
+                                    {/* 중앙 레이블 */}
+                                    <Label
+                                        value={`${total}명`}
+                                        position="center"
+                                        fill="#374151"
+                                        fontSize={24}
+                                        fontWeight={500}
+                                    />
                                 </Pie>
-                                <Tooltip formatter={(value) => [value, '환자 수']} />
-                                <Legend />
+                                <Tooltip
+                                    contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+                                    formatter={(value) => [`${value}명`, '환자 수']}
+                                />
+                                {/* 수직 범례를 차트 오른쪽에 배치 */}
+                                <Legend
+                                    layout="vertical"
+                                    verticalAlign="middle"
+                                    align="right"
+                                    iconSize={14}
+                                    wrapperStyle={{ right: -20, top: '20%' }}
+                                    formatter={(value) => <Typography variant="body1">{value}</Typography>}
+                                />
                             </PieChart>
                         </ResponsiveContainer>
-                    </div>
+                    </Box>
                 ) : null}
             </CardContent>
         </Card>

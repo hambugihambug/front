@@ -1,33 +1,40 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 
-// 임시 데이터
-const mockAlerts = [
-    {
-        id: 1,
-        patientName: '김영희',
-        room: '302',
-        timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
-        status: 'detected',
-        confidence: 0.92,
-    },
-    {
-        id: 2,
-        patientName: '박지민',
-        room: '201',
-        timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-        status: 'responding',
-        confidence: 0.88,
-    },
-];
+const API_BASE_URL = 'http://localhost:3001';
 
 export default function ActiveAlerts() {
-    const [alerts, setAlerts] = useState(mockAlerts);
-    const [isLoading] = useState(false);
-    const [error] = useState(null);
+    const [alerts, setAlerts] = useState([]);
+    const [expanded, setExpanded] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        async function loadAlerts() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/fall-incidents`);
+                const json = await res.json();
+                const data = json.data || [];
+                const active = data
+                    .filter(a => a.accident_YN === "Y")
+                    .map(a => ({
+                        id: a.accident_id,
+                        patientName: a.patient_name,
+                        timestamp: a.accident_date,
+                        status: 'detected',
+                    }));
+                setAlerts(active);
+            } catch (err) {
+                setError(err);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        loadAlerts();
+    }, []);
 
     const handleRespondClick = (id) => {
         setAlerts((prevAlerts) =>
@@ -69,86 +76,42 @@ export default function ActiveAlerts() {
         <div className="py-4">
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-medium text-gray-900">활성 알림</h2>
-                <Badge variant="destructive" className="text-sm">
-                    {alerts.length}개 활성
-                </Badge>
+                <div className="flex items-center space-x-2">
+                    <Badge variant="destructive" className="text-sm">
+                        {alerts.length}개 활성
+                    </Badge>
+                    <button
+                        style={{ background: 'transparent', border: 'none', padding: '4px', cursor: 'pointer' }}
+                        onClick={() => setExpanded(e => !e)}
+                    >
+                        {expanded ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}
+                    </button>
+                </div>
             </div>
-
-            {isLoading ? (
-                <div className="py-8 text-center">
-                    <p className="text-gray-500">알림 로딩 중...</p>
-                </div>
-            ) : error ? (
-                <div className="py-8 text-center">
-                    <p className="text-red-500">알림 로딩 오류</p>
-                </div>
-            ) : alerts.length === 0 ? (
-                <div className="p-6 text-center bg-white rounded-md shadow-sm">
-                    <p className="text-gray-500">현재 활성화된 낙상 알림이 없습니다.</p>
-                </div>
-            ) : (
+            {isLoading && <p className="text-gray-500">알림 로딩 중...</p>}
+            {error && <p className="text-red-500">알림 로딩 오류</p>}
+            {!isLoading && !error && alerts.length === 0 && (
+                <p className="text-gray-500">현재 활성화된 낙상 알림이 없습니다.</p>
+            )}
+            {!isLoading && !error && alerts.length > 0 && (
+                <>
                 <div className="grid gap-4 mt-2 sm:grid-cols-1 lg:grid-cols-2">
-                    {alerts.map((alert) => (
+                    { (expanded ? alerts : alerts.slice(0,2)).map(alert => (
                         <Card key={alert.id} className="border-l-4 border-red-500">
                             <CardContent className="p-4">
-                                <div className="flex">
-                                    <div className="flex-shrink-0">
-                                        <AlertCircle className="w-6 h-6 text-red-500" />
-                                    </div>
-                                    <div className="ml-3">
-                                        <h3 className="text-sm font-medium text-red-500">낙상 감지</h3>
-                                        <div className="mt-2 text-sm text-gray-700">
-                                            <p>
-                                                환자: <span className="font-medium">{alert.patientName}</span>
-                                            </p>
-                                            <p>
-                                                병실: <span className="font-medium">{alert.room}</span>
-                                            </p>
-                                            <p>
-                                                시간:{' '}
-                                                <span className="font-medium">
-                                                    {new Date(alert.timestamp).toLocaleString()}
-                                                </span>
-                                            </p>
-                                            <p>
-                                                상태:{' '}
-                                                <span className={`font-medium ${getStatusColor(alert.status)}`}>
-                                                    {getStatusText(alert.status)}
-                                                </span>
-                                            </p>
-                                        </div>
-                                        <div className="mt-4">
-                                            <div className="flex space-x-3">
-                                                <Button variant="outline" size="sm">
-                                                    상세 보기
-                                                </Button>
-                                                {alert.status === 'detected' ? (
-                                                    <Button
-                                                        onClick={() => handleRespondClick(alert.id)}
-                                                        variant="default"
-                                                        size="sm"
-                                                        className="bg-red-500 hover:bg-red-600"
-                                                    >
-                                                        조치 시작
-                                                    </Button>
-                                                ) : alert.status === 'responding' ? (
-                                                    <Button
-                                                        onClick={() => handleResolveClick(alert.id)}
-                                                        variant="default"
-                                                        size="sm"
-                                                        className="bg-yellow-500 hover:bg-yellow-600"
-                                                    >
-                                                        해결 완료
-                                                    </Button>
-                                                ) : null}
-                                            </div>
-                                        </div>
+                                <div className="flex items-center">
+                                    <AlertCircle className="w-6 h-6 text-red-500 mr-2" />
+                                    <div>
+                                        <p className="text-sm font-medium text-red-500">낙상 감지</p>
+                                        <p className="text-sm">환자: {alert.patientName}</p>
+                                        <p className="text-sm">시간: {new Date(alert.timestamp).toLocaleString()}</p>
                                     </div>
                                 </div>
                             </CardContent>
                         </Card>
                     ))}
                 </div>
+                </>
             )}
         </div>
     );
