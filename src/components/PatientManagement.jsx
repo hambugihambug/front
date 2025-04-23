@@ -94,6 +94,13 @@ const PatientManagement = () => {
         });
     };
 
+    // 이미지 URL 포맷팅 함수 추가
+    const formatImageUrl = (imagePath) => {
+        if (!imagePath) return null;
+        if (imagePath.startsWith('http')) return imagePath;
+        return `${API_BASE_URL}${imagePath}`;
+    };
+
     // fetchPatients 함수 수정
     const fetchPatients = async () => {
         try {
@@ -126,29 +133,38 @@ const PatientManagement = () => {
     // handleAddPatient 함수 수정
     const handleAddPatient = async (e) => {
         e.preventDefault();
+
         try {
-            setLoading(true);
+            const formData = new FormData();
 
-            const patientData = {
-                ...newPatient,
-                patient_status: newPatient.patient_status || '무위험군', // 'active' 대신 '무위험군' 사용
-                guardian_id: newPatient.guardian_id || null,
-                bed_id: newPatient.bed_id || null,
-            };
+            // 일반 텍스트 필드 추가
+            Object.keys(newPatient).forEach((key) => {
+                if (key !== 'patient_img' || !newPatient[key]) {
+                    formData.append(key, newPatient[key]);
+                }
+            });
 
-            const response = await axios.post(`${API_BASE_URL}/patients`, patientData);
+            // 파일이 있으면 추가
+            if (imageFile) {
+                formData.append('patient_img', imageFile);
+            }
+
+            const response = await axios.post(`${API_BASE_URL}/patients`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
 
             if (response.data.code === 0) {
-                await fetchPatients();
-                setNewPatient(initialFormState);
+                // 성공 처리 로직
                 setShowAddForm(false);
+                fetchPatients();
+                setNewPatient(initialFormState); // initialPatientState를 initialFormState로 변경
                 alert('환자가 성공적으로 등록되었습니다.');
             }
-        } catch (err) {
-            console.error('Error adding patient:', err);
-            alert(err.response?.data?.message || '환자 등록 중 오류가 발생했습니다.');
-        } finally {
-            setLoading(false);
+        } catch (error) {
+            console.error('Error adding patient:', error);
+            alert('환자 등록에 실패했습니다.');
         }
     };
 
@@ -285,15 +301,30 @@ const PatientManagement = () => {
             patient.patient_id.toString().includes(searchTerm)
     );
 
-    const handleImageUpload = (e, setFunction) => {
+    // 이미지 파일 상태 관리를 위한 상태 추가
+    const [imageFile, setImageFile] = useState(null);
+
+    // 이미지 업로드 처리 함수
+    const handleImageUpload = (e, type) => {
         const file = e.target.files[0];
         if (file) {
+            // 파일 상태 저장
+            setImageFile(file);
+
+            // 미리보기 생성
             const reader = new FileReader();
             reader.onloadend = () => {
-                setFunction((prev) => ({
-                    ...prev,
-                    profile_image: reader.result,
-                }));
+                if (type === 'add') {
+                    setNewPatient((prev) => ({
+                        ...prev,
+                        patient_img: reader.result, // 미리보기용 URL
+                    }));
+                } else if (type === 'edit') {
+                    setEditingPatient((prev) => ({
+                        ...prev,
+                        patient_img: reader.result, // 미리보기용 URL
+                    }));
+                }
             };
             reader.readAsDataURL(file);
         }
@@ -513,6 +544,26 @@ const PatientManagement = () => {
                                         placeholder="환자에 대한 메모를 입력하세요"
                                     />
                                 </div>
+                                <div className="form-group">
+                                    <label>환자 사진</label>
+                                    <div className="file-upload-container">
+                                        {newPatient.patient_img && (
+                                            <div className="image-preview">
+                                                <img
+                                                    src={newPatient.patient_img}
+                                                    alt="미리보기"
+                                                    className="preview-image"
+                                                />
+                                            </div>
+                                        )}
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => handleImageUpload(e, 'add')}
+                                            className="file-input"
+                                        />
+                                    </div>
+                                </div>
                             </div>
                             <div className="modal-footer">
                                 <button type="button" className="cancel-button" onClick={() => setShowAddForm(false)}>
@@ -610,9 +661,9 @@ const PatientManagement = () => {
                         </div>
                         <div className="profile-section">
                             <div className="profile-image-large">
-                                {selectedPatient.profile_image ? (
+                                {selectedPatient.patient_img ? (
                                     <img
-                                        src={selectedPatient.profile_image}
+                                        src={formatImageUrl(selectedPatient.patient_img)}
                                         alt={`${selectedPatient.patient_name}의 프로필`}
                                         className="profile-image"
                                     />
@@ -817,6 +868,26 @@ const PatientManagement = () => {
                                         placeholder="환자에 대한 메모를 입력하세요"
                                     />
                                 </div>
+                                <div className="form-group">
+                                    <label>환자 사진</label>
+                                    <div className="file-upload-container">
+                                        {editingPatient.patient_img && (
+                                            <div className="image-preview">
+                                                <img
+                                                    src={editingPatient.patient_img}
+                                                    alt="미리보기"
+                                                    className="preview-image"
+                                                />
+                                            </div>
+                                        )}
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => handleImageUpload(e, 'edit')}
+                                            className="file-input"
+                                        />
+                                    </div>
+                                </div>
                             </div>
                             <div className="modal-footer">
                                 <button type="button" className="cancel-button" onClick={() => setShowEditForm(false)}>
@@ -902,15 +973,15 @@ const PatientManagement = () => {
                                     </td>
                                     <td>
                                         <div className="patient-avatar">
-                                            {patient.patient_img ? (
-                                                <img
-                                                    src={patient.patient_img}
-                                                    alt={`${patient.patient_name}의 프로필`}
-                                                    className="patient-avatar-image"
-                                                />
-                                            ) : (
-                                                <User size={20} />
-                                            )}
+                                            <img
+                                                src={formatImageUrl(patient.patient_img)}
+                                                alt={`${patient.patient_name}의 프로필`}
+                                                className="patient-avatar-image"
+                                                onError={(e) => {
+                                                    e.target.onerror = null;
+                                                    e.target.src = 'https://via.placeholder.com/40?text=No+Image';
+                                                }}
+                                            />
                                         </div>
                                     </td>
                                     <td>
