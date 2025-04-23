@@ -185,13 +185,25 @@
     list-style: none;
     padding: 0;
     margin: 0;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.room-list-placeholder {
+    text-align: center;
+    padding: 20px;
+    color: #888;
+    font-size: 14px;
+    font-style: italic;
 }
 
 .room-item {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    padding: 10px;
+    align-items: center;
+    gap: 1px;
+    padding: 6px;
     border-radius: 6px;
     cursor: pointer;
     transition: background 0.2s;
@@ -222,8 +234,11 @@
 }
 
 .room-name {
-    flex: 1;
     font-weight: 500;
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .room-temp,
@@ -353,11 +368,6 @@
     gap: 8px;
 }
 
-.chart-container {
-    width: 100%;
-    height: 260px;
-}
-
 .environmental-data-page {
     padding: 20px;
 }
@@ -425,24 +435,6 @@
     margin-top: 4px;
 }
 
-.chart-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
-}
-
-.chart-icon {
-    color: #888;
-}
-
-.chart-title {
-    font-size: 14px;
-    font-weight: 500;
-    color: #333;
-    margin: 0;
-}
-
 .filter-floor {
     display: flex;
     align-items: center;
@@ -474,28 +466,91 @@
 .room-item-header {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.room-item-details-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
 }
 
 .room-item-metrics {
     display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 4px;
+    gap: 5px;
+    flex-shrink: 1;
+    min-width: 0;
 }
 
 .room-metric {
     display: flex;
     align-items: center;
     gap: 4px;
+    font-size: 16px;
+    color: #555;
 }
 
 .metric-icon {
-    color: #666;
+    color: #888;
 }
 
-.metric-value {
-    font-size: 14px;
+.room-occupancy {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 16px;
+    color: #555;
+    white-space: nowrap;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.room-occupancy .metric-value {
+    font-weight: 500;
+}
+
+.room-occupancy .metric-icon {
+    color: #888;
+}
+
+/* Add CCTV Monitoring Styles */
+.cctv-monitoring-section {
+    /* Remove margin-top, padding-top, and border-top */
+    /* margin-top: 20px; */
+    /* padding-top: 20px; */
+    /* border-top: 1px solid #eee; */
+}
+
+/* Remove section header styles if no longer needed elsewhere */
+/* 
+.section-header { 
+    display: flex; 
+    align-items: center;
+    margin-bottom: 12px; 
+}
+*/
+
+/* Remove section title style if no longer needed elsewhere */
+/*
+.section-title-cctv { 
+    font-size: 16px; 
+    font-weight: 600;
     color: #333;
+    margin: 0;
+}
+*/
+
+.cctv-placeholder {
+    width: 100%;
+    height: 400px; /* Increase height */
+    background-color: #f0f0f0;
+    border: 1px dashed #ccc;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-size: 16px;
 }

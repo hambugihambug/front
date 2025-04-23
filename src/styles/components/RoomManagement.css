@@ -93,7 +93,10 @@
 .section-header {
     display: flex;
     align-items: center;
-    margin-bottom: 15px;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 .section-header h2 {
@@ -108,11 +111,11 @@
 }
 
 .action-button {
-    padding: 8px 16px;
+    padding: 8px 20px !important;
     background-color: var(--primary-color, #4a55a2);
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     font-size: 14px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -120,6 +123,12 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
+    line-height: 1;
+    white-space: nowrap;
+    height: auto;
+    min-height: 36px;
+    box-sizing: border-box;
+    min-width: max-content;
 }
 
 .action-button:hover {
@@ -168,7 +177,7 @@
 
 .room-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 16px;
     padding: 16px;
 }
@@ -295,15 +304,21 @@
 }
 
 .detail-card {
-    background: #f8fafc;
+    background-color: #fff;
+    border-radius: 12px;
     padding: 16px;
-    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    min-width: 200px;
+    margin-right: 16px;
+    margin-bottom: 16px;
 }
 
 .detail-card h3 {
-    font-size: 14px;
-    color: #64748b;
+    margin-top: 0;
     margin-bottom: 12px;
+    font-size: 16px;
+    color: #333;
 }
 
 .detail-value {
@@ -383,6 +398,72 @@
     color: #dc2626;
 }
 
+/* 병상 정보 스타일 */
+.bed-info {
+    padding: 10px 0;
+}
+
+.bed-info p {
+    margin: 8px 0;
+    font-size: 14px;
+    color: #333;
+    display: flex;
+    align-items: center;
+}
+
+/* 룸 통계 섹션 */
+.room-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 20px;
+}
+
+.room-stats p {
+    margin: 0;
+    padding: 8px 16px;
+    background-color: #fff;
+    border-radius: 6px;
+    font-weight: 500;
+    color: #333;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* 상태 표시기 */
+.status-indicator {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+    text-align: center;
+    width: fit-content;
+}
+
+.status-indicator.정상 {
+    background-color: #4ade80;
+    color: #064e3b;
+}
+
+.status-indicator.중간 {
+    background-color: #fcd34d;
+    color: #78350f;
+}
+
+.status-indicator.높음 {
+    background-color: #f87171;
+    color: #7f1d1d;
+}
+
+/* 빈 메시지 스타일 */
+.empty-message {
+    text-align: center;
+    padding: 20px;
+    color: #6b7280;
+    font-style: italic;
+}
+
 @media (max-width: 1024px) {
     .room-management-content {
         flex-direction: column;
@@ -394,17 +475,204 @@
     }
 }
 
-.chart-section {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    padding: 24px;
-    margin: 16px 16px 0;
+/* 모달 스타일 */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
 }
 
-.chart-title {
-    margin: 0 0 16px;
+.modal-content {
+    background-color: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 20px;
+    color: #1f2937;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+    padding: 4px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-button:hover {
+    background-color: #f3f4f6;
+    color: #1f2937;
+}
+
+.patient-detail-content {
+    padding: 24px;
+}
+
+.profile-section {
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.profile-image-large {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-right: 16px;
+    border: 3px solid #e5e7eb;
+}
+
+.profile-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-placeholder {
+    color: #9ca3af;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.profile-info h3 {
+    margin: 0 0 4px 0;
     font-size: 18px;
-    font-weight: 600;
-    color: #1e293b;
+    color: #1f2937;
+}
+
+.profile-info p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.patient-details {
+    background-color: #f9fafb;
+    border-radius: 8px;
+    padding: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.detail-row {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-label {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+.detail-value {
+    font-size: 14px;
+    color: #1f2937;
+    font-weight: 500;
+}
+
+.patient-memo {
+    background-color: #fff9db;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 16px;
+}
+
+.patient-memo h4 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    color: #92400e;
+}
+
+.patient-memo p {
+    margin: 0;
+    color: #4b5563;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.patient-memo.medication {
+    background-color: #e8f4fe;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 16px;
+}
+
+.patient-memo.medication h4 {
+    color: #0c4a6e;
+    margin: 0 0 8px 0;
+    font-size: 16px;
+}
+
+.modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.submit-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.submit-button:hover {
+    background-color: #0d60c9;
+}
+
+.action-button span,
+.room-detail-section .section-header .action-button span {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.action-button svg,
+.room-detail-section .section-header .action-button svg {
+    flex-shrink: 0;
+    vertical-align: middle;
 }

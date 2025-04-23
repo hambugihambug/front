@@ -1,6 +1,7 @@
+@import './styles/main.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* Custom styles can be added below */
-@import './styles/main.css';

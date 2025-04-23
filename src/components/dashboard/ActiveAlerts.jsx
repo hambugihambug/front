@@ -4,7 +4,7 @@ import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = 'http://localhost:3000';
 
 export default function ActiveAlerts() {
     const [alerts, setAlerts] = useState([]);
@@ -19,8 +19,8 @@ export default function ActiveAlerts() {
                 const json = await res.json();
                 const data = json.data || [];
                 const active = data
-                    .filter(a => a.accident_YN === "Y")
-                    .map(a => ({
+                    .filter((a) => a.accident_YN === 'Y')
+                    .map((a) => ({
                         id: a.accident_id,
                         patientName: a.patient_name,
                         timestamp: a.accident_date,
@@ -82,9 +82,9 @@ export default function ActiveAlerts() {
                     </Badge>
                     <button
                         style={{ background: 'transparent', border: 'none', padding: '4px', cursor: 'pointer' }}
-                        onClick={() => setExpanded(e => !e)}
+                        onClick={() => setExpanded((e) => !e)}
                     >
-                        {expanded ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}
+                        {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                     </button>
                 </div>
             </div>
@@ -95,22 +95,24 @@ export default function ActiveAlerts() {
             )}
             {!isLoading && !error && alerts.length > 0 && (
                 <>
-                <div className="grid gap-4 mt-2 sm:grid-cols-1 lg:grid-cols-2">
-                    { (expanded ? alerts : alerts.slice(0,2)).map(alert => (
-                        <Card key={alert.id} className="border-l-4 border-red-500">
-                            <CardContent className="p-4">
-                                <div className="flex items-center">
-                                    <AlertCircle className="w-6 h-6 text-red-500 mr-2" />
-                                    <div>
-                                        <p className="text-sm font-medium text-red-500">낙상 감지</p>
-                                        <p className="text-sm">환자: {alert.patientName}</p>
-                                        <p className="text-sm">시간: {new Date(alert.timestamp).toLocaleString()}</p>
+                    <div className="grid gap-4 mt-2 sm:grid-cols-1 lg:grid-cols-2">
+                        {(expanded ? alerts : alerts.slice(0, 2)).map((alert) => (
+                            <Card key={alert.id} className="border-l-4 border-red-500">
+                                <CardContent className="p-4">
+                                    <div className="flex items-center">
+                                        <AlertCircle className="w-6 h-6 text-red-500 mr-2" />
+                                        <div>
+                                            <p className="text-sm font-medium text-red-500">낙상 감지</p>
+                                            <p className="text-sm">환자: {alert.patientName}</p>
+                                            <p className="text-sm">
+                                                시간: {new Date(alert.timestamp).toLocaleString()}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
                 </>
             )}
         </div>

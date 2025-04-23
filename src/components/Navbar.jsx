@@ -24,15 +24,16 @@ const navItems = [
         items: [
             { path: '/', label: '홈', icon: Home },
             { path: '/dashboard', label: '대시보드', icon: LayoutDashboard },
-            { path: '/patients', label: '환자 안전 대시보드', icon: Activity },
+
             { path: '/fall-incidents', label: '낙상 감지', icon: Activity },
             { path: '/environmental', label: '환경 모니터링', icon: Thermometer },
         ],
     },
     {
-        title: '병실 및 환자 관리',
+        title: '병실 관리',
         items: [
             { path: '/rooms', label: '병실 및 환자 관리', icon: BedDouble },
+            { path: '/patients', label: '환자 목록', icon: Activity },
             { path: '/schedule', label: '일정 관리', icon: Calendar },
         ],
     },

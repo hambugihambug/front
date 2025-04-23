@@ -1,9 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, Activity, Thermometer, Monitor } from 'lucide-react';
+import axios from 'axios';
 import '../styles/components/dashboard/Home.css';
 
 const Home = () => {
+    const [weather, setWeather] = useState({
+        temperature: 'N/A',
+        weather: ' 로딩중...',
+    });
+
+    useEffect(() => {
+        const fetchWeather = async () => {
+            try {
+                const response = await axios.get('http://localhost:3000/weather');
+                setWeather(response.data.data);
+            } catch (error) {
+                console.error('날씨 정보 조회 실패:', error);
+                setWeather({
+                    temperature: 'N/A',
+                    weather: '🌈 날씨 정보 없음',
+                });
+            }
+        };
+
+        fetchWeather();
+        const interval = setInterval(fetchWeather, 600000); // 10분마다 갱신
+        return () => clearInterval(interval);
+    }, []);
+
     const cards = [
         {
             title: '낙상 감지',
@@ -45,17 +70,27 @@ const Home = () => {
 
     return (
         <div className="dashboard-home-container">
-            <h1 className="home-title">병원 모니터링 시스템</h1>
-            <p className="home-subtitle">환영합니다. 이 시스템은 환자의 낙상 사고를 감지하고 환경을 모니터링합니다.</p>
+            <div className="home-header">
+                <div>
+                    <h1 className="home-title">병원 모니터링 시스템</h1>
+                    <p className="home-subtitle">
+                        환영합니다. 이 시스템은 환자의 낙상 사고를 감지하고 환경을 모니터링합니다.
+                    </p>
+                </div>
+                <div className="weather-widget">
+                    <span className="temperature">{weather.temperature}</span>
+                    <span className="weather">{weather.weather}</span>
+                </div>
+            </div>
             <div className="home-card-grid">
-                {cards.map((c) => (
-                    <NavLink to={c.link} key={c.title} className="home-card">
-                        <div className="home-card-icon" style={{ backgroundColor: c.iconBg }}>
-                            <c.icon size={24} color={c.iconColor} />
+                {cards.map((card) => (
+                    <NavLink to={card.link} key={card.title} className="home-card">
+                        <div className="home-card-icon" style={{ backgroundColor: card.iconBg }}>
+                            <card.icon size={24} color={card.iconColor} />
                         </div>
-                        <h3 className="home-card-title">{c.title}</h3>
-                        <p className="home-card-desc">{c.desc}</p>
-                        <span className="home-card-link">{c.linkLabel} →</span>
+                        <h3 className="home-card-title">{card.title}</h3>
+                        <p className="home-card-desc">{card.desc}</p>
+                        <span className="home-card-link">{card.linkLabel} →</span>
                     </NavLink>
                 ))}
             </div>
