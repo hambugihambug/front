@@ -12,7 +12,10 @@ import {
     Users,
     AlertTriangle,
     Clock,
+    PlusCircle,
+    AlertCircle,
 } from 'lucide-react';
+import { Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import '../styles/components/FallIncidents.css';
 
 const API_BASE_URL = 'http://localhost:3000';
@@ -32,6 +35,8 @@ const FallIncidents = () => {
     const [dataLoading, setDataLoading] = useState(false); // 탭 변경 시 데이터 로딩 상태
     const [error, setError] = useState(null);
     const [statsTab, setStatsTab] = useState('일간');
+    const [sendingAlert, setSendingAlert] = useState(false);
+    const [alertStatus, setAlertStatus] = useState(null);
 
     useEffect(() => {
         const fetchAllData = async () => {
@@ -204,6 +209,30 @@ const FallIncidents = () => {
         }
     };
 
+    const sendLatestAlertToAll = async () => {
+        try {
+            setSendingAlert(true);
+            setAlertStatus(null);
+
+            const response = await axios.post(`${API_BASE_URL}/api/notifications/broadcast-latest-alert`);
+
+            if (response.data.code === 0) {
+                setAlertStatus({ success: true, message: '최근 낙상 사고 알림이 성공적으로 전송되었습니다.' });
+            } else {
+                setAlertStatus({ success: false, message: '알림 전송에 실패했습니다.' });
+            }
+        } catch (error) {
+            console.error('알림 전송 오류:', error);
+            setAlertStatus({ success: false, message: `알림 전송 실패: ${error.message}` });
+        } finally {
+            setSendingAlert(false);
+            // 3초 후 알림 상태 초기화
+            setTimeout(() => {
+                setAlertStatus(null);
+            }, 3000);
+        }
+    };
+
     if (loading) {
         return <div className="loading-text">낙상 감지 정보를 불러오는 중...</div>;
     }
@@ -214,6 +243,20 @@ const FallIncidents = () => {
 
     return (
         <div className="dashboard-container">
+            <div className="page-header">
+                <h1>낙상 사고 관리</h1>
+                <div className="header-buttons">
+                    <button onClick={sendLatestAlertToAll} disabled={sendingAlert} className="alert-button">
+                        {sendingAlert ? '전송 중...' : '최근 사고 알림 보내기'}
+                        <AlertCircle size={18} />
+                    </button>
+                </div>
+            </div>
+
+            {alertStatus && (
+                <div className={`alert-status ${alertStatus.success ? 'success' : 'error'}`}>{alertStatus.message}</div>
+            )}
+
             <h1 className="dashboard-title">낙상 감지 통계</h1>
             <p className="dashboard-subtitle">병실별 낙상 감지 현황 및 통계를 관리하세요</p>
 

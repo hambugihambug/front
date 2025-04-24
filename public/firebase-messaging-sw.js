@@ -1,69 +1,72 @@
-// Firebase Cloud Messaging Service Worker
+// public/firebase-messaging-sw.js
+importScripts('https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.11.0/firebase-messaging-compat.js');
 
-importScripts('https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js');
-importScripts('https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js');
-
-// Firebase configuration - these values need to be updated with your project details
 firebase.initializeApp({
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID", 
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+    apiKey: 'your_api_key',
+    projectId: 'your_project_id',
+    messagingSenderId: 'your_sender_id',
+    appId: 'your_app_id',
 });
 
 const messaging = firebase.messaging();
 
-// Handle background messages
+// 백그라운드 메시지 핸들러 수정
 messaging.onBackgroundMessage((payload) => {
-  console.log('Received background message:', payload);
+    console.log('[firebase-messaging-sw.js] 백그라운드 메시지:', payload);
 
-  const notificationTitle = payload.notification.title;
-  const notificationOptions = {
-    body: payload.notification.body,
-    icon: '/assets/notification-icon.png',
-    badge: '/assets/notification-badge.png',
-    data: payload.data
-  };
+    // 클라이언트 찾기
+    self.clients
+        .matchAll({
+            type: 'window',
+            includeUncontrolled: true,
+        })
+        .then((clients) => {
+            if (clients.length > 0) {
+                // 활성화된 클라이언트가 있으면 메시지 전달
+                const client = clients[0];
+                client.postMessage({
+                    type: 'FIREBASE_ALERT',
+                    payload: payload,
+                });
+                return;
+            }
 
-  // Show notification
-  self.registration.showNotification(notificationTitle, notificationOptions);
+            // 활성화된 클라이언트가 없으면 기본 알림 표시
+            const { title, body } = payload.notification;
+            self.registration.showNotification(title, {
+                body,
+                icon: '/logo.png',
+                // 클릭하면 앱 열기
+                data: { url: self.location.origin },
+            });
+        });
 });
 
-// Handle notification click
+// 알림 클릭 처리
 self.addEventListener('notificationclick', (event) => {
-  console.log('Notification clicked:', event);
-  
-  // Close the notification
-  event.notification.close();
-  
-  // Get the notification data
-  const data = event.notification.data;
-  
-  // Determine the URL to navigate to based on the incident type
-  let url = '/';
-  if (data && data.incident_type) {
-    if (data.incident_type === 'fall') {
-      url = '/incidents';
-    } else if (data.incident_type.includes('temperature') || data.incident_type.includes('humidity')) {
-      url = '/environmental';
-    }
-  }
-  
-  // Navigate to the appropriate page
-  event.waitUntil(
-    clients.matchAll({type: 'window'}).then((clientList) => {
-      // Check if a window client is already open and navigate to the URL
-      for (const client of clientList) {
-        if (client.url.includes(self.registration.scope) && 'focus' in client) {
-          return client.focus().then((client) => client.navigate(url));
-        }
-      }
-      // If no window client is open, open a new one
-      if (clients.openWindow) {
-        return clients.openWindow(url);
-      }
-    })
-  );
+    event.notification.close();
+
+    // 앱 열기
+    const urlToOpen = event.notification.data?.url || self.location.origin;
+
+    event.waitUntil(
+        self.clients
+            .matchAll({
+                type: 'window',
+                includeUncontrolled: true,
+            })
+            .then((clientList) => {
+                // 이미 열린 창이 있으면 포커스
+                for (const client of clientList) {
+                    if (client.url === urlToOpen && 'focus' in client) {
+                        return client.focus();
+                    }
+                }
+                // 열린 창이 없으면 새 창 열기
+                if (self.clients.openWindow) {
+                    return self.clients.openWindow(urlToOpen);
+                }
+            })
+    );
 });

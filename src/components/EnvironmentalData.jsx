@@ -25,7 +25,7 @@ const EnvironmentalData = () => {
                 const data = res.data.data.map((room) => ({
                     roomId: room.room_id,
                     roomName: room.room_name,
-                    temperature: room.room_temp,
+                    temperature: Number(room.room_temp).toFixed(1),
                     humidity: room.humidity,
                     totalBeds: room.total_beds,
                     occupiedBeds: room.occupied_beds,
@@ -338,36 +338,12 @@ const EnvironmentalData = () => {
                         </span>
                     </div>
 
-                    <div className="chart-header">
-                        <Clock size={14} className="chart-icon" />
-                        <h3 className="chart-title">24시간 {metric === 'temperature' ? '온도' : '습도'} 변화</h3>
-                    </div>
-                    <div className="chart-container">
-                        <ResponsiveContainer width="100%" height={260}>
-                            <LineChart data={historyData} margin={{ top: 10, right: 20, bottom: 40, left: 0 }}>
-                                <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
-                                <XAxis
-                                    dataKey="timestamp"
-                                    interval={0}
-                                    type="category"
-                                    padding={{ left: 20, right: 20 }}
-                                    tickFormatter={(val) => {
-                                        const d = new Date(val);
-                                        const hh = String(d.getHours()).padStart(2, '0');
-                                        const mm = String(d.getMinutes()).padStart(2, '0');
-                                        return `${hh}:${mm}`;
-                                    }}
-                                    tick={{ fontSize: 12, fill: '#888' }}
-                                    axisLine={false}
-                                    tickLine={false}
-                                    height={40}
-                                    tickMargin={15}
-                                />
-                                <YAxis domain={[range.min, range.max]} unit={metric === 'temperature' ? '°C' : '%'} />
-                                <Tooltip labelFormatter={(val) => new Date(val).toLocaleString()} />
-                                <Line type="monotone" dataKey={metric} stroke="#f59e0b" dot={false} />
-                            </LineChart>
-                        </ResponsiveContainer>
+                    {/* Add CCTV Monitoring Section */}
+                    <div className="cctv-monitoring-section">
+                        <div className="cctv-placeholder">
+                            {/* Placeholder for CCTV feed */}
+                            <span>CCTV 화면 영역</span>
+                        </div>
                     </div>
                 </div>
             </div>
