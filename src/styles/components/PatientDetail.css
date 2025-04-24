@@ -1,94 +1,4 @@
 .patient-detail-container {
-<<<<<<< HEAD
-    padding: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.detail-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 2rem;
-}
-
-.back-button {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border: none;
-    background: none;
-    cursor: pointer;
-    color: #666;
-}
-
-.back-button:hover {
-    color: #000;
-}
-
-.detail-content {
-    background: white;
-    border-radius: 8px;
-    padding: 2rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.profile-section {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    margin-bottom: 2rem;
-}
-
-.info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.info-item {
-    background: #f8fafc;
-    padding: 1rem;
-    border-radius: 6px;
-}
-
-.info-item label {
-    color: #64748b;
-    font-size: 0.875rem;
-}
-
-.info-item p {
-    margin-top: 0.5rem;
-    font-size: 1rem;
-    color: #1e293b;
-}
-
-.memo-section {
-    background: #f8fafc;
-    padding: 1.5rem;
-    border-radius: 6px;
-}
-
-.medical-record {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* 1:1 비율 유지 */
-    gap: 2rem;
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    min-height: 600px; /* 최소 높이 설정 */
-}
-
-.left-panel {
-    border-right: 1px solid #e2e8f0;
-    padding-right: 2rem;
-}
-
-.right-panel {
-    padding-left: 2rem;
-=======
     @apply p-6 bg-gray-100 min-h-screen;
 }
 
@@ -110,111 +20,12 @@
 
 .right-panel {
     @apply bg-white p-6 rounded-lg shadow-md col-span-2; /* 2/3 차지 */
->>>>>>> b47947f53a3296521fc466a63e409020a2761bb4
 }
 
 .patient-basic-info,
 .vital-signs,
 .hospital-info,
 .guardian-info {
-<<<<<<< HEAD
-    margin-bottom: 2rem;
-    padding: 1rem;
-    background: #f8fafc;
-    border-radius: 6px;
-}
-
-h3 {
-    color: #1e40af;
-    font-size: 1rem;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid #e2e8f0;
-}
-
-.info-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.info-row span:first-child {
-    color: #64748b;
-    font-weight: 500;
-}
-
-.body-diagram {
-    position: relative;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.body-image {
-    position: relative;
-    width: 100%;
-    flex: 1;
-    padding: 1rem;
-    background: #f8fafc;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.body-image img {
-    max-height: 500px; /* 최대 높이 제한 */
-    max-width: 80%; /* 최대 너비 제한 */
-    width: auto; /* 비율 유지 */
-    height: auto; /* 비율 유지 */
-    object-fit: contain;
-}
-
-.symptom-marker {
-    position: absolute;
-    width: 10px; /* 마커 크기 축소 */
-    height: 10px; /* 마커 크기 축소 */
-    background: #ef4444;
-    border-radius: 50%;
-    cursor: pointer;
-    transform: translate(-50%, -50%);
-}
-
-.symptom-marker:hover::after {
-    content: attr(title);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 0.5rem;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    border-radius: 4px;
-    font-size: 0.875rem;
-    white-space: nowrap;
-}
-
-.status {
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.875rem;
-}
-
-.status.고위험군 {
-    background: #fee2e2;
-    color: #dc2626;
-}
-
-.status.저위험군 {
-    background: #fef3c7;
-    color: #d97706;
-}
-
-.status.무위험군 {
-    background: #dcfce7;
-    color: #16a34a;
-=======
     @apply mb-6;
 }
 
@@ -246,9 +57,22 @@ h3 {
 }
 
 .status {
-    @apply font-semibold;
+    @apply font-semibold px-2 py-1 rounded text-sm;
 }
 
+.status.고위험군 {
+    @apply bg-red-100 text-red-600;
+}
+
+.status.저위험군 {
+    @apply bg-amber-100 text-amber-600;
+}
+
+.status.무위험군 {
+    @apply bg-green-100 text-green-600;
+}
+
+/* 기존 상태 클래스도 유지 */
 .status.occupied {
     @apply text-blue-500;
 }
@@ -259,5 +83,4 @@ h3 {
 
 .status.maintenance {
     @apply text-yellow-500;
->>>>>>> b47947f53a3296521fc466a63e409020a2761bb4
 }

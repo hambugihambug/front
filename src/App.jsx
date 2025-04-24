@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from 'react';
-<<<<<<< HEAD
 import { messaging, getToken, onMessage, saveTokenToServer } from './firebase';
-=======
-// import { messaging, getToken, onMessage, saveTokenToServer } from './firebase';
->>>>>>> b47947f53a3296521fc466a63e409020a2761bb4
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Dashboard from './components/Dashboard';
@@ -50,7 +46,6 @@ function App() {
     const showCustomAlert = (title, body) => {
         setNotification({ title, body });
 
-        // 알림 소리 재생 (선택 사항)
         try {
             const audio = new Audio('/notification.mp3');
             audio.play().catch((err) => console.log('알림 소리 재생 실패:', err));
@@ -72,8 +67,6 @@ function App() {
                 .then((registration) => {
                     console.log('🛡️ Service Worker 등록 성공');
 
-<<<<<<< HEAD
-                    // 서비스 워커로부터 메시지 수신 처리
                     navigator.serviceWorker.addEventListener('message', (event) => {
                         console.log('Service Worker로부터 메시지 수신:', event.data);
 
@@ -93,13 +86,10 @@ function App() {
                                 body = '새로운 알림이 도착했습니다.';
                             }
 
-                            // 커스텀 알림 표시
                             showCustomAlert(title, body);
                         }
                     });
 
-=======
->>>>>>> b47947f53a3296521fc466a63e409020a2761bb4
                     getToken(messaging, {
                         vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
                         serviceWorkerRegistration: registration,
@@ -107,7 +97,6 @@ function App() {
                         .then((currentToken) => {
                             if (currentToken) {
                                 console.log('📬 FCM Token:', currentToken);
-                                // 서버로 토큰 전송
                                 saveTokenToServer(currentToken);
                             } else {
                                 console.log('알림 권한이 없음');
@@ -117,15 +106,9 @@ function App() {
                             console.error('토큰 가져오기 실패:', err);
                         });
 
-                    // 포그라운드 메시지 수신 처리
                     onMessage(messaging, (payload) => {
                         console.log('포그라운드 메시지 수신:', payload);
-<<<<<<< HEAD
 
-                        // 모든 payload 구조 확인
-                        console.log('Payload structure:', JSON.stringify(payload));
-
-                        // 다양한 구조에서 정보 추출
                         let title, body;
 
                         if (payload.notification) {
@@ -139,17 +122,8 @@ function App() {
                             body = '새로운 알림이 도착했습니다.';
                         }
 
-                        // 커스텀 알림 표시
                         showCustomAlert(title, body);
-
-                        // 브라우저 알림 표시 방지
                         return false;
-=======
-                        const { title, body } = payload.notification || {};
-                        if (title && body) {
-                            alert(`🔔 ${title}\n${body}`);
-                        }
->>>>>>> b47947f53a3296521fc466a63e409020a2761bb4
                     });
                 })
                 .catch((err) => {
