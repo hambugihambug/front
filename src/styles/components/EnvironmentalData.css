@@ -204,7 +204,7 @@
     justify-content: space-between;
     align-items: center;
     gap: 1px;
-    padding: 1rem 1.2rem; /* 패딩 증가 */
+    padding: 1rem 1.2rem;
     border-radius: 6px;
     cursor: pointer;
     transition: background 0.2s;
@@ -218,6 +218,13 @@
 .room-item:hover,
 .room-item.active {
     background: #f5f5f5;
+}
+
+.room-item-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
 }
 
 .status-dot {
@@ -241,6 +248,8 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    width: 50px;
+    padding-right: 6px;
 }
 
 .room-temp,
@@ -465,36 +474,36 @@
     box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
 }
 
-.room-item-header {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    flex-shrink: 0;
-}
-
 .room-item-details-group {
     display: grid;
-    grid-template-columns: 2fr 1fr; /* 메트릭 영역과 침대 정보 비율 조정 */
-    gap: 1rem;
-    margin-top: 0.8rem;
+    grid-template-columns: 2fr 1fr;
+    gap: 0.3rem;
 }
 
 .room-item-metrics {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    gap: 0.3rem;
 }
 
 .room-metric {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 0.95rem; /* 글자 크기 약간 증가 */
+    gap: 0.3rem;
+    font-size: 0.95rem;
     color: #555;
+    width: 70px;
 }
 
 .metric-icon {
     color: #888;
+    width: 16px;
+    flex-shrink: 0;
+}
+
+.metric-value {
+    min-width: 40px;
+    text-align: right;
 }
 
 .room-occupancy {
@@ -506,14 +515,18 @@
     white-space: nowrap;
     text-align: right;
     flex-shrink: 0;
+    width: 60px;
 }
 
 .room-occupancy .metric-value {
     font-weight: 500;
+    min-width: 35px;
 }
 
 .room-occupancy .metric-icon {
     color: #888;
+    width: 16px;
+    flex-shrink: 0;
 }
 
 /* Add CCTV Monitoring Styles */
