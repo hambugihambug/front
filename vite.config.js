@@ -12,9 +12,8 @@ export default defineConfig({
     server: {
         host: '0.0.0.0',
         port: 5000,
-        hmr: {
-            clientPort: 443,
-        },
+        // HMR 웹소켓 비활성화
+        hmr: false,
         fs: {
             strict: false,
         },

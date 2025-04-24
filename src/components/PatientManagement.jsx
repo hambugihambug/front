@@ -25,6 +25,7 @@ import { IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch';
 import EditNoteIcon from '@mui/icons-material/EditNote';
+import { useNavigate } from 'react-router-dom';
 
 const API_BASE_URL = 'http://localhost:3000';
 
@@ -82,6 +83,8 @@ const PatientManagement = () => {
             description: '퇴원 예정',
         },
     });
+
+    const navigate = useNavigate();
 
     // 날짜 포맷팅 함수 추가
     const formatBirthDate = (dateString) => {
@@ -238,6 +241,7 @@ const PatientManagement = () => {
     };
 
     // openDetailView 함수 수정
+<<<<<<< HEAD
     const openDetailView = async (patient) => {
         try {
             const response = await axios.get(`${API_BASE_URL}/patients/${patient.patient_id}`);
@@ -249,6 +253,10 @@ const PatientManagement = () => {
             console.error('Error fetching patient details:', err);
             alert('환자 상세 정보를 불러오는데 실패했습니다.');
         }
+=======
+    const openDetailView = (patient) => {
+        navigate(`/patients/${patient.patient_id}`);
+>>>>>>> b47947f53a3296521fc466a63e409020a2761bb4
     };
 
     const openEditForm = (patient) => {

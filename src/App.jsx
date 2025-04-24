@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
+<<<<<<< HEAD
 import { messaging, getToken, onMessage, saveTokenToServer } from './firebase';
+=======
+// import { messaging, getToken, onMessage, saveTokenToServer } from './firebase';
+>>>>>>> b47947f53a3296521fc466a63e409020a2761bb4
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Dashboard from './components/Dashboard';
@@ -68,6 +72,7 @@ function App() {
                 .then((registration) => {
                     console.log('🛡️ Service Worker 등록 성공');
 
+<<<<<<< HEAD
                     // 서비스 워커로부터 메시지 수신 처리
                     navigator.serviceWorker.addEventListener('message', (event) => {
                         console.log('Service Worker로부터 메시지 수신:', event.data);
@@ -93,6 +98,8 @@ function App() {
                         }
                     });
 
+=======
+>>>>>>> b47947f53a3296521fc466a63e409020a2761bb4
                     getToken(messaging, {
                         vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
                         serviceWorkerRegistration: registration,
@@ -113,6 +120,7 @@ function App() {
                     // 포그라운드 메시지 수신 처리
                     onMessage(messaging, (payload) => {
                         console.log('포그라운드 메시지 수신:', payload);
+<<<<<<< HEAD
 
                         // 모든 payload 구조 확인
                         console.log('Payload structure:', JSON.stringify(payload));
@@ -136,6 +144,12 @@ function App() {
 
                         // 브라우저 알림 표시 방지
                         return false;
+=======
+                        const { title, body } = payload.notification || {};
+                        if (title && body) {
+                            alert(`🔔 ${title}\n${body}`);
+                        }
+>>>>>>> b47947f53a3296521fc466a63e409020a2761bb4
                     });
                 })
                 .catch((err) => {

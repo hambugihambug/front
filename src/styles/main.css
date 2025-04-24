@@ -6,7 +6,7 @@
 @import './components/dashboard/RiskDistributionChart.css';
 
 :root {
-    --primary-color: #3498db;
+    --primary-color: rgb(25, 72, 144);
     --secondary-color: #2ecc71;
     --danger-color: #e74c3c;
     --warning-color: #f39c12;
