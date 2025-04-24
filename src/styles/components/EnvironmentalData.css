@@ -1,7 +1,9 @@
 .environmental-data-container {
-    display: flex;
-    padding: 20px;
-    gap: 20px;
+    display: grid;
+    grid-template-columns: 390px 1fr; /* 사이드바 너비를 300px에서 400px로 증가 */
+    gap: 2rem;
+    height: calc(100vh - 120px);
+    padding: 0.7rem;
 }
 
 .page-title {
@@ -168,11 +170,12 @@
 }
 
 .sidebar {
-    width: 300px;
-    background: #fff;
+    width: 100%;
+    background: white;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    padding: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
 }
 
 .sidebar-title {
@@ -182,12 +185,10 @@
 }
 
 .room-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    max-height: 400px;
+    width: 100%;
+    max-height: calc(100vh - 250px);
     overflow-y: auto;
-    padding-right: 10px;
+    padding-right: 0.5rem;
 }
 
 .room-list-placeholder {
@@ -203,10 +204,11 @@
     justify-content: space-between;
     align-items: center;
     gap: 1px;
-    padding: 6px;
+    padding: 1rem 1.2rem; /* 패딩 증가 */
     border-radius: 6px;
     cursor: pointer;
     transition: background 0.2s;
+    margin-bottom: 0.8rem;
 }
 
 .room-item:not(:last-child) {
@@ -471,24 +473,23 @@
 }
 
 .room-item-details-group {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    flex-shrink: 0;
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* 메트릭 영역과 침대 정보 비율 조정 */
+    gap: 1rem;
+    margin-top: 0.8rem;
 }
 
 .room-item-metrics {
-    display: flex;
-    gap: 5px;
-    flex-shrink: 1;
-    min-width: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
 }
 
 .room-metric {
     display: flex;
     align-items: center;
-    gap: 4px;
-    font-size: 16px;
+    gap: 0.5rem;
+    font-size: 0.95rem; /* 글자 크기 약간 증가 */
     color: #555;
 }
 
@@ -553,4 +554,23 @@
     justify-content: center;
     color: #888;
     font-size: 16px;
+}
+
+/* 스크롤바 스타일링 추가 */
+.room-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.room-list::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+
+.room-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.room-list::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
 }
