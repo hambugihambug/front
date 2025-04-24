@@ -25,7 +25,7 @@ const EnvironmentalData = () => {
                 const data = res.data.data.map((room) => ({
                     roomId: room.room_id,
                     roomName: room.room_name,
-                    temperature: room.room_temp,
+                    temperature: Number(room.room_temp).toFixed(1),
                     humidity: room.humidity,
                     totalBeds: room.total_beds,
                     occupiedBeds: room.occupied_beds,

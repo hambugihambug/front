@@ -4,6 +4,7 @@
     gap: 2rem;
     height: calc(100vh - 120px);
     padding: 0.7rem;
+    overflow: hidden; /* 컨테이너의 오버플로우 숨김 */
 }
 
 .page-title {
@@ -175,7 +176,10 @@
     border-radius: 8px;
     padding: 1.5rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    overflow-y: auto;
+    height: 100%; /* 높이를 100%로 설정 */
+    display: flex; /* Flexbox 사용 */
+    flex-direction: column; /* 세로 방향 정렬 */
+    overflow: hidden; /* 사이드바 자체의 오버플로우 숨김 */
 }
 
 .sidebar-title {
@@ -186,8 +190,8 @@
 
 .room-list {
     width: 100%;
-    max-height: calc(100vh - 250px);
-    overflow-y: auto;
+    flex: 1; /* 남은 공간 모두 차지 */
+    overflow-y: auto; /* 세로 스크롤만 표시 */
     padding-right: 0.5rem;
 }
 
@@ -203,7 +207,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 1px;
+    gap: 24px;
     padding: 1rem 1.2rem;
     border-radius: 6px;
     cursor: pointer;
@@ -569,7 +573,7 @@
     font-size: 16px;
 }
 
-/* 스크롤바 스타일링 추가 */
+/* 스크롤바 스타일링 */
 .room-list::-webkit-scrollbar {
     width: 8px;
 }
