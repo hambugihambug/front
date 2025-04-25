@@ -13,9 +13,11 @@ const RoomManagement = () => {
     const [error, setError] = useState(null);
     const [selectedFloor, setSelectedFloor] = useState('1');
     const [selectedRoom, setSelectedRoom] = useState(null);
+    const [floorList, setFloorList] = useState([]);
     const [activeTab, setActiveTab] = useState('상세정보');
     const [selectedPatient, setSelectedPatient] = useState(null);
     const [showPatientDetailModal, setShowPatientDetailModal] = useState(false);
+    const [assignModal, setAssignModal] = useState({ phase: null, patientId: null, roomName: '', freeBeds: [] });
     const [stats, setStats] = useState({
         totalBeds: {
             value: '150개',
@@ -174,13 +176,9 @@ const RoomManagement = () => {
     };
 
     // 핸들러 함수 추가
-    const handlePatientAssignment = async (patientId) => {
-        try {
-            // TODO: 환자 재배정 로직 구현
-            console.log('Patient assignment:', patientId);
-        } catch (err) {
-            console.error('Error assigning patient:', err);
-        }
+    const handlePatientAssignment = (patientId, originalBed) => {
+        // 1단계: 병실 선택 모달 오픈, originalBed 저장
+        setAssignModal({ phase: 'selectRoom', patientId, originalBed, roomName: '', allBeds: [], occupiedMap: {} });
     };
 
     if (loading) {
@@ -246,7 +244,8 @@ const RoomManagement = () => {
             <div className="room-management-content">
                 <div className="room-list-section">
                     <div className="section-header">
-                        <h2>병실 목록</h2>
+                        <h2>병실 관리</h2>
+                        <p className="dashboard-subtitle">병실 정보 및 배치</p>
                     </div>
 
                     <div className="floor-tabs">
@@ -261,39 +260,36 @@ const RoomManagement = () => {
                         ))}
                     </div>
 
-                    <div className="room-grid">
+                    <ul className="room-list">
                         {floorRooms[selectedFloor]?.map((room) => {
                             const status = getRoomStatus(room.room_temp);
                             return (
-                                <div
+                                <li
                                     key={room.room_name}
-                                    className={`room-card ${status.toLowerCase()} ${
+                                    className={`room-list-item ${status.toLowerCase()} ${
                                         selectedRoom?.room_name === room.room_name ? 'selected' : ''
                                     }`}
                                     onClick={() => handleRoomClick(room)}
                                 >
-                                    <div className="room-header">
-                                        <h3>{room.room_name}호</h3>
+                                    <div className="info-left">
+                                        <span className="room-name">{room.room_name}호</span>
+                                        <span className="info-item">
+                                            <Thermometer size={14} className="temp-icon" />
+                                            {Number(room.room_temp).toFixed(1)}°C
+                                        </span>
+                                        <span className="info-item">
+                                            <Droplets size={14} className="humi-icon" />
+                                            {room.room_humi}%
+                                        </span>
+                                    </div>
+                                    <div className="info-right">
                                         <span className={`status-badge ${status.toLowerCase()}`}>{status}</span>
+                                        <span className="patient-count">{room.current_patients} 환자</span>
                                     </div>
-                                    <div className="room-info">
-                                        <div className="info-row">
-                                            <Thermometer size={16} />
-                                            <span>온도: {room.room_temp}°C</span>
-                                        </div>
-                                        <div className="info-row">
-                                            <Droplets size={16} />
-                                            <span>습도: {room.room_humi}%</span> {/* room_humidity → room_humi */}
-                                        </div>
-                                        <div className="info-row">
-                                            <Users size={16} />
-                                            <span>환자: {room.current_patients || 0}명</span>
-                                        </div>
-                                    </div>
-                                </div>
+                                </li>
                             );
                         })}
-                    </div>
+                    </ul>
                 </div>
 
                 {selectedRoom && (
@@ -327,15 +323,15 @@ const RoomManagement = () => {
                                     <div className="detail-card">
                                         <h3>온도</h3>
                                         <div className="detail-value">
-                                            <Thermometer size={20} />
-                                            <span>{selectedRoom.room_temp}°C</span>
+                                            <Thermometer size={20} className="temp-icon" />
+                                            <span>{Number(selectedRoom.room_temp).toFixed(1)}°C</span>
                                         </div>
                                         <p className="detail-reference">기준: 26°C</p>
                                     </div>
                                     <div className="detail-card">
                                         <h3>습도</h3>
                                         <div className="detail-value">
-                                            <Droplets size={20} />
+                                            <Droplets size={20} className="humi-icon" />
                                             <span>{selectedRoom.room_humi}%</span>
                                         </div>
                                         <p className="detail-reference">기준: 60%</p>
@@ -390,7 +386,10 @@ const RoomManagement = () => {
                                                             <button
                                                                 className="action-button small"
                                                                 onClick={() =>
-                                                                    handlePatientAssignment(patient.patient_id)
+                                                                    handlePatientAssignment(
+                                                                        patient.patient_id,
+                                                                        parseInt(patient.bed_num)
+                                                                    )
                                                                 }
                                                             >
                                                                 재배정
@@ -399,7 +398,7 @@ const RoomManagement = () => {
                                                     </tr>
                                                 ))
                                             ) : (
-                                                <tr>
+                                                <tr className="empty-row">
                                                     <td colSpan="6" className="empty-message">
                                                         배정된 환자가 없습니다.
                                                     </td>
@@ -514,6 +513,146 @@ const RoomManagement = () => {
                                 확인
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* 클릭식 재배정 모달 */}
+            {assignModal.phase === 'selectRoom' && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <h3>재배정할 병실 선택</h3>
+                        <ul className="assign-list">
+                            {rooms.map((r) => (
+                                <li key={r.room_name} className="assign-list-item">
+                                    <button
+                                        className="assign-btn"
+                                        disabled={r.total_beds === 0}
+                                        onClick={async () => {
+                                            // 선택한 병실 상세 조회
+                                            const res = await axios.get(`${API_BASE_URL}/rooms/${r.room_name}`);
+                                            const roomDetail = res.data.data;
+                                            // 병실 bed 정보 맵 생성
+                                            const allBeds = Array.from(
+                                                { length: Number(r.total_beds) },
+                                                (_, i) => i + 1
+                                            );
+                                            const occupiedMap = {};
+                                            roomDetail.patients.forEach((p) => {
+                                                occupiedMap[Number(p.bed_num)] = p.patient_id;
+                                            });
+                                            setAssignModal({
+                                                phase: 'selectBed',
+                                                patientId: assignModal.patientId,
+                                                originalBed: assignModal.originalBed,
+                                                roomName: r.room_name,
+                                                allBeds,
+                                                occupiedMap,
+                                            });
+                                        }}
+                                    >
+                                        {r.room_name}호
+                                    </button>
+                                </li>
+                            ))}
+                            <li className="assign-list-item">
+                                <button
+                                    className="cancel-btn"
+                                    onClick={() =>
+                                        setAssignModal({ phase: null, patientId: null, roomName: '', freeBeds: [] })
+                                    }
+                                >
+                                    취소
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            )}
+            {assignModal.phase === 'selectBed' && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <h3>{assignModal.roomName}호에서 배정할 침대 선택</h3>
+                        {assignModal.allBeds.length === 0 ? (
+                            <div>
+                                <p>배정 가능한 침대가 없습니다.</p>
+                                <button
+                                    className="cancel-btn"
+                                    onClick={() =>
+                                        setAssignModal({
+                                            phase: null,
+                                            patientId: null,
+                                            roomName: '',
+                                            allBeds: [],
+                                            occupiedMap: {},
+                                        })
+                                    }
+                                >
+                                    취소
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="bed-list">
+                                {assignModal.allBeds.map((bedNum) => {
+                                    const isOccupied = assignModal.occupiedMap[bedNum] != null;
+                                    return (
+                                        <button
+                                            key={bedNum}
+                                            className="bed-btn"
+                                            disabled={false}
+                                            onClick={async () => {
+                                                try {
+                                                    // swap 로직: 이미 점유 중인 경우 기존 환자와 교체
+                                                    const targetPatient = assignModal.occupiedMap[bedNum];
+                                                    if (targetPatient) {
+                                                        // 기존 환자를 원래 침대로 이동
+                                                        await axios.put(`${API_BASE_URL}/patients/${targetPatient}`, {
+                                                            bed_id: assignModal.originalBed,
+                                                        });
+                                                    }
+                                                    // 재배정 대상 환자를 선택 침대로 이동
+                                                    await axios.put(
+                                                        `${API_BASE_URL}/patients/${assignModal.patientId}`,
+                                                        { bed_id: bedNum }
+                                                    );
+                                                    alert('환자 재배정(스왑) 완료');
+                                                    fetchRooms();
+                                                    if (selectedRoom) fetchRoomDetail(selectedRoom.room_name);
+                                                } catch (e) {
+                                                    console.error('Swap error', e);
+                                                    alert('재배정 중 오류가 발생했습니다.');
+                                                } finally {
+                                                    setAssignModal({
+                                                        phase: null,
+                                                        patientId: null,
+                                                        roomName: '',
+                                                        allBeds: [],
+                                                        occupiedMap: {},
+                                                    });
+                                                }
+                                            }}
+                                        >
+                                            {bedNum}
+                                            {isOccupied && ' (교체)'}
+                                        </button>
+                                    );
+                                })}
+                                <button
+                                    className="cancel-btn"
+                                    onClick={() =>
+                                        setAssignModal({
+                                            phase: null,
+                                            patientId: null,
+                                            roomName: '',
+                                            allBeds: [],
+                                            occupiedMap: {},
+                                        })
+                                    }
+                                >
+                                    취소
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

@@ -1,6 +1,6 @@
 .environmental-data-container {
     display: grid;
-    grid-template-columns: 390px 1fr; /* 사이드바 너비를 300px에서 400px로 증가 */
+    grid-template-columns: minmax(auto, 390px) 1fr;
     gap: 2rem;
     height: calc(100vh - 120px);
     padding: 0.7rem;
@@ -172,14 +172,15 @@
 
 .sidebar {
     width: 100%;
+    max-width: 390px;
     background: white;
     border-radius: 8px;
-    padding: 1.5rem;
+    padding: 1.25rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    height: 100%; /* 높이를 100%로 설정 */
-    display: flex; /* Flexbox 사용 */
-    flex-direction: column; /* 세로 방향 정렬 */
-    overflow: hidden; /* 사이드바 자체의 오버플로우 숨김 */
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .sidebar-title {
@@ -189,9 +190,12 @@
 }
 
 .room-list {
-    width: 100%;
-    flex: 1; /* 남은 공간 모두 차지 */
-    overflow-y: auto; /* 세로 스크롤만 표시 */
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    overflow-y: auto;
+    overflow-x: hidden;
     padding-right: 0.5rem;
 }
 
@@ -205,30 +209,109 @@
 
 .room-item {
     display: flex;
+    flex-direction: column;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid #e5e7eb;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* 같은 층의 병실들을 그룹화하는 컨테이너 */
+.floor-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* 층 구분선 */
+.floor-group:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: -0.5rem;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #e5e7eb;
+    margin: 0 -0.5rem;
+}
+
+/* 층 헤더 */
+.floor-header {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #6b7280;
+    padding: 0.25rem 0.5rem;
+    background: #f9fafb;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+}
+
+.room-item:hover {
+    background: #f8f9fa;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.room-item.selected {
+    background: #f0f7ff;
+    border-color: #3b82f6;
+}
+
+.room-header {
+    display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 24px;
-    padding: 1rem 1.2rem;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.2s;
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
-.room-item:not(:last-child) {
-    margin-bottom: 8px;
+.room-name {
+    font-weight: 600;
+    color: #374151;
 }
 
-.room-item:hover,
-.room-item.active {
-    background: #f5f5f5;
+.room-status {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-weight: 500;
+    white-space: nowrap;
 }
 
-.room-item-header {
+.room-status.normal {
+    background-color: #dcfce7;
+    color: #15803d;
+}
+
+.room-status.warning {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.room-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+    width: 100%;
+}
+
+.metric {
     display: flex;
     align-items: center;
-    gap: 4px;
-    flex-shrink: 0;
+    gap: 0.25rem;
+    white-space: nowrap;
 }
 
 .status-dot {
@@ -244,16 +327,6 @@
 
 .normal-dot {
     background: #4caf50;
-}
-
-.room-name {
-    font-weight: 500;
-    font-size: 16px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 50px;
-    padding-right: 6px;
 }
 
 .room-temp,

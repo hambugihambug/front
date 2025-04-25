@@ -1,86 +1,392 @@
 .patient-detail-container {
-    @apply p-6 bg-gray-100 min-h-screen;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .detail-header {
-    @apply flex items-center justify-between mb-6;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    justify-content: space-between;
+}
+
+.detail-header h1 {
+    font-size: 20px;
+    color: #333;
+    margin: 0;
+    font-weight: 500;
 }
 
 .back-button {
-    @apply flex items-center text-gray-600 hover:text-gray-800 transition;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #555;
+    font-size: 14px;
+    transition: all 0.2s;
+    border-radius: 4px;
+}
+
+.back-button:hover {
+    background: #f8f9fa;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.edit-button,
+.save-button,
+.cancel-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.edit-button {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.edit-button:hover {
+    background: #bbdefb;
+}
+
+.save-button {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.save-button:hover {
+    background: #c8e6c9;
+}
+
+.cancel-button {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.cancel-button:hover {
+    background: #ffcdd2;
+}
+
+.info-row input,
+.info-row select {
+    padding: 0.5rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 200px;
+}
+
+.info-row input:focus,
+.info-row select:focus {
+    outline: none;
+    border-color: #2196f3;
+}
+
+.memo-info textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 0.5rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 14px;
+    resize: vertical;
+}
+
+.memo-info textarea:focus {
+    outline: none;
+    border-color: #2196f3;
 }
 
 .medical-record {
-    @apply grid grid-cols-1 lg:grid-cols-3 gap-6; /* 3등분 레이아웃 */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
 }
 
 .left-panel {
-    @apply bg-white p-6 rounded-lg shadow-md col-span-1; /* 1/3 차지 */
-}
-
-.right-panel {
-    @apply bg-white p-6 rounded-lg shadow-md col-span-2; /* 2/3 차지 */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
 .patient-basic-info,
 .vital-signs,
 .hospital-info,
-.guardian-info {
-    @apply mb-6;
+.guardian-info,
+.memo-info,
+.medication-info {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .patient-basic-info h3,
 .vital-signs h3,
 .hospital-info h3,
-.guardian-info h3 {
-    @apply text-lg font-semibold mb-4;
+.guardian-info h3,
+.memo-info h3,
+.medication-info h3 {
+    font-size: 16px;
+    color: #333;
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e9ecef;
 }
 
 .info-row {
-    @apply flex justify-between mb-2 text-gray-700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    font-size: 14px;
 }
 
-.body-diagram {
-    @apply mb-6;
+.info-row span:first-child {
+    color: #666;
 }
 
-.body-image {
-    @apply relative;
-}
-
-.body-image img {
-    @apply w-full rounded-lg;
-}
-
-.clickable-areas .symptom-marker {
-    @apply absolute w-4 h-4 bg-red-500 rounded-full cursor-pointer;
+.info-row span:last-child {
+    font-weight: 500;
+    color: #333;
 }
 
 .status {
-    @apply font-semibold px-2 py-1 rounded text-sm;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
 }
 
-.status.고위험군 {
-    @apply bg-red-100 text-red-600;
+.status.정상 {
+    background: #e6f4ea;
+    color: #1a7340;
 }
 
-.status.저위험군 {
-    @apply bg-amber-100 text-amber-600;
+.status.주의 {
+    background: #fff3e0;
+    color: #e65100;
 }
 
-.status.무위험군 {
-    @apply bg-green-100 text-green-600;
+.status.위험 {
+    background: #ffebee;
+    color: #c62828;
 }
 
-/* 기존 상태 클래스도 유지 */
-.status.occupied {
-    @apply text-blue-500;
+.memo-content {
+    color: #555;
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: pre-wrap;
 }
 
-.status.available {
-    @apply text-green-500;
+.medication-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
-.status.maintenance {
-    @apply text-yellow-500;
+.medication-item {
+    position: relative;
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    padding-top: 2.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #e9ecef;
+}
+
+.medication-item:not(:last-child) {
+    margin-bottom: 0.5rem;
+}
+
+.medication-item .info-row:first-child {
+    margin-top: 0.5rem;
+}
+
+.right-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.loading,
+.error {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+    font-size: 16px;
+}
+
+.error {
+    color: #dc3545;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1024px) {
+    .medical-record {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .patient-detail-container {
+        padding: 1rem;
+    }
+
+    .detail-header {
+        padding: 1rem;
+    }
+}
+
+.body-diagram {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.body-diagram h3 {
+    font-size: 16px;
+    color: #333;
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.body-image {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    background: white;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e9ecef;
+}
+
+.body-image img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.clickable-areas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.symptom-marker {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: #f44336;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.symptom-marker:hover {
+    transform: scale(1.5);
+}
+
+.image-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.add-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: #e3f2fd;
+    color: #1976d2;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.add-button:hover {
+    background: #bbdefb;
+}
+
+.medication-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.remove-button {
+    padding: 0.25rem 0.5rem;
+    background: #ffebee;
+    color: #c62828;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.remove-button:hover {
+    background: #ffcdd2;
+}
+
+.remove-med-button {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.remove-med-button:hover {
+    color: #dc3545;
 }

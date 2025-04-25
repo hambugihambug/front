@@ -208,52 +208,161 @@ const EnvironmentalData = () => {
                             ))}
                         </select>
                     </div>
-                    <ul className="room-list">
-                        {filteredRooms.length === 0 ? (
-                            <li className="room-list-placeholder">
-                                {selectedFloor === 'all'
-                                    ? '표시할 병실이 없습니다.'
-                                    : selectedFloor === 'warning'
-                                    ? '경고 상태인 병실이 없습니다.'
-                                    : `${selectedFloor}층에 병실이 없습니다.`}
-                            </li>
-                        ) : (
-                            filteredRooms.map((item) => (
-                                <li
-                                    key={item.roomId}
-                                    className={`room-item ${item.roomId === selectedRoomId ? 'active' : ''}`}
-                                    onClick={() => setSelectedRoomId(item.roomId)}
-                                >
-                                    <div className="room-item-header">
-                                        <span
-                                            className={`status-dot ${
-                                                item.status === '경고' ? 'warning-dot' : 'normal-dot'
-                                            }`}
-                                        />
-                                        <span className="room-name">{item.roomName}호</span>
-                                    </div>
-                                    <div className="room-item-details-group">
-                                        <div className="room-item-metrics">
-                                            <div className="room-metric">
-                                                <Thermometer size={14} className="metric-icon" />
-                                                <span className="metric-value">{item.temperature}°C</span>
-                                            </div>
-                                            <div className="room-metric">
-                                                <Droplets size={14} className="metric-icon" />
-                                                <span className="metric-value">{item.humidity}%</span>
-                                            </div>
-                                        </div>
-                                        <div className="room-occupancy">
-                                            <Bed size={14} className="metric-icon" />
-                                            <span className="metric-value">
-                                                {item.occupiedBeds}/{item.totalBeds}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </li>
-                            ))
-                        )}
-                    </ul>
+                    <div className="room-list">
+                        {selectedFloor === 'all'
+                            ? // 모든 층일 때
+                              floors.map((floor) => {
+                                  const floorRooms = filteredRooms.filter((room) => {
+                                      const roomNumber = parseInt(room.roomName.replace(/[^0-9]/g, ''), 10);
+                                      return Math.floor(roomNumber / 100).toString() === floor;
+                                  });
+
+                                  if (floorRooms.length === 0) return null;
+
+                                  return (
+                                      <div key={floor} className="floor-group">
+                                          <div className="floor-header">{floor}층</div>
+                                          {floorRooms.map((room) => (
+                                              <div
+                                                  key={room.roomId}
+                                                  className={`room-item ${
+                                                      selectedRoomId === room.roomId ? 'selected' : ''
+                                                  }`}
+                                                  onClick={() => setSelectedRoomId(room.roomId)}
+                                              >
+                                                  <div className="room-header">
+                                                      <span className="room-name">{room.roomName}</span>
+                                                      <span
+                                                          className={`room-status ${
+                                                              room.status === '경고' ? 'warning' : 'normal'
+                                                          }`}
+                                                      >
+                                                          {room.status}
+                                                      </span>
+                                                  </div>
+                                                  <div className="room-metrics">
+                                                      <div className="metric">
+                                                          <Thermometer size={16} />
+                                                          <span>{room.temperature}°C</span>
+                                                      </div>
+                                                      <div className="metric">
+                                                          <Droplets size={16} />
+                                                          <span>{room.humidity}%</span>
+                                                      </div>
+                                                      <div className="metric">
+                                                          <Bed size={16} />
+                                                          <span>
+                                                              {room.occupiedBeds}/{room.totalBeds}
+                                                          </span>
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                          ))}
+                                      </div>
+                                  );
+                              })
+                            : selectedFloor === 'warning'
+                            ? // 경고 상태일 때 (층별로 그룹화)
+                              floors.map((floor) => {
+                                  const warningRooms = filteredRooms.filter((room) => {
+                                      const roomNumber = parseInt(room.roomName.replace(/[^0-9]/g, ''), 10);
+                                      return (
+                                          Math.floor(roomNumber / 100).toString() === floor && room.status === '경고'
+                                      );
+                                  });
+
+                                  if (warningRooms.length === 0) return null;
+
+                                  return (
+                                      <div key={floor} className="floor-group">
+                                          <div className="floor-header">{floor}층</div>
+                                          {warningRooms.map((room) => (
+                                              <div
+                                                  key={room.roomId}
+                                                  className={`room-item ${
+                                                      selectedRoomId === room.roomId ? 'selected' : ''
+                                                  }`}
+                                                  onClick={() => setSelectedRoomId(room.roomId)}
+                                              >
+                                                  <div className="room-header">
+                                                      <span className="room-name">{room.roomName}</span>
+                                                      <span className="room-status warning">{room.status}</span>
+                                                  </div>
+                                                  <div className="room-metrics">
+                                                      <div className="metric">
+                                                          <Thermometer size={16} />
+                                                          <span>{room.temperature}°C</span>
+                                                      </div>
+                                                      <div className="metric">
+                                                          <Droplets size={16} />
+                                                          <span>{room.humidity}%</span>
+                                                      </div>
+                                                      <div className="metric">
+                                                          <Bed size={16} />
+                                                          <span>
+                                                              {room.occupiedBeds}/{room.totalBeds}
+                                                          </span>
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                          ))}
+                                      </div>
+                                  );
+                              })
+                            : // 특정 층 선택일 때
+                              floors.map((floor) => {
+                                  if (floor !== selectedFloor) return null;
+
+                                  const floorRooms = filteredRooms.filter((room) => {
+                                      const roomNumber = parseInt(room.roomName.replace(/[^0-9]/g, ''), 10);
+                                      return Math.floor(roomNumber / 100).toString() === floor;
+                                  });
+
+                                  if (floorRooms.length === 0) return null;
+
+                                  return (
+                                      <div key={floor} className="floor-group">
+                                          <div className="floor-header">{floor}층</div>
+                                          {floorRooms.map((room) => (
+                                              <div
+                                                  key={room.roomId}
+                                                  className={`room-item ${
+                                                      selectedRoomId === room.roomId ? 'selected' : ''
+                                                  }`}
+                                                  onClick={() => setSelectedRoomId(room.roomId)}
+                                              >
+                                                  <div className="room-header">
+                                                      <span className="room-name">{room.roomName}</span>
+                                                      <span
+                                                          className={`room-status ${
+                                                              room.status === '경고' ? 'warning' : 'normal'
+                                                          }`}
+                                                      >
+                                                          {room.status}
+                                                      </span>
+                                                  </div>
+                                                  <div className="room-metrics">
+                                                      <div className="metric">
+                                                          <Thermometer size={16} />
+                                                          <span>{room.temperature}°C</span>
+                                                      </div>
+                                                      <div className="metric">
+                                                          <Droplets size={16} />
+                                                          <span>{room.humidity}%</span>
+                                                      </div>
+                                                      <div className="metric">
+                                                          <Bed size={16} />
+                                                          <span>
+                                                              {room.occupiedBeds}/{room.totalBeds}
+                                                          </span>
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                          ))}
+                                      </div>
+                                  );
+                              })}
+                    </div>
                 </div>
 
                 <div className="main-detail">

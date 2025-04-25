@@ -60,7 +60,7 @@ const PatientManagement = () => {
         hasGuardian: null,
     });
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedPatients, setSelectedPatients] = useState([]);
     const [stats, setStats] = useState({
@@ -896,15 +896,10 @@ const PatientManagement = () => {
                 </div>
             )}
 
-            {/* 테이블 헤더 액션 */}
-            <div className="table-header-actions">
-                <h1 className="table-title">Patients</h1>
-            </div>
-
-            {/* 검색 */}
+            {/* 검색 및 필터 섹션 */}
             <div className="search-filter-section">
                 <div className="search-container">
-                    <Search className="search-icon" size={20} />
+                    <Search className="search-icon" />
                     <input
                         type="text"
                         className="search-input"
@@ -915,17 +910,17 @@ const PatientManagement = () => {
                 </div>
                 <div className="action-group">
                     <button className="filter-button" onClick={() => setShowFilterModal(true)}>
-                        <Filter size={18} />
+                        <Filter size={16} />
                         Filter
                     </button>
-                    <button className="header-button add-button" onClick={() => setShowAddForm(true)}>
-                        <Plus size={18} />
+                    <button className="add-button" onClick={() => setShowAddForm(true)}>
+                        <Plus size={16} />
                         Add
                     </button>
                 </div>
             </div>
 
-            {/* 환자 목록 테이블 */}
+            {/* 테이블 */}
             <div className="data-table-container">
                 <table className="data-table">
                     <thead>
@@ -999,9 +994,6 @@ const PatientManagement = () => {
                                             <button className="action-button" onClick={() => openDetailView(patient)}>
                                                 <ContentPasteSearchIcon sx={{ fontSize: 20 }} />
                                             </button>
-                                            <button className="action-button" onClick={() => openEditForm(patient)}>
-                                                <EditNoteIcon sx={{ fontSize: 20 }} />
-                                            </button>
                                             <button
                                                 className="action-button delete"
                                                 onClick={() => handleDeletePatient(patient.patient_id)}
@@ -1022,21 +1014,18 @@ const PatientManagement = () => {
                         <select
                             value={rowsPerPage}
                             onChange={(e) => {
-                                const newRowsPerPage = Number(e.target.value);
-                                setRowsPerPage(newRowsPerPage);
-                                // 페이지당 행 수가 변경될 때 현재 페이지 조정
-                                const maxPage = Math.ceil(filteredPatients.length / newRowsPerPage);
-                                setCurrentPage((current) => Math.min(current, maxPage));
+                                setRowsPerPage(Number(e.target.value));
+                                setCurrentPage(1);
                             }}
                             className="rows-select"
                         >
-                            <option value={5}>5</option>
                             <option value={10}>10</option>
                             <option value={20}>20</option>
+                            <option value={30}>30</option>
                         </select>
                     </div>
                     <div className="pagination-info">
-                        {`${Math.min((currentPage - 1) * rowsPerPage + 1, filteredPatients.length)}-${Math.min(
+                        {`${(currentPage - 1) * rowsPerPage + 1}-${Math.min(
                             currentPage * rowsPerPage,
                             filteredPatients.length
                         )} of ${filteredPatients.length}`}
@@ -1047,17 +1036,18 @@ const PatientManagement = () => {
                             onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                             disabled={currentPage === 1}
                         >
-                            <ChevronLeft size={20} />
+                            <ChevronLeft size={16} />
                         </button>
                         <button
                             className="pagination-button"
-                            onClick={() => {
-                                const maxPage = Math.ceil(filteredPatients.length / rowsPerPage);
-                                setCurrentPage((prev) => Math.min(prev + 1, maxPage));
-                            }}
+                            onClick={() =>
+                                setCurrentPage((prev) =>
+                                    Math.min(prev + 1, Math.ceil(filteredPatients.length / rowsPerPage))
+                                )
+                            }
                             disabled={currentPage * rowsPerPage >= filteredPatients.length}
                         >
-                            <ChevronRight size={20} />
+                            <ChevronRight size={16} />
                         </button>
                     </div>
                 </div>
