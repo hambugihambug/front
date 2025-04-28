@@ -99,7 +99,7 @@ const PatientManagement = () => {
 
     // 이미지 URL 포맷팅 함수 추가
     const formatImageUrl = (imagePath) => {
-        if (!imagePath) return null;
+        if (!imagePath) return '/images/default-patient.png';
         if (imagePath.startsWith('http')) return imagePath;
         return `${API_BASE_URL}${imagePath}`;
     };
@@ -968,7 +968,7 @@ const PatientManagement = () => {
                                                 className="patient-avatar-image"
                                                 onError={(e) => {
                                                     e.target.onerror = null;
-                                                    e.target.src = 'https://via.placeholder.com/40?text=No+Image';
+                                                    e.target.src = '/images/default-patient.png';
                                                 }}
                                             />
                                         </div>

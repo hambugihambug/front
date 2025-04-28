@@ -72,7 +72,7 @@ const RoomDetail = () => {
                     </div>
                     <div className="stat-content">
                         <h3>현재 습도</h3>
-                        <p className="stat-value">{room.room_humidity}%</p>
+                        <p className="stat-value">{room.room_humi}%</p>
                         <p className="stat-description">기준: 60%</p>
                     </div>
                 </div>
@@ -144,7 +144,7 @@ const RoomDetail = () => {
                                     <div className="humidity-history">
                                         <div className="current-value">
                                             <Droplets size={24} />
-                                            <span>{room.room_humidity}%</span>
+                                            <span>{room.room_humi}%</span>
                                         </div>
                                         <p className="description">지난 24시간 평균: 55%</p>
                                     </div>
