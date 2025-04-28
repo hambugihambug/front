@@ -60,7 +60,6 @@
     gap: 16px;
     margin-bottom: 32px;
 }
-<<<<<<< HEAD
 @media (min-width: 640px) {
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -70,23 +69,12 @@
     .stats-grid {
         grid-template-columns: repeat(4, 1fr);
     }
-=======
-@media(min-width: 640px) {
-    .stats-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media(min-width: 1024px) {
-    .stats-grid { grid-template-columns: repeat(4, 1fr); }
->>>>>>> b47947f53a3296521fc466a63e409020a2761bb4
 }
 
 .stat-card {
     background: #fff;
     border-radius: 8px;
-<<<<<<< HEAD
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-=======
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
->>>>>>> b47947f53a3296521fc466a63e409020a2761bb4
     padding: 24px;
     display: flex;
     flex-direction: column;
@@ -121,11 +109,7 @@
 .monitoring-section {
     background: #fff;
     border-radius: 8px;
-<<<<<<< HEAD
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-=======
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
->>>>>>> b47947f53a3296521fc466a63e409020a2761bb4
     padding: 24px;
     margin-bottom: 32px;
 }
@@ -137,22 +121,14 @@
 }
 .room-grid {
     display: grid;
-<<<<<<< HEAD
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-=======
-    grid-template-columns: repeat(auto-fill,minmax(280px,1fr));
->>>>>>> b47947f53a3296521fc466a63e409020a2761bb4
     gap: 16px;
 }
 .room-card {
     background: #fff;
     border-radius: 8px;
     padding: 16px;
-<<<<<<< HEAD
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-=======
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
->>>>>>> b47947f53a3296521fc466a63e409020a2761bb4
     transition: transform 0.2s;
     cursor: pointer;
 }
@@ -177,7 +153,6 @@
     border-radius: 4px;
     font-weight: 500;
 }
-<<<<<<< HEAD
 .status-badge.정상 {
     background-color: #dcfce7;
     color: #166534;
@@ -190,11 +165,6 @@
     background-color: #fee2e2;
     color: #991b1b;
 }
-=======
-.status-badge.정상 { background-color: #dcfce7; color: #166534; }
-.status-badge.중간 { background-color: #fef3c7; color: #92400e; }
-.status-badge.높음 { background-color: #fee2e2; color: #991b1b; }
->>>>>>> b47947f53a3296521fc466a63e409020a2761bb4
 
 .room-card .room-info {
     font-size: 14px;
@@ -227,11 +197,7 @@
 .shortcut-section {
     background: #fff;
     border-radius: 8px;
-<<<<<<< HEAD
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-=======
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
->>>>>>> b47947f53a3296521fc466a63e409020a2761bb4
     padding: 24px;
 }
 .activity-section .section-title,
@@ -259,7 +225,9 @@
     font-size: 14px;
     color: #4b5563;
     font-weight: 500;
-    transition: background-color 0.2s, color 0.2s;
+    transition:
+        background-color 0.2s,
+        color 0.2s;
 }
 .floor-tab:hover {
     background-color: #e5e7eb;
@@ -293,7 +261,6 @@
 .dashboard-page .btn-small,
 .dashboard-page .floor-tab,
 .dashboard-page .tab {
-<<<<<<< HEAD
     background-color: #fff;
     border: 1px solid #e5e7eb;
     border-radius: 4px;
@@ -301,52 +268,29 @@
     font-weight: 500;
     padding: 8px 16px;
     cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s;
-=======
-  background-color: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 4px;
-  color: #374151;
-  font-weight: 500;
-  padding: 8px 16px;
-  cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s;
->>>>>>> b47947f53a3296521fc466a63e409020a2761bb4
+    transition:
+        background-color 0.2s,
+        border-color 0.2s;
 }
 .dashboard-page .btn:hover,
 .dashboard-page .btn-small:hover,
 .dashboard-page .floor-tab:hover,
 .dashboard-page .tab:hover {
-<<<<<<< HEAD
     background-color: #f3f4f6;
-=======
-  background-color: #f3f4f6;
->>>>>>> b47947f53a3296521fc466a63e409020a2761bb4
 }
 
 /* 활성 탭 / 버튼 */
 .dashboard-page .tab.active,
 .dashboard-page .floor-tab.active {
-<<<<<<< HEAD
     background-color: var(--primary-color);
     border-color: var(--primary-color);
     color: #fff;
-=======
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-  color: #fff;
->>>>>>> b47947f53a3296521fc466a63e409020a2761bb4
 }
 
 /* 작은 버튼 padding 조정 */
 .dashboard-page .btn-small {
-<<<<<<< HEAD
     padding: 4px 8px;
     font-size: 0.875rem;
-=======
-  padding: 4px 8px;
-  font-size: 0.875rem;
->>>>>>> b47947f53a3296521fc466a63e409020a2761bb4
 }
 
 /* Chart tabs styling */
@@ -380,8 +324,4 @@
 .room-grid.single .room-card {
     max-width: 280px;
     width: 100%;
-<<<<<<< HEAD
 }
-=======
-} 
->>>>>>> b47947f53a3296521fc466a63e409020a2761bb4

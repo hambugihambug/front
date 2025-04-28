@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Edit2, Save, X } from 'lucide-react';
 import axios from 'axios';
 import '../styles/components/PatientDetail.css';
+import HumanModel3D from './HumanModel3D';
 
 const API_BASE_URL = 'http://localhost:3000';
 
@@ -421,21 +422,25 @@ const PatientDetail = () => {
 
                     <div className="body-diagram">
                         <h3>증상 체크</h3>
-                        <div className="body-image">
-                            <img src="/images/body-diagram.png" alt="신체 다이어그램" />
-                            <div className="clickable-areas">
-                                {patient.symptoms?.map((symptom, index) => (
-                                    <div
-                                        key={index}
-                                        className="symptom-marker"
-                                        style={{
-                                            top: `${symptom.y}%`,
-                                            left: `${symptom.x}%`,
-                                        }}
-                                        title={symptom.description}
-                                    />
-                                ))}
-                            </div>
+                        <div className="body-model">
+                            <HumanModel3D
+                                symptoms={patient.symptoms}
+                                onSymptomAdd={
+                                    isEditing
+                                        ? (point) => {
+                                              const newSymptom = {
+                                                  x: point.x,
+                                                  y: point.y,
+                                                  description: prompt('증상을 입력하세요:') || '증상 없음',
+                                              };
+                                              handleInputChange('symptoms', [
+                                                  ...(editedPatient.symptoms || []),
+                                                  newSymptom,
+                                              ]);
+                                          }
+                                        : undefined
+                                }
+                            />
                         </div>
                     </div>
                 </div>
