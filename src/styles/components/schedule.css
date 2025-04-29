@@ -12,7 +12,7 @@
 }
 
 .schedule-title {
-    font-size: 16px !important;
+    font-size: 1.5rem !important;
     font-weight: 700;
     margin-bottom: 8px;
     color: rgb(25, 72, 144);
@@ -403,6 +403,7 @@
 /* 일정 관리 페이지 서브타이틀 */
 .schedule-subtitle {
     font-size: 14px;
+    font-weight: 700;
     color: #64748b;
     margin-top: 4px;
     margin-bottom: 24px;

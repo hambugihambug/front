@@ -133,8 +133,12 @@
     }
 }
 
-/* Dashboard wrapper 네우모픽 스타일 */
-.dashboard-container {
+/* Page wrapper 네우모픽 스타일 (대시보드, 홈, 환경, 일정, 환자목록, 병실관리, 낙상감지) */
+.dashboard-container,
+.dashboard-page,
+.dashboard-home-container,
+.environmental-data-page,
+.schedule-container {
     background-color: #fcfcfc;
     padding: 2rem;
     border-radius: 1rem;
