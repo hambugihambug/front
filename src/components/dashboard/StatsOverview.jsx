@@ -51,10 +51,10 @@ export default function StatsOverview() {
     }, []);
 
     const items = [
-        { name: '총 환자 수', value: stats.totalPatients, icon: Users },
-        { name: '낙상 위험 환자', value: stats.highRiskPatients, icon: AlertTriangle },
-        { name: '이번 달 낙상 횟수', value: stats.fallsThisMonth, icon: Activity },
-        { name: '평균 대응 시간', value: stats.avgResponseTime ?? '—', icon: Clock },
+        { name: '총 환자 수', value: stats.totalPatients, icon: Users, color: 'rgb(25,72,144)', bgColor: 'rgba(25,72,144,0.1)' },
+        { name: '낙상 위험 환자', value: stats.highRiskPatients, icon: AlertTriangle, color: 'rgb(220,53,69)', bgColor: 'rgba(220,53,69,0.1)' },
+        { name: '이번 달 낙상 횟수', value: stats.fallsThisMonth, icon: Activity, color: 'rgb(139,92,246)', bgColor: 'rgba(139,92,246,0.1)' },
+        { name: '평균 대응 시간', value: stats.avgResponseTime ?? '—', icon: Clock, color: 'rgb(249,115,22)', bgColor: 'rgba(249,115,22,0.1)' },
     ];
 
     return (
@@ -77,8 +77,11 @@ export default function StatsOverview() {
                         <Card key={index} className="overflow-hidden shadow">
                             <CardContent className="p-5">
                                 <div className="flex items-center">
-                                    <div className="p-2 mr-2 rounded-full bg-blue-100">
-                                        <item.icon className="w-5 h-5 text-blue-600" />
+                                    <div
+                                        className="p-2 mr-2 rounded-full"
+                                        style={{ backgroundColor: item.bgColor }}
+                                    >
+                                        <item.icon className="w-5 h-5" style={{ color: item.color }} />
                                     </div>
                                     <div>
                                         <p className="text-sm font-medium text-gray-500 truncate">{item.name}</p>

@@ -638,3 +638,11 @@ body {
 .incident-info-value {
     flex: 1;
 }
+
+/* 대시보드 헤더 카드 스타일 완전 제거 */
+.dashboard-page > .dashboard-header {
+    background: none !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+}
