@@ -132,3 +132,15 @@
         opacity: 1;
     }
 }
+
+/* Dashboard wrapper 네우모픽 스타일 */
+.dashboard-container {
+    background-color: #fcfcfc;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow:
+        -8px -8px 16px rgba(255, 255, 255, 0.7),
+         8px -8px 16px rgba(255, 255, 255, 0.7),
+        -8px  8px 16px rgba(0, 0, 0, 0.08),
+         8px  8px 16px rgba(0, 0, 0, 0.08);
+}

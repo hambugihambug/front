@@ -14,6 +14,7 @@ import {
     Clock,
     Heart,
     X,
+    Trash2,
     Upload,
     Download,
     ChevronLeft,
@@ -151,7 +152,7 @@ const PatientManagement = () => {
                     },
                     dischargeScheduled: {
                         value: `${dischargeScheduled}명`,
-                        description: '퇴원 예정',
+                        
                     },
                 }));
             } else {
@@ -479,7 +480,6 @@ const PatientManagement = () => {
                     <div className="stat-content">
                         <h3>퇴원 예정</h3>
                         <p className="stat-value">{stats.dischargeScheduled.value}</p>
-                        <p className="stat-description">{stats.dischargeScheduled.description}</p>
                     </div>
                 </div>
             </div>
@@ -815,7 +815,7 @@ const PatientManagement = () => {
                     <input
                         type="text"
                         className="search-input"
-                        placeholder="Search customer"
+                        placeholder="Search patient"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -837,23 +837,15 @@ const PatientManagement = () => {
                 <table className="data-table">
                     <thead>
                         <tr>
-                            <th>
-                                <input
-                                    type="checkbox"
-                                    className="row-checkbox"
-                                    checked={selectedPatients.length === patients.length}
-                                    onChange={handleSelectAll}
-                                />
-                            </th>
-                            <th>ID</th>
-                            <th>사진</th>
-                            <th>이름</th>
-                            <th>생년월일</th>
-                            <th>신체 정보</th>
-                            <th>혈액형</th>
-                            <th>병실/침대</th>
-                            <th>상태</th>
-                            <th>Actions</th>
+                            <th className="header-label">ID</th>
+                            <th className="header-label">사진</th>
+                            <th className="header-label">이름</th>
+                            <th className="header-label">생년월일</th>
+                            <th className="header-label">신체 정보</th>
+                            <th className="header-label">혈액형</th>
+                            <th className="header-label">병실/침대</th>
+                            <th className="header-label">상태</th>
+                            <th className="header-label">작업</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -861,14 +853,6 @@ const PatientManagement = () => {
                             .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
                             .map((patient) => (
                                 <tr key={patient.patient_id}>
-                                    <td>
-                                        <input
-                                            type="checkbox"
-                                            className="row-checkbox"
-                                            checked={selectedPatients.includes(patient.patient_id)}
-                                            onChange={() => handleSelectPatient(patient.patient_id)}
-                                        />
-                                    </td>
                                     <td>
                                         <span className="patient-id">{patient.patient_id}</span>
                                     </td>
@@ -895,7 +879,7 @@ const PatientManagement = () => {
                                     <td>
                                         <span className="status-badge blood-type">{patient.patient_blood}형</span>
                                     </td>
-                                    <td>{patient.room_name ? `${patient.room_name}호 / ${patient.bed_num}번` : '-'}</td>
+                                    <td>{patient.room_name ? `${patient.room_name}호 / ${patient.bed_num}` : '-'}</td>
                                     <td>
                                         <span className={`status-badge ${getStatusClass(patient.patient_status)}`}>
                                             {patient.patient_status}
@@ -910,7 +894,7 @@ const PatientManagement = () => {
                                                 className="action-button delete"
                                                 onClick={() => handleDeletePatient(patient.patient_id)}
                                             >
-                                                <DeleteIcon sx={{ fontSize: 20, color: '#dc2626' }} />
+                                                <Trash2 size={20} color="#dc2626" />
                                             </button>
                                         </div>
                                     </td>

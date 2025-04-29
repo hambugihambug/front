@@ -139,6 +139,20 @@
     margin-bottom: 1rem;
 }
 
+/* Stats Overview 아이콘 컬러 지정 */
+.stats-overview .stat-card:nth-child(1) .stat-icon svg {
+    color: var(--primary-color);
+}
+.stats-overview .stat-card:nth-child(2) .stat-icon svg {
+    color: #06b6d4; /* 시안 계열 */
+}
+.stats-overview .stat-card:nth-child(3) .stat-icon svg {
+    color: #f59e0b; /* 옐로우 계열 */
+}
+.stats-overview .stat-card:nth-child(4) .stat-icon svg {
+    color: #10b981; /* 그린 계열 */
+}
+
 .stat-content h3 {
     font-size: 0.875rem;
     color: #6b7280;
@@ -339,6 +353,8 @@
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.95rem;
 }
 
 /* Table Cell Alignment */
@@ -350,9 +366,11 @@
 
 .data-table th {
     text-align: center;
-    background-color: #f9fafb;
+    background-color: var(--primary-color);
     font-weight: 600;
-    color: #4b5563;
+    color: #ffffff;
+    padding: 1rem;
+    text-transform: uppercase;
 }
 
 /* Column Widths and Alignment */
@@ -820,9 +838,10 @@
 
 .search-input {
     width: 100%;
-    padding: 0.625rem 1rem 0.625rem 2.5rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.375rem;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
     font-size: 0.875rem;
     color: #374151;
     background-color: white;
@@ -852,7 +871,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.625rem 1rem;
+    padding: 0.5rem 1rem;
     background-color: #f3f4f6;
     border: none;
     border-radius: 0.375rem;
@@ -860,18 +879,19 @@
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.3s, transform 0.2s;
 }
 
 .filter-button:hover {
-    background-color: #e5e7eb;
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
 }
 
 .add-button {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.625rem 1rem;
+    padding: 0.5rem 1rem;
     background-color: rgb(25, 72, 144);
     border: none;
     border-radius: 0.375rem;
@@ -879,11 +899,12 @@
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.3s, transform 0.2s;
 }
 
 .add-button:hover {
     background-color: rgb(20, 58, 115);
+    transform: translateY(-2px);
 }
 
 /* Table Footer and Pagination */
@@ -927,23 +948,189 @@
 
 .pagination-button {
     padding: 0.25rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.375rem;
-    background-color: white;
-    color: #374151;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
+    border: none;
+    background-color: transparent;
+    transition: background-color 0.3s, transform 0.15s;
 }
 
 .pagination-button:hover:not(:disabled) {
-    background-color: #f3f4f6;
-    border-color: #d1d5db;
+    background-color: var(--primary-light);
+    transform: translateY(-2px);
 }
 
 .pagination-button:disabled {
-    color: #d1d5db;
-    cursor: not-allowed;
+    opacity: 0.4;
+}
+
+/* Modern table enhancements */
+.data-table thead {
+    background-color: var(--primary-hover);
+}
+.data-table thead th {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    padding: 1rem;
+    text-transform: uppercase;
+}
+.data-table tbody tr {
+    transition: background-color 0.3s, transform 0.15s;
+}
+.data-table tbody tr:hover {
+    background-color: #eef2f7;
+    transform: scale(1.01);
+}
+.data-table tbody tr:nth-child(even) {
+    background-color: #f9fafb;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+.status-badge.blood-type {
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+}
+.status-badge.stable {
+    background-color: #d1fae5;
+    color: #047857;
+}
+.status-badge.critical {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+/* Container card */
+.data-table-container {
+    padding: 1rem;
+    border-radius: 1rem;
+    background-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Search & filter */
+.search-input {
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    width: 320px;
+}
+.filter-button, .add-button {
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    transition: background-color 0.3s, transform 0.2s;
+}
+.filter-button:hover, .add-button:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+}
+
+/* Pagination */
+.pagination-buttons .pagination-button {
+    border: none;
+    background-color: transparent;
+    transition: background-color 0.3s, transform 0.15s;
+}
+.pagination-buttons .pagination-button:hover:not(:disabled) {
+    background-color: var(--primary-light);
+    transform: translateY(-2px);
+}
+.pagination-buttons .pagination-button:disabled {
+    opacity: 0.4;
+}
+
+/* 배경 컨테이너 스타일 */
+.patient-management-container {
+    background-color: #fcfcfc;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow:
+        -8px -8px 16px rgba(255, 255, 255, 0.7),
+         8px -8px 16px rgba(255, 255, 255, 0.7),
+        -8px  8px 16px rgba(0, 0, 0, 0.08),
+         8px  8px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* 메인 테마 색상 일관 적용 */
+.add-button, .filter-button {
+    background-color: var(--primary-color) !important;
+    color: #ffffff !important;
+}
+.add-button:hover, .filter-button:hover {
+    background-color: var(--primary-hover) !important;
+}
+
+/* 체크박스 완전 제거 */
+.row-checkbox {
+    display: none !important;
+}
+.row-checkbox:disabled {
+    display: none !important;
+}
+
+/* 제목 h1 볼드 */
+.patient-management-container .header .title-section h1 {
+    font-weight: 700;
+}
+
+/* patient-name 스타일 수정 */
+.data-table .patient-name {
+    font-weight: 400;
+    font-size: 0.9rem;
+}
+
+/* header-label 기본 스타일 (컬러 제거) */
+.header-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* 테이블 헤더의 header-label은 흰색으로 표시 */
+.data-table thead th.header-label {
+    color: #ffffff;
+}
+
+/* 검색/필터/에드/편집 버튼 그리드 정렬 */
+.search-filter-section .action-group {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    gap: 0.75rem;
+}
+
+/* 체크박스 셀 최소 너비 유지 */
+.data-table th:first-child,
+.data-table td:first-child {
+    width: 48px;
+}
+
+/* 상태별 뱃지 컬러 */
+.status-badge.high-risk {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+.status-badge.low-risk {
+    background-color: #fffbeb;
+    color: #92400e;
+}
+.status-badge.no-risk {
+    background-color: #d1fae5;
+    color: #047857;
+}
+
+/* Dashboard 컨테이너 스타일 */
+.dashboard-container {
+    background-color: #fcfcfc;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow:
+        -8px -8px 16px rgba(255, 255, 255, 0.7),
+         8px -8px 16px rgba(255, 255, 255, 0.7),
+        -8px  8px 16px rgba(0, 0, 0, 0.08),
+         8px  8px 16px rgba(0, 0, 0, 0.08);
 }
