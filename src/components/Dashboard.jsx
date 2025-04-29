@@ -6,7 +6,7 @@ import ActiveAlerts from './dashboard/ActiveAlerts';
 import FallsChart from './dashboard/FallsChart';
 import RecentActivity from './dashboard/RecentActivity';
 import RoomGrid from './dashboard/RoomGrid';
-import '../styles/pages/DashboardPage.css';
+import '../styles/components/DashboardPage.css';
 
 export default function Dashboard() {
     const navigate = useNavigate();

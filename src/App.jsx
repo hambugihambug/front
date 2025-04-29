@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Dashboard from './components/Dashboard';
 import PatientManagement from './components/PatientManagement';
+import PatientAdd from './components/PatientAdd';
 import RoomManagement from './components/RoomManagement';
 import BedManagement from './components/BedManagement';
 import FallIncidents from './components/FallIncidents';
@@ -152,6 +153,7 @@ function App() {
                         <Route path="/rooms" element={<RoomManagement />} />
                         <Route path="/rooms/:roomName" element={<RoomDetail />} />
                         <Route path="/patients" element={<PatientManagement />} />
+                        <Route path="/patients/add" element={<PatientAdd />} />
                         <Route path="/patients/:id" element={<PatientDetail />} />
                         <Route path="/beds" element={<BedManagement />} />
                         <Route path="/fall-incidents" element={<FallIncidents />} />

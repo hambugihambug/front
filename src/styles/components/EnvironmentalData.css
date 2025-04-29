@@ -8,13 +8,15 @@
 }
 
 .page-title {
-    font-size: 24px;
+    font-size: 24px !important;
+    font-weight: 700 !important;
     margin-bottom: 8px;
-    color: #333;
+    color: #1e293b;
 }
 
 .page-description {
-    color: #666;
+    font-size: 14px;
+    color: #64748b;
     margin-bottom: 24px;
 }
 
@@ -215,9 +217,26 @@
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #e2e8f0;
     width: 100%;
     box-sizing: border-box;
+}
+
+.room-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.room-item.selected {
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border-color: #e2e8f0;
+    background: white;
+}
+
+.room-item.selected:hover {
+    transform: none;
 }
 
 /* 같은 층의 병실들을 그룹화하는 컨테이너 */
@@ -255,17 +274,6 @@
     margin-bottom: 0.5rem;
 }
 
-.room-item:hover {
-    background: #f8f9fa;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.room-item.selected {
-    background: #f0f7ff;
-    border-color: #3b82f6;
-}
-
 .room-header {
     display: flex;
     justify-content: space-between;
@@ -289,13 +297,19 @@
 }
 
 .room-status.normal {
-    background-color: #dcfce7;
-    color: #15803d;
+    color: #10b981;
+    background-color: rgba(16, 185, 129, 0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
 }
 
 .room-status.warning {
-    background-color: #fee2e2;
     color: #dc2626;
+    background-color: rgba(220, 38, 38, 0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
 }
 
 .room-metrics {
@@ -487,7 +501,9 @@
     font-size: 14px;
     color: #666;
     cursor: pointer;
-    transition: background-color 0.2s, color 0.2s;
+    transition:
+        background-color 0.2s,
+        color 0.2s;
 }
 
 .toggle-input.active {

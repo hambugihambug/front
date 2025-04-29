@@ -1,4 +1,3 @@
-@import './components/Dashboard.css';
 @import './components/dashboard/StatsOverview.css';
 @import './components/dashboard/ActiveAlerts.css';
 @import './components/dashboard/FallsChart.css';

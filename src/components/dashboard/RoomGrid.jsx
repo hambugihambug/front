@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Thermometer, Droplet, Users } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
-import '../../styles/pages/DashboardPage.css';
+import '../../styles/components/DashboardPage.css';
 
 const API_BASE_URL = 'http://localhost:3000';
 

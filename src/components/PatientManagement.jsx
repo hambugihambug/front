@@ -44,13 +44,11 @@ const initialFormState = {
 
 const PatientManagement = () => {
     const [patients, setPatients] = useState([]);
-    const [showAddForm, setShowAddForm] = useState(false);
     const [showEditForm, setShowEditForm] = useState(false);
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [showFilterModal, setShowFilterModal] = useState(false);
     const [selectedPatient, setSelectedPatient] = useState(null);
     const [editingPatient, setEditingPatient] = useState(null);
-    const [newPatient, setNewPatient] = useState(initialFormState);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -171,14 +169,14 @@ const PatientManagement = () => {
         }
     };
 
-    const handleDeletePatient = async (id) => {
-        if (window.confirm('정말 이 환자를 삭제하시겠습니까?')) {
+    const handleDeletePatient = async (patientId) => {
+        if (window.confirm('정말로 이 환자를 삭제하시겠습니까?')) {
             try {
-                await axios.delete(`${API_BASE_URL}/patients/${id}`);
-                setPatients(patients.filter((patient) => patient.patient_id !== id));
-            } catch (err) {
-                console.error('Error deleting patient:', err);
-                setError('환자 삭제에 실패했습니다.');
+                await axios.delete(`${API_BASE_URL}/patients/${patientId}`);
+                setPatients(patients.filter((p) => p.patient_id !== patientId));
+            } catch (error) {
+                console.error('Error deleting patient:', error);
+                alert('환자 삭제 중 오류가 발생했습니다.');
             }
         }
     };
@@ -210,34 +208,9 @@ const PatientManagement = () => {
     }, [patients, sortConfig]);
 
     // handleEditPatient 함수 수정
-    const handleEditPatient = async (e) => {
-        e.preventDefault();
-        try {
-            setLoading(true);
-
-            const patientData = {
-                ...editingPatient,
-                patient_birth: editingPatient.patient_birth,
-                patient_status: editingPatient.patient_status || 'active',
-                medications: editingPatient.medications || [],
-            };
-
-            const response = await axios.put(`${API_BASE_URL}/patients/${editingPatient.patient_id}`, patientData);
-
-            if (response.data.code === 0) {
-                await fetchPatients();
-                setShowEditForm(false);
-                setEditingPatient(null);
-                alert('환자 정보가 성공적으로 수정되었습니다.');
-            } else {
-                setError('환자 정보 수정에 실패했습니다.');
-            }
-        } catch (err) {
-            console.error('Error updating patient:', err);
-            alert(err.response?.data?.message || '환자 정보 수정 중 오류가 발생했습니다.');
-        } finally {
-            setLoading(false);
-        }
+    const handleEditPatient = (patient) => {
+        setEditingPatient(patient);
+        setShowEditForm(true);
     };
 
     // openDetailView 함수 수정
@@ -261,15 +234,10 @@ const PatientManagement = () => {
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
-        if (name.includes('.')) {
-            const [parent, child] = name.split('.');
-            setFilters((prev) => ({
-                ...prev,
-                [parent]: { ...prev[parent], [child]: value },
-            }));
-        } else {
-            setFilters((prev) => ({ ...prev, [name]: value }));
-        }
+        setFilters((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
     };
 
     // 필터링 함수 수정
@@ -324,20 +292,22 @@ const PatientManagement = () => {
         }
     };
 
-    const handleSelectAll = (e) => {
-        if (e.target.checked) {
-            setSelectedPatients(patients.map((patient) => patient.patient_id));
-        } else {
+    const handleSelectAll = () => {
+        if (selectedPatients.length === patients.length) {
             setSelectedPatients([]);
+        } else {
+            setSelectedPatients(patients.map((p) => p.patient_id));
         }
     };
 
-    const handleSelectPatient = (id) => {
-        if (selectedPatients.includes(id)) {
-            setSelectedPatients(selectedPatients.filter((i) => i !== id));
-        } else {
-            setSelectedPatients([...selectedPatients, id]);
-        }
+    const handleSelectPatient = (patientId) => {
+        setSelectedPatients((prev) => {
+            if (prev.includes(patientId)) {
+                return prev.filter((id) => id !== patientId);
+            } else {
+                return [...prev, patientId];
+            }
+        });
     };
 
     const getStatusClass = (status) => {
@@ -351,6 +321,58 @@ const PatientManagement = () => {
             default:
                 return '';
         }
+    };
+
+    const handleRowsPerPageChange = (e) => {
+        setRowsPerPage(Number(e.target.value));
+        setCurrentPage(1);
+    };
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
+    const handleBulkDelete = async () => {
+        if (window.confirm(`선택한 ${selectedPatients.length}명의 환자를 삭제하시겠습니까?`)) {
+            try {
+                await Promise.all(selectedPatients.map((id) => axios.delete(`${API_BASE_URL}/patients/${id}`)));
+                setPatients(patients.filter((p) => !selectedPatients.includes(p.patient_id)));
+                setSelectedPatients([]);
+            } catch (error) {
+                console.error('Error deleting patients:', error);
+                alert('환자 삭제 중 오류가 발생했습니다.');
+            }
+        }
+    };
+
+    const handleBulkExport = () => {
+        // 선택된 환자들의 데이터를 CSV로 내보내기
+        const selectedPatientsData = patients.filter((p) => selectedPatients.includes(p.patient_id));
+        const csvContent = convertToCSV(selectedPatientsData);
+        downloadCSV(csvContent, 'patients.csv');
+    };
+
+    const convertToCSV = (data) => {
+        const headers = ['ID', '이름', '생년월일', '성별', '혈액형', '보호자', '병실', '상태'];
+        const rows = data.map((patient) => [
+            patient.patient_id,
+            patient.patient_name,
+            patient.patient_birth,
+            patient.gender,
+            patient.patient_blood,
+            patient.guardian_id,
+            patient.bed_id,
+            patient.patient_status,
+        ]);
+        return [headers, ...rows].map((row) => row.join(',')).join('\n');
+    };
+
+    const downloadCSV = (content, fileName) => {
+        const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        link.click();
     };
 
     if (loading) {
@@ -370,9 +392,12 @@ const PatientManagement = () => {
     }
 
     return (
-        <div className="dashboard-container">
-            <h1 className="dashboard-title">환자 관리</h1>
-            <p className="dashboard-subtitle">환자 정보를 관리하고 모니터링하세요</p>
+        <div className="patient-management-container">
+            <div className="header">
+                <div className="title-section">
+                    <h1>환자 관리</h1>
+                </div>
+            </div>
 
             {/* 주요 통계 */}
             <div className="stats-overview">
@@ -420,157 +445,6 @@ const PatientManagement = () => {
                     </div>
                 </div>
             </div>
-
-            {/* 환자 등록 모달 */}
-            {showAddForm && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h2>환자 등록</h2>
-                            <button className="close-button" onClick={() => setShowAddForm(false)}>
-                                <X size={20} />
-                            </button>
-                        </div>
-                        <form onSubmit={handleAddPatient} className="modal-form">
-                            <div className="form-grid">
-                                <div className="form-group">
-                                    <label>이름</label>
-                                    <input
-                                        type="text"
-                                        name="patient_name"
-                                        value={newPatient.patient_name}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>생년월일</label>
-                                    <input
-                                        type="date"
-                                        name="patient_birth"
-                                        value={newPatient.patient_birth}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>키 (cm)</label>
-                                    <input
-                                        type="number"
-                                        name="patient_height"
-                                        value={newPatient.patient_height}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>몸무게 (kg)</label>
-                                    <input
-                                        type="number"
-                                        name="patient_weight"
-                                        value={newPatient.patient_weight}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>혈액형</label>
-                                    <select
-                                        name="patient_blood"
-                                        value={newPatient.patient_blood}
-                                        onChange={handleInputChange}
-                                        required
-                                    >
-                                        <option value="">선택하세요</option>
-                                        <option value="A">A형</option>
-                                        <option value="B">B형</option>
-                                        <option value="O">O형</option>
-                                        <option value="AB">AB형</option>
-                                    </select>
-                                </div>
-                                <div className="form-group">
-                                    <label>보호자 ID</label>
-                                    <input
-                                        type="text"
-                                        name="guardian_id"
-                                        value={newPatient.guardian_id}
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>침대 ID</label>
-                                    <input
-                                        type="text"
-                                        name="bed_id"
-                                        value={newPatient.bed_id}
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>상태</label>
-                                    <select
-                                        name="patient_status"
-                                        value={newPatient.patient_status}
-                                        onChange={handleInputChange}
-                                    >
-                                        <option value="고위험군">고위험군</option>
-                                        <option value="저위험군">저위험군</option>
-                                        <option value="무위험군">무위험군</option>
-                                    </select>
-                                </div>
-                                <div className="form-group">
-                                    <label>이미지 URL</label>
-                                    <input
-                                        type="text"
-                                        name="patient_img"
-                                        value={newPatient.patient_img || ''}
-                                        onChange={handleInputChange}
-                                        placeholder="이미지 URL을 입력하세요"
-                                    />
-                                </div>
-                                <div className="form-group full-width">
-                                    <label>메모</label>
-                                    <textarea
-                                        name="patient_memo"
-                                        value={newPatient.patient_memo || ''}
-                                        onChange={handleInputChange}
-                                        rows="3"
-                                        placeholder="환자에 대한 메모를 입력하세요"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>환자 사진</label>
-                                    <div className="file-upload-container">
-                                        {newPatient.patient_img && (
-                                            <div className="image-preview">
-                                                <img
-                                                    src={newPatient.patient_img}
-                                                    alt="미리보기"
-                                                    className="preview-image"
-                                                />
-                                            </div>
-                                        )}
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={(e) => handleImageUpload(e, 'add')}
-                                            className="file-input"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="modal-footer">
-                                <button type="button" className="cancel-button" onClick={() => setShowAddForm(false)}>
-                                    취소
-                                </button>
-                                <button type="submit" className="submit-button">
-                                    등록
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
 
             {/* 필터 모달 */}
             {showFilterModal && (
@@ -913,7 +787,7 @@ const PatientManagement = () => {
                         <Filter size={16} />
                         Filter
                     </button>
-                    <button className="add-button" onClick={() => setShowAddForm(true)}>
+                    <button className="add-button" onClick={() => navigate('/patients/add')}>
                         <Plus size={16} />
                         Add
                     </button>
@@ -1011,14 +885,7 @@ const PatientManagement = () => {
                 <div className="table-footer">
                     <div className="rows-per-page">
                         <span>Rows per page:</span>
-                        <select
-                            value={rowsPerPage}
-                            onChange={(e) => {
-                                setRowsPerPage(Number(e.target.value));
-                                setCurrentPage(1);
-                            }}
-                            className="rows-select"
-                        >
+                        <select value={rowsPerPage} onChange={handleRowsPerPageChange} className="rows-select">
                             <option value={10}>10</option>
                             <option value={20}>20</option>
                             <option value={30}>30</option>
@@ -1033,7 +900,7 @@ const PatientManagement = () => {
                     <div className="pagination-buttons">
                         <button
                             className="pagination-button"
-                            onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                            onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                             disabled={currentPage === 1}
                         >
                             <ChevronLeft size={16} />
@@ -1041,8 +908,8 @@ const PatientManagement = () => {
                         <button
                             className="pagination-button"
                             onClick={() =>
-                                setCurrentPage((prev) =>
-                                    Math.min(prev + 1, Math.ceil(filteredPatients.length / rowsPerPage))
+                                handlePageChange(
+                                    Math.min(currentPage + 1, Math.ceil(filteredPatients.length / rowsPerPage))
                                 )
                             }
                             disabled={currentPage * rowsPerPage >= filteredPatients.length}

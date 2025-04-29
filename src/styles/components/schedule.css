@@ -12,13 +12,14 @@
 }
 
 .schedule-title {
-    font-size: 24px;
-    font-weight: bold;
-    color: #1e293b;
+    font-size: 16px !important;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: rgb(25, 72, 144);
 }
 
 .add-button {
-    background-color: #0066cc;
+    background-color: rgb(25, 72, 144);
     color: white;
     border: none;
     padding: 8px 16px;
@@ -30,7 +31,7 @@
 }
 
 .add-button:hover {
-    background-color: #0052a3;
+    background-color: rgba(25, 72, 144, 0.8);
 }
 
 .schedule-grid {
@@ -58,10 +59,10 @@
 }
 
 .schedule-icon {
-    background-color: rgba(0, 102, 204, 0.1);
+    background-color: rgba(25, 72, 144, 0.1);
     padding: 8px;
     border-radius: 50%;
-    color: #0066cc;
+    color: rgb(25, 72, 144);
 }
 
 .schedule-details h3 {
@@ -144,9 +145,9 @@
 }
 
 .dialog-title {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 600;
-    color: #1e293b;
+    color: rgb(25, 72, 144);
 }
 
 .form-group {
@@ -172,8 +173,8 @@
 
 .form-input:focus {
     outline: none;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+    border-color: rgb(25, 72, 144);
+    box-shadow: 0 0 0 2px rgba(25, 72, 144, 0.1);
 }
 
 .form-select {
@@ -189,8 +190,8 @@
 
 .form-select:focus {
     outline: none;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+    border-color: rgb(25, 72, 144);
+    box-shadow: 0 0 0 2px rgba(25, 72, 144, 0.1);
 }
 
 .time-inputs {
@@ -280,7 +281,7 @@
 
 .calendar-weekday {
     text-align: center;
-    padding: 10px;
+    padding: 12px 0;
     font-weight: bold;
 }
 
@@ -302,8 +303,13 @@
 
 .calendar-day {
     border: 1px solid #e2e8f0;
-    min-height: 120px;
-    padding: 8px;
+    background-color: white;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    transition: background-color 0.2s;
 }
 
 .calendar-day.other {
@@ -314,7 +320,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    padding: 4px 8px;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 .day-number {
@@ -342,7 +349,7 @@
 }
 
 .day-schedule {
-    background-color: #f0f9ff;
+    background-color: rgba(25, 72, 144, 0.1);
     padding: 4px;
     border-radius: 4px;
     font-size: 12px;
@@ -352,7 +359,7 @@
 }
 
 .schedule-time {
-    color: #0066cc;
+    color: rgb(25, 72, 144);
     font-weight: 500;
     margin-right: 4px;
 }
@@ -391,4 +398,261 @@
 /* 일요일 날짜 스타일 */
 .calendar-day:nth-child(7n + 1) .day-number {
     color: #dc2626; /* 빨간색 */
+}
+
+/* 일정 관리 페이지 서브타이틀 */
+.schedule-subtitle {
+    font-size: 14px;
+    color: #64748b;
+    margin-top: 4px;
+    margin-bottom: 24px;
+}
+
+/* 컨텐츠 그리드 레이아웃 */
+.schedule-content {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 24px;
+}
+
+/* 카드 공통 스타일 */
+.schedule-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+}
+
+/* 카드 헤더 */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+/* 캘린더 네비게이션 */
+.calendar-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.calendar-nav button {
+    background: none;
+    border: 1px solid #e2e8f0;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.calendar-nav button:hover {
+    background-color: #f3f4f6;
+}
+
+.nav-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #1e293b;
+}
+
+/* 일정 추가 버튼 */
+.add-events-btn {
+    background-color: rgb(25, 72, 144);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    min-width: 120px;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.add-events-btn:hover {
+    background-color: #1e3a8a;
+}
+
+.plus-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+}
+
+/* 이벤트 카드 내용 스크롤 */
+.events-content {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.no-schedule-text {
+    color: #64748b;
+    font-size: 14px;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 4px;
+}
+
+.calendar-day:hover {
+    background-color: #f8fafc;
+}
+
+/* 요일 헤더 스타일 조정 */
+.calendar-weekdays,
+.calendar-weekday {
+    /* 요일 셀 높이 및 중앙 정렬 */
+}
+
+/* 캘린더 요일 그리드 */
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+/* 선택된 날짜 강조 스타일 */
+.selected-date {
+    border: 2px solid rgb(25, 72, 144) !important;
+    background-color: rgba(25, 72, 144, 0.1);
+}
+
+/* 일정이 있는 날짜 표시 */
+.calendar-day.current.has-schedule {
+    position: relative;
+}
+.calendar-day.current.has-schedule::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    background-color: rgb(25, 72, 144);
+    border-radius: 50%;
+}
+
+/* 일정 요약 (시간, 제목) */
+.schedule-summary {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.schedule-time {
+    font-size: 12px;
+    color: #2563eb;
+    min-width: 50px;
+}
+.schedule-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1e293b;
+}
+.schedule-desc {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #64748b;
+    padding-left: 62px; /* time width + gap */
+}
+/* 확장/축소 시 배경 강조 */
+.day-schedule {
+    padding: 8px;
+    border-bottom: 1px solid #e2e8f0;
+    cursor: pointer;
+}
+.day-schedule:hover {
+    background-color: #f8fafc;
+}
+
+/* 근무표 카드 스타일 */
+.roster-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+    margin-top: 24px;
+}
+.roster-card .card-header {
+    margin-bottom: 12px;
+}
+.roster-content {
+    overflow-x: auto;
+}
+.roster-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.roster-table th,
+.roster-table td {
+    border: 1px solid #e2e8f0;
+    padding: 8px;
+    text-align: center;
+    font-size: 14px;
+}
+.roster-table th {
+    background-color: rgba(25, 72, 144, 0.1);
+    color: rgb(25, 72, 144);
+    font-weight: 600;
+    padding: 12px 8px;
+}
+
+.roster-table td:first-child {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-right: 16px;
+}
+
+.delete-staff-btn {
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: #dc2626;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.roster-table tr:hover .delete-staff-btn {
+    opacity: 1;
+}
+
+.delete-staff-btn:hover {
+    color: #b91c1c;
+}
+
+/* 근무 유형별 스타일 */
+.shift-E {
+    background-color: rgba(25, 72, 144, 0.1);
+    color: rgb(25, 72, 144);
+    font-weight: 500;
+}
+
+.shift-N {
+    background-color: rgba(79, 70, 229, 0.1);
+    color: #4f46e5;
+    font-weight: 500;
+}
+
+.shift-D {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    font-weight: 500;
+}
+
+.shift-O {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    font-weight: 500;
 }

@@ -197,15 +197,15 @@ const PatientDetail = () => {
                             <span>성별</span>
                             {isEditing ? (
                                 <select
-                                    value={editedPatient.patient_gender || ''}
-                                    onChange={(e) => handleInputChange('patient_gender', e.target.value)}
+                                    value={editedPatient.patient_sex || ''}
+                                    onChange={(e) => handleInputChange('patient_sex', e.target.value)}
                                 >
                                     <option value="">선택</option>
-                                    <option value="M">남성</option>
-                                    <option value="F">여성</option>
+                                    <option value="Male">남성</option>
+                                    <option value="Female">여성</option>
                                 </select>
                             ) : (
-                                <span>{patient.patient_gender || '-'}</span>
+                                <span>{patient.patient_sex || '-'}</span>
                             )}
                         </div>
                     </div>
