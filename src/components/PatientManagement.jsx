@@ -108,12 +108,50 @@ const PatientManagement = () => {
             setLoading(true);
             const response = await axios.get(`${API_BASE_URL}/patients`);
             if (response.data.code === 0) {
-                setPatients(response.data.data); // data[0] 제거
+                const patients = response.data.data;
+                setPatients(patients);
+
+                // 오늘 날짜 기준
+                const now = new Date();
+                const threeDaysAgo = new Date(now);
+                threeDaysAgo.setDate(now.getDate() - 3);
+                const threeDaysLater = new Date(now);
+                threeDaysLater.setDate(now.getDate() + 3);
+
+                // 통계 계산
+                const newAdmissions = patients.filter((patient) => {
+                    if (!patient.patient_in) return false;
+                    const admissionDate = new Date(patient.patient_in);
+                    return admissionDate >= threeDaysAgo && admissionDate <= now;
+                }).length;
+
+                const criticalPatients = patients.filter((patient) => patient.patient_status === '고위험군').length;
+
+                const dischargeScheduled = patients.filter((patient) => {
+                    if (!patient.patient_out) return false;
+                    const dischargeDate = new Date(patient.patient_out);
+                    return dischargeDate >= now && dischargeDate <= threeDaysLater;
+                }).length;
+
                 setStats((prev) => ({
                     ...prev,
                     totalPatients: {
                         ...prev.totalPatients,
-                        value: `${response.data.totalCount}명`,
+                        value: `${patients.length}명`,
+                    },
+                    newPatients: {
+                        value: `${newAdmissions}명`,
+                        description: '신규 입원',
+                        change: '', // 변동량 표시 추가 가능
+                    },
+                    criticalPatients: {
+                        value: `${criticalPatients}명`,
+                        description: '고위험군',
+                        change: '', // 변동량 표시 추가 가능
+                    },
+                    dischargeScheduled: {
+                        value: `${dischargeScheduled}명`,
+                        description: '퇴원 예정',
                     },
                 }));
             } else {

@@ -205,11 +205,11 @@ const EnvironmentalData = () => {
                                             </div>
                                             <div className="room-metrics">
                                                 <div className="metric">
-                                                    <Thermometer size={16} />
+                                                    <Thermometer size={16} style={{ color: 'rgb(234,179,8)' }} />
                                                     <span>{room.temperature}°C</span>
                                                 </div>
                                                 <div className="metric">
-                                                    <Droplets size={16} />
+                                                    <Droplets size={16} style={{ color: '#3b82f6' }} />
                                                     <span>{room.humidity}%</span>
                                                 </div>
                                                 <div className="metric">

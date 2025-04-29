@@ -52,53 +52,130 @@
 /* Stats Overview */
 .stats-overview {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 16px;
-    margin-bottom: 24px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
 }
 
 .stat-card {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
+    background-color: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+.stat-card .profile-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stat-card .profile-image-large {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-card .profile-placeholder.large {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f3f4f6;
+    color: #9ca3af;
+}
+
+.stat-card .profile-info {
+    text-align: center;
+}
+
+.stat-card .profile-info h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+.stat-card .profile-info p {
+    color: #6b7280;
+    margin-bottom: 1rem;
+}
+
+.stat-card .profile-upload-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #3b82f6;
+    color: white;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 0.875rem;
+}
+
+.stat-card .profile-upload-button:hover {
+    background-color: #2563eb;
+}
+
+.stat-card .profile-input {
+    display: none;
+}
+
 .stat-icon {
-    padding: 12px;
-    background: #f1f5f9;
-    border-radius: 12px;
-    color: var(--primary-color);
+    width: 40px;
+    height: 40px;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
 }
 
 .stat-content h3 {
-    font-size: 14px;
-    color: #64748b;
-    margin-bottom: 4px;
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
 }
 
 .stat-value {
-    font-size: 24px;
+    font-size: 1.5rem;
     font-weight: 600;
-    color: #1e293b;
-    margin-bottom: 4px;
-}
-
-.stat-description {
-    font-size: 13px;
-    color: #64748b;
+    color: #111827;
+    margin-bottom: 0.25rem;
 }
 
 .stat-change {
-    font-size: 13px;
-    color: #16a34a;
+    font-size: 0.875rem;
+    color: #10b981;
 }
 
 .stat-change.negative {
-    color: #dc2626;
+    color: #ef4444;
+}
+
+.stat-description {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+@media (max-width: 768px) {
+    .stats-overview {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-overview {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Patient Details */

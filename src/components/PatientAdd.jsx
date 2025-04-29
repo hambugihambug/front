@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/components/PatientAdd.css';
-import { X, User } from 'lucide-react';
+import { X, User, ArrowLeft } from 'lucide-react';
 
 const API_BASE_URL = 'http://localhost:3000';
 
@@ -76,120 +76,167 @@ const PatientAdd = () => {
     };
 
     return (
-        <div className="patient-add-container">
-            <div className="patient-add-header">
-                <h2>환자 등록</h2>
+        <div className="patient-detail-container">
+            <div className="detail-header">
                 <button className="back-button" onClick={() => navigate('/patients')}>
-                    <X size={20} />
+                    <ArrowLeft size={16} />
+                    돌아가기
                 </button>
+                <h1>환자 등록</h1>
+                <div className="header-buttons">
+                    <button className="cancel-button" onClick={() => navigate('/patients')}>
+                        <X size={16} />
+                        취소
+                    </button>
+                    <button className="submit-button" onClick={handleSubmit}>
+                        등록
+                    </button>
+                </div>
             </div>
-            <form onSubmit={handleSubmit} className="patient-add-form">
-                <div className="form-grid">
-                    <div className="form-group">
-                        <label>이름</label>
-                        <input
-                            type="text"
-                            name="patient_name"
-                            value={newPatient.patient_name}
-                            onChange={handleInputChange}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>생년월일</label>
-                        <input
-                            type="date"
-                            name="patient_birth"
-                            value={newPatient.patient_birth}
-                            onChange={handleInputChange}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>신장 (cm)</label>
-                        <input
-                            type="number"
-                            name="patient_height"
-                            value={newPatient.patient_height}
-                            onChange={handleInputChange}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>체중 (kg)</label>
-                        <input
-                            type="number"
-                            name="patient_weight"
-                            value={newPatient.patient_weight}
-                            onChange={handleInputChange}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>혈액형</label>
-                        <select
-                            name="patient_blood"
-                            value={newPatient.patient_blood}
-                            onChange={handleInputChange}
-                            required
-                        >
-                            <option value="">선택하세요</option>
-                            <option value="A">A형</option>
-                            <option value="B">B형</option>
-                            <option value="O">O형</option>
-                            <option value="AB">AB형</option>
-                        </select>
-                    </div>
-                    <div className="form-group">
-                        <label>보호자 ID</label>
-                        <input
-                            type="text"
-                            name="guardian_id"
-                            value={newPatient.guardian_id}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>침대 ID</label>
-                        <input type="text" name="bed_id" value={newPatient.bed_id} onChange={handleInputChange} />
-                    </div>
-                    <div className="form-group">
-                        <label>상태</label>
-                        <select name="patient_status" value={newPatient.patient_status} onChange={handleInputChange}>
-                            <option value="고위험군">고위험군</option>
-                            <option value="저위험군">저위험군</option>
-                            <option value="무위험군">무위험군</option>
-                        </select>
-                    </div>
-                    <div className="form-group full-width">
-                        <label>메모</label>
-                        <textarea
-                            name="patient_memo"
-                            value={newPatient.patient_memo || ''}
-                            onChange={handleInputChange}
-                            rows="3"
-                            placeholder="환자에 대한 메모를 입력하세요"
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>환자 사진</label>
-                        <div className="file-upload-container">
-                            {newPatient.patient_img && (
-                                <div className="image-preview">
-                                    <img src={newPatient.patient_img} alt="미리보기" className="preview-image" />
+
+            <form onSubmit={handleSubmit} className="medical-record">
+                <div className="left-panel">
+                    <div className="profile-section">
+                        <div className="profile-image-large">
+                            {newPatient.patient_img ? (
+                                <img src={newPatient.patient_img} alt="프로필 미리보기" className="profile-image" />
+                            ) : (
+                                <div className="profile-placeholder large">
+                                    <User size={48} />
                                 </div>
                             )}
-                            <input type="file" accept="image/*" onChange={handleImageUpload} className="file-input" />
+                        </div>
+                        <div className="profile-info">
+                            <h3>새 환자</h3>
+                            <p>환자 정보를 입력해주세요</p>
+                        </div>
+                    </div>
+
+                    <div className="patient-basic-info">
+                        <h3>기본 정보</h3>
+                        <div className="info-row">
+                            <span>이름</span>
+                            <input
+                                type="text"
+                                name="patient_name"
+                                value={newPatient.patient_name}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+                        <div className="info-row">
+                            <span>생년월일</span>
+                            <input
+                                type="date"
+                                name="patient_birth"
+                                value={newPatient.patient_birth}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+                        <div className="info-row">
+                            <span>혈액형</span>
+                            <select
+                                name="patient_blood"
+                                value={newPatient.patient_blood}
+                                onChange={handleInputChange}
+                                required
+                            >
+                                <option value="">선택하세요</option>
+                                <option value="A">A형</option>
+                                <option value="B">B형</option>
+                                <option value="O">O형</option>
+                                <option value="AB">AB형</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="vital-signs">
+                        <h3>신체 정보</h3>
+                        <div className="info-row">
+                            <span>키</span>
+                            <input
+                                type="number"
+                                name="patient_height"
+                                value={newPatient.patient_height}
+                                onChange={handleInputChange}
+                                required
+                                placeholder="cm"
+                            />
+                        </div>
+                        <div className="info-row">
+                            <span>체중</span>
+                            <input
+                                type="number"
+                                name="patient_weight"
+                                value={newPatient.patient_weight}
+                                onChange={handleInputChange}
+                                required
+                                placeholder="kg"
+                            />
                         </div>
                     </div>
                 </div>
-                <div className="form-actions">
-                    <button type="button" className="cancel-button" onClick={() => navigate('/patients')}>
-                        취소
-                    </button>
-                    <button type="submit" className="submit-button">
-                        등록
-                    </button>
+
+                <div className="right-panel">
+                    <div className="hospital-info">
+                        <h3>입원 정보</h3>
+                        <div className="info-row">
+                            <span>침대 번호</span>
+                            <input
+                                type="text"
+                                name="bed_id"
+                                value={newPatient.bed_id}
+                                onChange={handleInputChange}
+                                placeholder="침대 번호 입력"
+                            />
+                        </div>
+                        <div className="info-row">
+                            <span>위험도</span>
+                            <select
+                                name="patient_status"
+                                value={newPatient.patient_status}
+                                onChange={handleInputChange}
+                                required
+                            >
+                                <option value="무위험군">무위험군</option>
+                                <option value="저위험군">저위험군</option>
+                                <option value="고위험군">고위험군</option>
+                            </select>
+                        </div>
+                        <div className="info-row">
+                            <span>보호자 ID</span>
+                            <input
+                                type="text"
+                                name="guardian_id"
+                                value={newPatient.guardian_id}
+                                onChange={handleInputChange}
+                                placeholder="보호자 ID 입력"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="memo-info">
+                        <h3>메모</h3>
+                        <textarea
+                            name="patient_memo"
+                            value={newPatient.patient_memo}
+                            onChange={handleInputChange}
+                            rows="5"
+                            placeholder="환자에 대한 메모를 입력하세요"
+                        />
+                    </div>
+                    <div className="profile-upload-container">
+                        <label className="profile-upload-button">
+                            사진 업로드
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                                className="profile-input"
+                            />
+                        </label>
+                    </div>
                 </div>
             </form>
         </div>
