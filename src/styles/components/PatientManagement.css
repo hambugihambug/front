@@ -136,7 +136,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
 }
 
 /* Stats Overview 아이콘 컬러 지정 */
@@ -1149,4 +1149,21 @@
         8px -8px 16px rgba(255, 255, 255, 0.7),
         -8px 8px 16px rgba(0, 0, 0, 0.08),
         8px 8px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* Stats Overview 카드: 아이콘과 텍스트를 수평 정렬 */
+.stats-overview .stat-card {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 1rem !important;
+}
+.stats-overview .stat-card .stat-icon {
+    margin: 0 !important;
+    margin-right: 1rem !important;
+}
+.stats-overview .stat-card .stat-content {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
 }
