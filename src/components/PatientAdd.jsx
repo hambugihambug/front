@@ -23,18 +23,20 @@ const PatientAdd = () => {
     const navigate = useNavigate();
     const [newPatient, setNewPatient] = useState(initialFormState);
     const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setNewPatient((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleImageUpload = (e) => {
+    const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             setImageFile(file);
             const reader = new FileReader();
             reader.onloadend = () => {
+                setImagePreview(reader.result);
                 setNewPatient((prev) => ({
                     ...prev,
                     patient_img: reader.result,
@@ -96,22 +98,6 @@ const PatientAdd = () => {
 
             <form onSubmit={handleSubmit} className="medical-record">
                 <div className="left-panel">
-                    <div className="profile-section">
-                        <div className="profile-image-large">
-                            {newPatient.patient_img ? (
-                                <img src={newPatient.patient_img} alt="프로필 미리보기" className="profile-image" />
-                            ) : (
-                                <div className="profile-placeholder large">
-                                    <User size={48} />
-                                </div>
-                            )}
-                        </div>
-                        <div className="profile-info">
-                            <h3>새 환자</h3>
-                            <p>환자 정보를 입력해주세요</p>
-                        </div>
-                    </div>
-
                     <div className="patient-basic-info">
                         <h3>기본 정보</h3>
                         <div className="info-row">
@@ -226,16 +212,30 @@ const PatientAdd = () => {
                             placeholder="환자에 대한 메모를 입력하세요"
                         />
                     </div>
-                    <div className="profile-upload-container">
-                        <label className="profile-upload-button">
-                            사진 업로드
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleImageUpload}
-                                className="profile-input"
-                            />
-                        </label>
+
+                    <div className="profile-section">
+                        <div className="profile-image-large">
+                            {imagePreview ? (
+                                <img src={imagePreview} alt="프로필 미리보기" className="profile-image" />
+                            ) : (
+                                <div className="profile-placeholder large">
+                                    <User size={48} />
+                                </div>
+                            )}
+                        </div>
+                        <div className="profile-info">
+                            <h3>새 환자</h3>
+                            <p>환자 정보를 입력해주세요</p>
+                            <label className="profile-upload-button">
+                                사진 업로드
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageChange}
+                                    className="profile-input"
+                                />
+                            </label>
+                        </div>
                     </div>
                 </div>
             </form>
