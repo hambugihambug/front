@@ -1,5 +1,5 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard,
     Home,
@@ -16,7 +16,9 @@ import {
     MessageSquare,
     LogOut,
     User,
+    LogIn,
 } from 'lucide-react';
+import { AuthContext } from '../contexts/AuthContext';
 
 const navItems = [
     {
@@ -159,10 +161,13 @@ const styles = {
         justifyContent: 'center',
         borderRadius: '6px',
         transition: 'all 0.2s',
+        marginLeft: 'auto',
     },
 };
 
 const Navbar = () => {
+    const { isLoggedIn, user, logout } = useContext(AuthContext);
+    const navigate = useNavigate();
     return (
         <nav style={styles.nav}>
             <div style={styles.brand}>
@@ -196,26 +201,35 @@ const Navbar = () => {
 
             <div style={styles.footer}>
                 <div style={styles.profile}>
-                    <div
-                        style={{
-                            width: '40px',
-                            height: '40px',
-                            borderRadius: '8px',
-                            backgroundColor: '#f1f5f9',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                        }}
-                    >
-                        <User size={20} color="#64748b" />
-                    </div>
-                    <div style={styles.profileInfo}>
-                        <p style={styles.profileName}>김원장</p>
-                        <p style={styles.profileRole}>병원장</p>
-                    </div>
-                    <button style={styles.logoutButton}>
-                        <LogOut size={20} />
-                    </button>
+                    {isLoggedIn ? (
+                        <>  
+                            <div
+                                style={{
+                                    width: '40px',
+                                    height: '40px',
+                                    borderRadius: '8px',
+                                    backgroundColor: '#f1f5f9',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}
+                            >
+                                <User size={20} color="#64748b" />
+                            </div>
+                            <div style={styles.profileInfo}>
+                                <p style={styles.profileName}>{user.name}</p>
+                                <p style={styles.profileRole}>{user.role}</p>
+                            </div>
+                            <button style={styles.logoutButton} onClick={logout}>
+                                <LogOut size={20} />
+                            </button>
+                        </>
+                    ) : (
+                        <button style={styles.logoutButton} onClick={() => navigate('/login')}>
+                            <LogIn size={20} />
+                            <span style={{ fontSize: '12px', marginLeft: '4px' }}>로그인</span>
+                        </button>
+                    )}
                 </div>
             </div>
         </nav>

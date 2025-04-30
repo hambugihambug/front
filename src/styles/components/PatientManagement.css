@@ -3,6 +3,9 @@
     --primary-color: rgb(25, 72, 144);
     --primary-hover: rgba(25, 72, 144, 0.9);
     --primary-light: rgba(25, 72, 144, 0.1);
+    --secondary-color: #06b6d4;
+    --warning-color: #f59e0b;
+    --danger-color: #dc2626;
 }
 
 /* Enhanced Modal Styles */
@@ -144,13 +147,13 @@
     color: var(--primary-color);
 }
 .stats-overview .stat-card:nth-child(2) .stat-icon svg {
-    color: #06b6d4; /* 시안 계열 */
+    color: #10b981; /* 연두 계열 for 신규 입원 */
 }
 .stats-overview .stat-card:nth-child(3) .stat-icon svg {
-    color: #f59e0b; /* 옐로우 계열 */
+    color: var(--warning-color);
 }
 .stats-overview .stat-card:nth-child(4) .stat-icon svg {
-    color: #10b981; /* 그린 계열 */
+    color: #6b7280; /* 회색 계열 for 퇴원 예정 */
 }
 
 .stat-content h3 {
@@ -366,7 +369,7 @@
 
 .data-table th {
     text-align: center;
-    background-color: var(--primary-color);
+    background-color: rgb(25, 72, 144) !important;
     font-weight: 600;
     color: #ffffff;
     padding: 1rem;
@@ -838,6 +841,7 @@
 
 .search-input {
     width: 100%;
+    max-width: 320px;
     padding: 0.75rem 1rem 0.75rem 2.5rem;
     border: 1px solid #d1d5db;
     border-radius: 0.5rem;
@@ -867,47 +871,24 @@
     align-items: center;
 }
 
+/* Filter 버튼 스타일 추가 */
 .filter-button {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    background-color: #f3f4f6;
+    background-color: #e5e7eb;
     border: none;
     border-radius: 0.375rem;
     color: #374151;
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
-    transition:
-        background-color 0.3s,
-        transform 0.2s;
+    transition: background-color 0.3s, transform 0.2s;
 }
 
 .filter-button:hover {
-    background-color: var(--primary-hover);
-    transform: translateY(-2px);
-}
-
-.add-button {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background-color: rgb(25, 72, 144);
-    border: none;
-    border-radius: 0.375rem;
-    color: white;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition:
-        background-color 0.3s,
-        transform 0.2s;
-}
-
-.add-button:hover {
-    background-color: rgb(20, 58, 115);
+    background-color: #d1d5db;
     transform: translateY(-2px);
 }
 
@@ -970,10 +951,10 @@
 
 /* Modern table enhancements */
 .data-table thead {
-    background-color: var(--primary-hover);
+    background-color: rgb(25, 72, 144) !important;
 }
 .data-table thead th {
-    background-color: var(--primary-color);
+    background-color: rgb(25, 72, 144) !important;
     color: #ffffff;
     padding: 1rem;
     text-transform: uppercase;
@@ -1022,25 +1003,15 @@
 
 /* Search & filter */
 .search-input {
+    width: 100%;
+    max-width: 320px;
     padding: 0.75rem 1rem 0.75rem 2.5rem;
     border: 1px solid #d1d5db;
     border-radius: 0.5rem;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-    width: 320px;
-}
-.filter-button,
-.add-button {
-    padding: 0.5rem 1rem;
-    border-radius: 0.375rem;
-    font-weight: 500;
-    transition:
-        background-color 0.3s,
-        transform 0.2s;
-}
-.filter-button:hover,
-.add-button:hover {
-    background-color: var(--primary-hover);
-    transform: translateY(-2px);
+    font-size: 0.875rem;
+    color: #374151;
+    background-color: white;
 }
 
 /* Pagination */
@@ -1069,25 +1040,6 @@
         8px -8px 16px rgba(255, 255, 255, 0.7),
         -8px 8px 16px rgba(0, 0, 0, 0.08),
         8px 8px 16px rgba(0, 0, 0, 0.08);
-}
-
-/* 메인 테마 색상 일관 적용 */
-.add-button,
-.filter-button {
-    background-color: var(--primary-color) !important;
-    color: #ffffff !important;
-}
-.add-button:hover,
-.filter-button:hover {
-    background-color: var(--primary-hover) !important;
-}
-
-/* 체크박스 완전 제거 */
-.row-checkbox {
-    display: none !important;
-}
-.row-checkbox:disabled {
-    display: none !important;
 }
 
 /* 제목 h1 볼드 */
@@ -1166,4 +1118,22 @@
     display: flex !important;
     flex-direction: column !important;
     align-items: flex-start !important;
+}
+
+/* 검색/필터 섹션 필터 버튼 스타일 재적용 */
+.search-filter-section .action-group .filter-button {
+    background-color: #e5e7eb !important;
+    color: #374151 !important;
+}
+.search-filter-section .action-group .filter-button:hover {
+    background-color: #d1d5db !important;
+}
+
+/* 검색/필터 섹션 Add 버튼 스타일 재정의 */
+.search-filter-section .action-group .add-button {
+    background-color: rgb(25, 72, 144) !important;
+    color: #ffffff !important;
+}
+.search-filter-section .action-group .add-button:hover {
+    background-color: rgb(25, 72, 144) !important;
 }

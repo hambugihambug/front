@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { messaging, getToken, onMessage, saveTokenToServer } from './firebase';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import AuthPage from './components/AuthPage';
 import Dashboard from './components/Dashboard';
 import PatientManagement from './components/PatientManagement';
 import PatientAdd from './components/PatientAdd';
@@ -144,28 +145,44 @@ function App() {
 
     return (
         <Router>
-            <div className="app">
-                <Navbar />
-                <main className="main-content">
-                    <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/dashboard" element={<Dashboard />} />
-                        <Route path="/rooms" element={<RoomManagement />} />
-                        <Route path="/rooms/:roomName" element={<RoomDetail />} />
-                        <Route path="/patients" element={<PatientManagement />} />
-                        <Route path="/patients/add" element={<PatientAdd />} />
-                        <Route path="/patients/:id" element={<PatientDetail />} />
-                        <Route path="/beds" element={<BedManagement />} />
-                        <Route path="/fall-incidents" element={<FallIncidents />} />
-                        <Route path="/environmental" element={<EnvironmentalData />} />
-                        <Route path="/notifications" element={<Notifications />} />
-                        <Route path="/schedule" element={<Schedule />} />
-                    </Routes>
-                </main>
-                <AlertNotification notification={notification} onClose={handleCloseNotification} />
-            </div>
+            <AppContent
+                notification={notification}
+                onCloseNotification={handleCloseNotification}
+                isLoading={isLoading}
+                setIsLoading={setIsLoading}
+            />
         </Router>
     );
 }
 
 export default App;
+
+// AppContent 컴포넌트: 라우트별 레이아웃 제어
+function AppContent({ notification, onCloseNotification, isLoading, setIsLoading }) {
+    const location = useLocation();
+    const hideNavbar = ['/login', '/signup'].includes(location.pathname);
+    return (
+        <div className="app">
+            {!hideNavbar && <Navbar />}
+            <main className={hideNavbar ? '' : 'main-content'}>
+                <Routes>
+                    <Route path="/login" element={<AuthPage />} />
+                    <Route path="/signup" element={<AuthPage />} />
+                    <Route path="/" element={<Home />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/rooms" element={<RoomManagement />} />
+                    <Route path="/rooms/:roomName" element={<RoomDetail />} />
+                    <Route path="/patients" element={<PatientManagement />} />
+                    <Route path="/patients/add" element={<PatientAdd />} />
+                    <Route path="/patients/:id" element={<PatientDetail />} />
+                    <Route path="/beds" element={<BedManagement />} />
+                    <Route path="/fall-incidents" element={<FallIncidents />} />
+                    <Route path="/environmental" element={<EnvironmentalData />} />
+                    <Route path="/notifications" element={<Notifications />} />
+                    <Route path="/schedule" element={<Schedule />} />
+                </Routes>
+            </main>
+            <AlertNotification notification={notification} onClose={onCloseNotification} />
+        </div>
+    );
+}
