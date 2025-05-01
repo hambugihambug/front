@@ -160,7 +160,7 @@ export default App;
 // AppContent 컴포넌트: 라우트별 레이아웃 제어
 function AppContent({ notification, onCloseNotification, isLoading, setIsLoading }) {
     const location = useLocation();
-    const hideNavbar = ['/login', '/signup'].includes(location.pathname);
+    const hideNavbar = ['/login', '/signup', '/register'].includes(location.pathname);
     return (
         <div className="app">
             {!hideNavbar && <Navbar />}
@@ -168,6 +168,7 @@ function AppContent({ notification, onCloseNotification, isLoading, setIsLoading
                 <Routes>
                     <Route path="/login" element={<AuthPage />} />
                     <Route path="/signup" element={<AuthPage />} />
+                    <Route path="/register" element={<AuthPage />} />
                     <Route path="/" element={<Home />} />
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/rooms" element={<RoomManagement />} />

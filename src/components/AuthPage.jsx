@@ -15,12 +15,20 @@ const AuthPage = () => {
     const handleSignUpSubmit = (e) => {
         e.preventDefault();
         // TODO: 실제 회원가입 로직 추가
+        // 가입 후 로그인 탭으로 전환
         setIsLogin(true);
     };
 
     return (
         <div className="auth-container">
             <div className="auth-left">
+                <button
+                    type="button"
+                    className="home-button"
+                    onClick={() => navigate('/')}
+                >
+                    홈으로 이동
+                </button>
                 <h1>병원 안전 관리 시스템</h1>
                 <p>로그인 또는 계정을 생성하세요</p>
                 <div className="auth-tabs">
@@ -72,13 +80,6 @@ const AuthPage = () => {
                         <div className="form-group">
                             <label>비밀번호 확인</label>
                             <input type="password" placeholder="비밀번호를 다시 입력하세요" required />
-                        </div>
-                        <div className="form-group">
-                            <label>계정 유형</label>
-                            <select required>
-                                <option value="patient">환자</option>
-                                <option value="doctor">의료진</option>
-                            </select>
                         </div>
                         <button type="submit" className="submit-button">회원가입</button>
                     </form>

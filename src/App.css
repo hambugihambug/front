@@ -4,6 +4,11 @@
     background-color: #f8f9fa;
 }
 
+/* 메인 컨텐트가 사이드바 없이 로드될 때도 전체 너비 차지 */
+.app > main {
+    flex: 1;
+}
+
 .main-content {
     flex: 1;
     margin-left: 280px; /* Navbar 너비만큼 여백 */
