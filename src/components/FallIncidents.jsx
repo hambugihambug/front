@@ -47,27 +47,50 @@ const FallIncidents = () => {
                     setDataLoading(true);
                 }
 
-                // 낙상 사고 목록 조회
                 const incidentsResponse = await axios.get(`${API_BASE_URL}/fall-incidents`);
-
-                // 시간대별 통계 데이터 조회
                 const statsResponse = await axios.get(`${API_BASE_URL}/fall-incidents/stats`);
 
-                // 데이터 설정
+                // 낙상 사고 목록은 모든 데이터 유지
                 if (incidentsResponse?.data?.code === 0) {
                     setIncidents(incidentsResponse.data.data);
-                }
 
-                if (statsResponse?.data?.code === 0) {
-                    setHourlyStats(statsResponse.data.data);
+                    const now = new Date();
+                    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    const sevenDaysAgo = new Date(today);
+                    sevenDaysAgo.setDate(today.getDate() - 6);
+                    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-                    // 병실별 통계 계산
-                    const roomData = processRoomStats(incidentsResponse.data.data);
+                    // 시간대별 데이터 필터링만 탭에 따라 처리
+                    let filteredIncidents = [];
+                    switch (statsTab) {
+                        case '일간':
+                            filteredIncidents = incidentsResponse.data.data.filter((incident) => {
+                                const incidentDate = new Date(incident.accident_date);
+                                return incidentDate >= today;
+                            });
+                            break;
+                        case '주간':
+                            filteredIncidents = incidentsResponse.data.data.filter((incident) => {
+                                const incidentDate = new Date(incident.accident_date);
+                                return incidentDate >= sevenDaysAgo;
+                            });
+                            break;
+                        case '월간':
+                            filteredIncidents = incidentsResponse.data.data.filter((incident) => {
+                                const incidentDate = new Date(incident.accident_date);
+                                return incidentDate >= firstDayOfMonth;
+                            });
+                            break;
+                    }
+
+                    // 병실별 통계 처리
+                    const roomData = processRoomStats(filteredIncidents);
                     setRoomStats(roomData);
 
-                    // 요약 통계 계산
-                    const summary = calculateSummaryStats(incidentsResponse.data.data);
-                    setSummaryStats(summary);
+                    // 시간대별 통계 처리
+                    if (statsResponse?.data?.code === 0) {
+                        setHourlyStats(statsResponse.data.data);
+                    }
                 }
 
                 setError(null);
@@ -275,8 +298,8 @@ const FallIncidents = () => {
                                 {summaryStats.todayCount > summaryStats.yesterdayCount
                                     ? `+${summaryStats.todayCount - summaryStats.yesterdayCount}`
                                     : summaryStats.todayCount < summaryStats.yesterdayCount
-                                    ? `-${summaryStats.yesterdayCount - summaryStats.todayCount}`
-                                    : '±0'}
+                                      ? `-${summaryStats.yesterdayCount - summaryStats.todayCount}`
+                                      : '±0'}
                                 건
                             </div>
                         </div>
@@ -369,8 +392,44 @@ const FallIncidents = () => {
                     )}
 
                     <div className="stats-total">
-                        <span>총 낙상 감지</span>
-                        <span>{incidents.filter((i) => i.accident_YN === 1).length}건</span>
+                        <span>
+                            {statsTab === '일간'
+                                ? '일간 총 낙상감지'
+                                : statsTab === '주간'
+                                  ? '주간 총 낙상감지'
+                                  : '월간 총 낙상감지'}
+                        </span>
+                        <span>
+                            {(() => {
+                                const now = new Date();
+                                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                                const sevenDaysAgo = new Date(today);
+                                sevenDaysAgo.setDate(today.getDate() - 6);
+                                const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+                                let filteredCount;
+                                switch (statsTab) {
+                                    case '일간':
+                                        filteredCount = incidents.filter(
+                                            (i) => new Date(i.accident_date) >= today && i.accident_YN === 'Y'
+                                        ).length;
+                                        break;
+                                    case '주간':
+                                        filteredCount = incidents.filter(
+                                            (i) => new Date(i.accident_date) >= sevenDaysAgo && i.accident_YN === 'Y'
+                                        ).length;
+                                        break;
+                                    case '월간':
+                                        filteredCount = incidents.filter(
+                                            (i) => new Date(i.accident_date) >= firstDayOfMonth && i.accident_YN === 'Y'
+                                        ).length;
+                                        break;
+                                    default:
+                                        filteredCount = 0;
+                                }
+                                return `${filteredCount}건`;
+                            })()}
+                        </span>
                     </div>
                 </div>
 

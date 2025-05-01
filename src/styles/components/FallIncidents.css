@@ -702,8 +702,8 @@
     margin-left: auto;
 }
 
-/* 새로운 통계 카드 스타일 */류
-.stats-summary-cards {
+/* 새로운 통계 카드 스타일 */
+류 .stats-summary-cards {
     margin-bottom: 20px;
 }
 
@@ -1036,7 +1036,9 @@
     color: #64748b;
     cursor: pointer;
     position: relative;
-    transition: color 0.3s ease, background-color 0.3s ease;
+    transition:
+        color 0.3s ease,
+        background-color 0.3s ease;
 }
 
 .tab-button:hover {
@@ -1120,7 +1122,9 @@
     z-index: 10;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
+    transition:
+        opacity 0.3s ease,
+        visibility 0.3s ease;
 }
 
 .stats-card.loading .loading-overlay {

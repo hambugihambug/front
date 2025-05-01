@@ -15,9 +15,11 @@ const initialFormState = {
     patient_img: null,
     patient_memo: '',
     patient_status: '무위험군',
-    guardian_id: '',
+    guardian_tel: '',
     bed_id: '',
     patient_sex: '',
+    patient_in: '',
+    patient_out: '',
 };
 
 const PatientAdd = () => {
@@ -187,7 +189,7 @@ const PatientAdd = () => {
             </div>
 
             <div className="profile-upload-section">
-                <div className="profile-image-large">
+                <div className="profile-image-large" style={{ margin: 0 }}>
                     {imagePreview ? (
                         <img src={imagePreview} alt="환자 프로필 미리보기" className="profile-image" />
                     ) : (
@@ -295,6 +297,26 @@ const PatientAdd = () => {
                     <div className="hospital-info" ref={hospitalInfoRef}>
                         <h3>입원 정보</h3>
                         <div className="info-row">
+                            <span>입원 날짜</span>
+                            <input
+                                type="date"
+                                name="patient_in"
+                                value={newPatient.patient_in}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+                        <div className="info-row">
+                            <span>퇴원 예정일</span>
+                            <input
+                                type="date"
+                                name="patient_out"
+                                value={newPatient.patient_out}
+                                onChange={handleInputChange}
+                                min={newPatient.patient_in}
+                            />
+                        </div>
+                        <div className="info-row">
                             <span>병실 선택</span>
                             <select
                                 name="room"
@@ -341,13 +363,14 @@ const PatientAdd = () => {
                             </select>
                         </div>
                         <div className="info-row">
-                            <span>보호자 ID</span>
+                            <span>보호자 전화</span>
                             <input
-                                type="text"
-                                name="guardian_id"
-                                value={newPatient.guardian_id}
+                                type="tel"
+                                name="guardian_tel"
+                                value={newPatient.guardian_tel}
                                 onChange={handleInputChange}
-                                placeholder="보호자 ID 입력"
+                                placeholder="010-0000-0000"
+                                pattern="[0-9]{3}-[0-9]{4}-[0-9]{4}"
                             />
                         </div>
                     </div>
