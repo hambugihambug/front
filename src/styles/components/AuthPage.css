@@ -76,26 +76,27 @@ p,
     margin-bottom: 1.5rem; /* 하단 여백을 통일하여 버튼 아래가 늘어나지 않도록 조정 */
 }
 
-.tab-button {
-    flex: 1;
-    padding: 0.75rem 1rem;
-    background-color: #f9fafb;
+.auth-container .auth-tab-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    padding: 0;
+    box-sizing: border-box;
     border: none;
+    font-size: 14px;
     cursor: pointer;
-    font-weight: 600;
-    color: var(--primary-color);
-    transition: background-color 0.2s;
-    text-align: left;
-    padding-left: 1rem;
-    min-width: 100px; /* 최소 너비 설정 */
-    height: 36px; /* 버튼 높이를 줄여 슬림하게 조정 */
-    line-height: 36px; /* 텍스트 세로 정렬 유지 */
-    padding: 0 0.5rem; /* 좌우 여백 조정 */
-    box-sizing: border-box; /* 패딩 포함 크기 계산 */
+    transition: all 0.3s ease;
+}
+
+.auth-container .auth-tab-button.active {
+    border-bottom: 2px solid var(--primary-color);
+    margin-bottom: -2px;
+    font-weight: bold;
 }
 
 /* 로그인/회원가입 선택 버튼 높이와 여백 고정 */
-.tab-button {
+.auth-tab-button {
     height: 40px; /* 고정 높이 설정 */
     margin: 0; /* 버튼 간 여백 제거 */
     padding: 0.5rem 1rem; /* 내부 여백 고정 */
@@ -103,7 +104,7 @@ p,
 }
 
 /* 로그인/회원가입 선택 버튼 높이와 여백 강제 적용 */
-.tab-button {
+.auth-tab-button {
     height: 40px !important; /* 고정 높이 강제 적용 */
     margin: 0 !important; /* 버튼 간 여백 강제 제거 */
     padding: 0.5rem 1rem !important; /* 내부 여백 강제 고정 */
@@ -111,13 +112,13 @@ p,
 }
 
 /* 버튼 글자를 위로 올려 잘리지 않도록 조정 */
-.tab-button {
+.auth-tab-button {
     line-height: normal; /* 텍스트 줄 높이를 기본값으로 설정 */
     padding: 0.5rem 0.5rem; /* 상하 여백 추가로 텍스트 위치 조정 */
 }
 
 /* 로그인/회원가입 선택 버튼 높낮이 통일 */
-.tab-button {
+.auth-tab-button {
     display: flex; /* 플렉스 박스 사용 */
     align-items: center; /* 세로 가운데 정렬 */
     justify-content: center; /* 가로 가운데 정렬 */
@@ -126,7 +127,7 @@ p,
 }
 
 /* 로그인/회원가입 선택 버튼 높낮이 완전히 고정 */
-.tab-button {
+.auth-tab-button {
     display: flex; /* 플렉스 박스 사용 */
     align-items: center; /* 세로 가운데 정렬 */
     justify-content: center; /* 가로 가운데 정렬 */
@@ -137,7 +138,7 @@ p,
 }
 
 /* 로그인/회원가입 선택 버튼 높이와 여백 강제 고정 */
-.tab-button {
+.auth-tab-button {
     display: flex !important; /* 플렉스 박스 강제 적용 */
     align-items: center !important; /* 세로 가운데 정렬 강제 적용 */
     justify-content: center !important; /* 가로 가운데 정렬 강제 적용 */
@@ -148,7 +149,7 @@ p,
 }
 
 /* 로그인/회원가입 선택 버튼 높이와 여백 완전히 고정 */
-.tab-button {
+.auth-tab-button {
     display: flex; /* 플렉스 박스 사용 */
     align-items: center; /* 세로 가운데 정렬 */
     justify-content: center; /* 가로 가운데 정렬 */
@@ -158,7 +159,7 @@ p,
     border: none; /* 테두리 제거 */
 }
 
-.tab-button.active {
+.auth-tab-button.active {
     background-color: #ffffff;
     color: var(--primary-color);
     border-bottom: 2px solid var(--primary-color);
@@ -169,7 +170,7 @@ p,
     padding: 0 !important; /* 내부 여백 강제 제거로 높이 변화 방지 */
 }
 
-.tab-button.active {
+.auth-tab-button.active {
     border-bottom: 2px solid var(--primary-color); /* 활성화된 버튼 하단 테두리 */
     margin-bottom: -2px; /* 하단 테두리로 인한 높이 변화 방지 */
     height: 40px; /* 활성화된 버튼도 동일한 높이 유지 */
@@ -342,7 +343,7 @@ p,
 .auth-left h1,
 .auth-left p,
 .home-button,
-.tab-button,
+.auth-tab-button,
 .auth-right h2,
 .auth-right p {
     text-align: left;
@@ -357,7 +358,7 @@ p,
 .home-button,
 h1,
 p,
-.tab-button,
+.auth-tab-button,
 .auth-right h2,
 .auth-right p,
 .auth-right .features li {
@@ -365,12 +366,12 @@ p,
 }
 
 /* 탭 버튼은 내부 텍스트를 좀 더 왼쪽으로 */
-.tab-button {
+.auth-tab-button {
     padding-left: 1rem;
 }
 
 /* 버튼 글자 가운데 정렬 */
-.tab-button,
+.auth-tab-button,
 .auth-form button {
     text-align: center; /* 글자 가운데 정렬 */
 }

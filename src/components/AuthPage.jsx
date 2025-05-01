@@ -33,11 +33,11 @@ const AuthPage = () => {
                 <p>로그인 또는 계정을 생성하세요</p>
                 <div className="auth-tabs">
                     <button
-                        className={`tab-button ${isLogin ? 'active' : ''}`}
+                        className={`auth-tab-button ${isLogin ? 'active' : ''}`}
                         onClick={() => setIsLogin(true)}
                     >로그인</button>
                     <button
-                        className={`tab-button ${!isLogin ? 'active' : ''}`}
+                        className={`auth-tab-button ${!isLogin ? 'active' : ''}`}
                         onClick={() => setIsLogin(false)}
                     >회원가입</button>
                 </div>
@@ -98,4 +98,4 @@ const AuthPage = () => {
     );
 };
 
-export default AuthPage; 
+export default AuthPage;
