@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Edit2, Save, X } from 'lucide-react';
+import { ArrowLeft, Edit2, Save, X, User } from 'lucide-react';
 import axios from 'axios';
 import '../styles/components/PatientDetail.css';
 import HumanModel3D from './HumanModel3D';
@@ -20,9 +20,23 @@ const PatientDetail = () => {
         const fetchPatientDetail = async () => {
             try {
                 const response = await axios.get(`${API_BASE_URL}/patients/${id}`);
-                console.log('Patient data:', response.data.data);
-                setPatient(response.data.data);
-                setEditedPatient(response.data.data);
+                const patientData = response.data.data;
+
+                // 프로필 이미지 URL이 있는 경우 이미지 데이터 가져오기
+                if (patientData.profile_image) {
+                    try {
+                        const imageResponse = await axios.get(`${API_BASE_URL}/patients/${id}/profile-image`, {
+                            responseType: 'blob',
+                        });
+                        patientData.profile_image = URL.createObjectURL(imageResponse.data);
+                    } catch (imageError) {
+                        console.error('Error fetching profile image:', imageError);
+                        patientData.profile_image = null;
+                    }
+                }
+
+                setPatient(patientData);
+                setEditedPatient(patientData);
                 setLoading(false);
             } catch (err) {
                 console.error('Error fetching patient details:', err);
@@ -32,6 +46,14 @@ const PatientDetail = () => {
         };
 
         fetchPatientDetail();
+
+        // Cleanup function
+        return () => {
+            // URL.createObjectURL()로 생성된 URL 해제
+            if (patient?.profile_image) {
+                URL.revokeObjectURL(patient.profile_image);
+            }
+        };
     }, [id]);
 
     const handleInputChange = (field, value) => {
@@ -88,6 +110,15 @@ const PatientDetail = () => {
         setIsEditing(false);
     };
 
+    const handleSymptomAdd = (point) => {
+        const newSymptom = {
+            x: point.x,
+            y: point.y,
+            description: prompt('증상을 입력하세요:') || '증상 없음',
+        };
+        handleInputChange('symptoms', [...(editedPatient.symptoms || []), newSymptom]);
+    };
+
     if (loading) return <div className="loading">로딩 중...</div>;
     if (error) return <div className="error">{error}</div>;
     if (!patient) return <div className="error">환자 정보를 찾을 수 없습니다.</div>;
@@ -120,7 +151,9 @@ const PatientDetail = () => {
                     <ArrowLeft size={16} />
                     돌아가기
                 </button>
-                <h1>{patient.patient_name}님의 상세 정보</h1>
+                <h1>
+                    <span>{patient.patient_name}</span>님의 상세 정보
+                </h1>
                 <div className="header-buttons">
                     {!isEditing ? (
                         <button className="edit-button" onClick={() => setIsEditing(true)}>
@@ -146,6 +179,39 @@ const PatientDetail = () => {
                 <div className="left-panel">
                     <div className="patient-basic-info">
                         <h3>기본 정보</h3>
+                        <div className="profile-section">
+                            <div className="profile-image-container">
+                                {patient.profile_image ? (
+                                    <img
+                                        src={patient.profile_image}
+                                        alt={`${patient.patient_name}의 프로필`}
+                                        className="profile-image"
+                                    />
+                                ) : (
+                                    <div className="profile-placeholder">
+                                        <User size={40} />
+                                    </div>
+                                )}
+                            </div>
+                            {isEditing && (
+                                <input
+                                    type="file"
+                                    id="profile-upload"
+                                    accept="image/*"
+                                    className="profile-upload-button"
+                                    onChange={(e) => {
+                                        const file = e.target.files[0];
+                                        if (file) {
+                                            const reader = new FileReader();
+                                            reader.onloadend = () => {
+                                                handleInputChange('profile_image', reader.result);
+                                            };
+                                            reader.readAsDataURL(file);
+                                        }
+                                    }}
+                                />
+                            )}
+                        </div>
                         <div className="info-row">
                             <span>이름</span>
                             {isEditing ? (
@@ -293,19 +359,6 @@ const PatientDetail = () => {
                             )}
                         </div>
                     </div>
-
-                    <div className="memo-info">
-                        <h3>메모</h3>
-                        {isEditing ? (
-                            <textarea
-                                value={editedPatient.patient_memo || ''}
-                                onChange={(e) => handleInputChange('patient_memo', e.target.value)}
-                                placeholder="메모를 입력하세요"
-                            />
-                        ) : (
-                            <div className="memo-content">{patient.patient_memo || '메모가 없습니다.'}</div>
-                        )}
-                    </div>
                 </div>
 
                 <div className="right-panel">
@@ -425,23 +478,22 @@ const PatientDetail = () => {
                         <div className="body-model">
                             <HumanModel3D
                                 symptoms={patient.symptoms}
-                                onSymptomAdd={
-                                    isEditing
-                                        ? (point) => {
-                                              const newSymptom = {
-                                                  x: point.x,
-                                                  y: point.y,
-                                                  description: prompt('증상을 입력하세요:') || '증상 없음',
-                                              };
-                                              handleInputChange('symptoms', [
-                                                  ...(editedPatient.symptoms || []),
-                                                  newSymptom,
-                                              ]);
-                                          }
-                                        : undefined
-                                }
+                                onSymptomAdd={isEditing ? handleSymptomAdd : undefined}
                             />
                         </div>
+                    </div>
+
+                    <div className="memo-info">
+                        <h3>메모</h3>
+                        {isEditing ? (
+                            <textarea
+                                value={editedPatient.patient_memo || ''}
+                                onChange={(e) => handleInputChange('patient_memo', e.target.value)}
+                                placeholder="메모를 입력하세요"
+                            />
+                        ) : (
+                            <div className="memo-content">{patient.patient_memo || '메모가 없습니다.'}</div>
+                        )}
                     </div>
                 </div>
             </div>
