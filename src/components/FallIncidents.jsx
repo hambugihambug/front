@@ -52,7 +52,12 @@ const FallIncidents = () => {
 
                 // 낙상 사고 목록은 모든 데이터 유지
                 if (incidentsResponse?.data?.code === 0) {
-                    setIncidents(incidentsResponse.data.data);
+                    const incidents = incidentsResponse.data.data;
+                    setIncidents(incidents);
+
+                    // 요약 통계 업데이트
+                    const summaryData = calculateSummaryStats(incidents);
+                    setSummaryStats(summaryData);
 
                     const now = new Date();
                     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -130,23 +135,53 @@ const FallIncidents = () => {
 
     // 요약 통계 계산 함수
     const calculateSummaryStats = (incidents) => {
-        const today = new Date().toDateString();
-        const yesterday = new Date(Date.now() - 86400000).toDateString();
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
 
+        // 오늘 낙상 건수 계산
         const todayIncidents = incidents.filter(
-            (i) => new Date(i.accident_date).toDateString() === today && i.accident_YN === 'Y'
+            (i) => new Date(i.accident_date) >= today && i.accident_YN === 'Y'
         ).length;
 
-        const yesterdayIncidents = incidents.filter(
-            (i) => new Date(i.accident_date).toDateString() === yesterday && i.accident_YN === 'Y'
-        ).length;
+        // 어제 낙상 건수 계산
+        const yesterdayIncidents = incidents.filter((i) => {
+            const date = new Date(i.accident_date);
+            return date >= yesterday && date < today && i.accident_YN === 'Y';
+        }).length;
+
+        // 평균 대응 시간 계산 (최근 24시간)
+        const last24Hours = new Date(now - 24 * 60 * 60 * 1000);
+        const recent24HoursIncidents = incidents.filter(
+            (i) =>
+                new Date(i.accident_date) >= last24Hours &&
+                i.accident_YN === 'Y' &&
+                i.accident_chYN === 'Y' &&
+                i.accident_chDT // 확인 시간이 있는 경우만 필터링
+        );
+
+        let avgResponseTime = '0분 0초';
+        if (recent24HoursIncidents.length > 0) {
+            const totalResponseTime = recent24HoursIncidents.reduce((sum, incident) => {
+                const detectTime = new Date(incident.accident_date);
+                const checkTime = new Date(incident.accident_chDT);
+                // checkTime이 더 최근 시간이므로 checkTime에서 detectTime을 빼야 합니다
+                return sum + Math.max(0, checkTime - detectTime); // 음수가 나오지 않도록 보호
+            }, 0);
+
+            const avgTimeInMs = totalResponseTime / recent24HoursIncidents.length;
+            const minutes = Math.floor(avgTimeInMs / 60000);
+            const seconds = Math.floor((avgTimeInMs % 60000) / 1000);
+            avgResponseTime = `${minutes}분 ${seconds}초`;
+        }
 
         return {
             todayCount: todayIncidents,
             yesterdayCount: yesterdayIncidents,
-            responseTime: '2분 34초', // 임시 데이터
-            accuracy: '95%', // 임시 데이터
-            accuracyChange: '+2.3%', // 임시 데이터
+            responseTime: avgResponseTime,
+            accuracy: '95%', // 임시 데이터 유지
+            accuracyChange: '+2.3%', // 임시 데이터 유지
         };
     };
 

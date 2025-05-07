@@ -21,6 +21,7 @@ import {
     ChevronRight,
     User,
     Eye,
+    RotateCcw,
 } from 'lucide-react';
 import { IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -38,18 +39,14 @@ const initialFormState = {
     patient_blood: '',
     patient_img: null,
     patient_memo: '',
-    patient_status: '무위험군', // 기본값 수정
+    patient_status: '무위험군',
     guardian_id: '',
     bed_id: '',
 };
 
 const PatientManagement = () => {
     const [patients, setPatients] = useState([]);
-    const [showEditForm, setShowEditForm] = useState(false);
-    const [showDetailModal, setShowDetailModal] = useState(false);
     const [showFilterModal, setShowFilterModal] = useState(false);
-    const [selectedPatient, setSelectedPatient] = useState(null);
-    const [editingPatient, setEditingPatient] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -57,6 +54,8 @@ const PatientManagement = () => {
         ageRange: { min: '', max: '' },
         bloodType: '',
         hasGuardian: null,
+        room: '',
+        status: '',
     });
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -152,7 +151,6 @@ const PatientManagement = () => {
                     },
                     dischargeScheduled: {
                         value: `${dischargeScheduled}명`,
-                        
                     },
                 }));
             } else {
@@ -246,37 +244,41 @@ const PatientManagement = () => {
         });
     }, [patients, sortConfig]);
 
-    // handleEditPatient 함수 수정
-    const handleEditPatient = (patient) => {
-        setEditingPatient(patient);
-        setShowEditForm(true);
-    };
-
     // openDetailView 함수 수정
     const openDetailView = (patient) => {
         navigate(`/patients/${patient.patient_id}`);
     };
 
-    const openEditForm = (patient) => {
-        // 생년월일 포맷팅 (patient_birth 또는 patient_age 필드 사용)
-        const birthField = patient.patient_birth || patient.patient_age;
-        const formattedBirthDate = birthField
-            ? new Date(new Date(birthField).getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-            : '';
-
-        setEditingPatient({
-            ...patient,
-            patient_birth: formattedBirthDate,
-        });
-        setShowEditForm(true);
-    };
-
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
-        setFilters((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
+
+        // 중첩된 객체 구조 처리 (예: ageRange.min, ageRange.max)
+        if (name.includes('.')) {
+            const [parent, child] = name.split('.');
+            setFilters((prev) => ({
+                ...prev,
+                [parent]: {
+                    ...prev[parent],
+                    [child]: value,
+                },
+            }));
+        } else {
+            setFilters((prev) => ({
+                ...prev,
+                [name]: value,
+            }));
+        }
+    };
+
+    // 필터 초기화 함수 추가
+    const resetFilters = () => {
+        setFilters({
+            ageRange: { min: '', max: '' },
+            bloodType: '',
+            hasGuardian: null,
+            room: '',
+            status: '', // 상태 필터 초기화
+        });
     };
 
     // 필터링 함수 수정
@@ -291,8 +293,10 @@ const PatientManagement = () => {
                 filters.hasGuardian === null ||
                 (filters.hasGuardian === true && patient.guardian_tel) ||
                 (filters.hasGuardian === false && !patient.guardian_tel);
+            const matchesRoom = !filters.room || patient.room_name === filters.room;
+            const matchesStatus = !filters.status || patient.patient_status === filters.status;
 
-            return matchesAge && matchesBlood && matchesGuardian;
+            return matchesAge && matchesBlood && matchesGuardian && matchesRoom && matchesStatus;
         });
     };
 
@@ -487,60 +491,72 @@ const PatientManagement = () => {
             {/* 필터 모달 */}
             {showFilterModal && (
                 <div className="modal-overlay">
-                    <div className="modal-content">
+                    <div className="modal-content filter-modal">
                         <div className="modal-header">
                             <h2>필터 설정</h2>
-                            <button className="close-button" onClick={() => setShowFilterModal(false)}>
-                                <X size={20} />
-                            </button>
+                            <div className="modal-header-buttons">
+                                <button className="reset-button" onClick={resetFilters} title="필터 초기화">
+                                    <RotateCcw size={18} />
+                                </button>
+                                <button className="close-button" onClick={() => setShowFilterModal(false)}>
+                                    <X size={20} />
+                                </button>
+                            </div>
                         </div>
-                        <div className="filter-form">
-                            <div className="form-group">
-                                <label>나이 범위</label>
-                                <div className="flex gap-2">
-                                    <input
-                                        type="number"
-                                        name="ageRange.min"
-                                        placeholder="최소"
-                                        value={filters.ageRange.min}
-                                        onChange={handleFilterChange}
-                                    />
-                                    <span>~</span>
-                                    <input
-                                        type="number"
-                                        name="ageRange.max"
-                                        placeholder="최대"
-                                        value={filters.ageRange.max}
-                                        onChange={handleFilterChange}
-                                    />
+                        <div className="filter-modal-body">
+                            <div className="filter-panel">
+                                <div className="form-group">
+                                    <label>나이 범위</label>
+                                    <div className="flex">
+                                        <input
+                                            type="number"
+                                            name="ageRange.min"
+                                            placeholder="최소"
+                                            value={filters.ageRange.min}
+                                            onChange={handleFilterChange}
+                                        />
+                                        <span>~</span>
+                                        <input
+                                            type="number"
+                                            name="ageRange.max"
+                                            placeholder="최대"
+                                            value={filters.ageRange.max}
+                                            onChange={handleFilterChange}
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="form-group">
-                                <label>혈액형</label>
-                                <select name="bloodType" value={filters.bloodType} onChange={handleFilterChange}>
-                                    <option value="">전체</option>
-                                    <option value="A">A형</option>
-                                    <option value="B">B형</option>
-                                    <option value="O">O형</option>
-                                    <option value="AB">AB형</option>
-                                </select>
-                            </div>
-                            <div className="form-group">
-                                <label>보호자 여부</label>
-                                <select
-                                    name="hasGuardian"
-                                    value={filters.hasGuardian === null ? '' : filters.hasGuardian}
-                                    onChange={(e) =>
-                                        setFilters((prev) => ({
-                                            ...prev,
-                                            hasGuardian: e.target.value === '' ? null : e.target.value === 'true',
-                                        }))
-                                    }
-                                >
-                                    <option value="">전체</option>
-                                    <option value="true">있음</option>
-                                    <option value="false">없음</option>
-                                </select>
+                                <div className="form-group">
+                                    <label>혈액형</label>
+                                    <select name="bloodType" value={filters.bloodType} onChange={handleFilterChange}>
+                                        <option value="">전체</option>
+                                        <option value="A">A형</option>
+                                        <option value="B">B형</option>
+                                        <option value="O">O형</option>
+                                        <option value="AB">AB형</option>
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label>병실</label>
+                                    <select name="room" value={filters.room} onChange={handleFilterChange}>
+                                        <option value="">전체</option>
+                                        {Array.from(new Set(patients.map((p) => p.room_name)))
+                                            .filter(Boolean)
+                                            .map((room) => (
+                                                <option key={room} value={room}>
+                                                    {room}
+                                                </option>
+                                            ))}
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label>환자 상태</label>
+                                    <select name="status" value={filters.status} onChange={handleFilterChange}>
+                                        <option value="">전체</option>
+                                        <option value="고위험군">고위험군</option>
+                                        <option value="저위험군">저위험군</option>
+                                        <option value="무위험군">무위험군</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <div className="modal-footer">
@@ -551,259 +567,6 @@ const PatientManagement = () => {
                                 적용
                             </button>
                         </div>
-                    </div>
-                </div>
-            )}
-
-            {/* 상세보기 모달 */}
-            {showDetailModal && selectedPatient && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h2>환자 상세정보</h2>
-                            <button className="close-button" onClick={() => setShowDetailModal(false)}>
-                                <X size={20} />
-                            </button>
-                        </div>
-                        <div className="profile-section">
-                            <div className="profile-image-large">
-                                {selectedPatient.patient_img ? (
-                                    <img
-                                        src={formatImageUrl(selectedPatient.patient_img)}
-                                        alt={`${selectedPatient.patient_name}의 프로필`}
-                                        className="profile-image"
-                                    />
-                                ) : (
-                                    <div className="profile-placeholder large">
-                                        <UserPlus size={48} />
-                                    </div>
-                                )}
-                            </div>
-                            <div className="profile-info">
-                                <h3>{selectedPatient.patient_name}</h3>
-                                <p>환자 ID: {selectedPatient.patient_id}</p>
-                            </div>
-                        </div>
-                        <div className="patient-details">
-                            <div className="detail-row">
-                                <span className="detail-label">이름:</span>
-                                <span className="detail-value">{selectedPatient.patient_name}</span>
-                            </div>
-                            <div className="detail-row">
-                                <span className="detail-label">생년월일:</span>
-                                <span className="detail-value">{formatBirthDate(selectedPatient.patient_birth)}</span>
-                            </div>
-                            <div className="detail-row">
-                                <span className="detail-label">키:</span>
-                                <span className="detail-value">{selectedPatient.patient_height}cm</span>
-                            </div>
-                            <div className="detail-row">
-                                <span className="detail-label">몸무게:</span>
-                                <span className="detail-value">{selectedPatient.patient_weight}kg</span>
-                            </div>
-                            <div className="detail-row">
-                                <span className="detail-label">혈액형:</span>
-                                <span className="detail-value">{selectedPatient.patient_blood}형</span>
-                            </div>
-                            <div className="detail-row">
-                                <span className="detail-label">병실:</span>
-                                <span className="detail-value">{selectedPatient.room_name || '-'}</span>
-                            </div>
-                            <div className="detail-row">
-                                <span className="detail-label">침대 번호:</span>
-                                <span className="detail-value">{selectedPatient.bed_num || '-'}</span>
-                            </div>
-                            <div className="detail-row">
-                                <span className="detail-label">보호자 연락처:</span>
-                                <span className="detail-value">{selectedPatient.guardian_tel || '-'}</span>
-                            </div>
-                            <div className="detail-row">
-                                <span className="detail-label">상태:</span>
-                                <span className="detail-value">{selectedPatient.patient_status || 'active'}</span>
-                            </div>
-                            {selectedPatient.patient_memo && (
-                                <div className="detail-row">
-                                    <span className="detail-label">메모:</span>
-                                    <span className="detail-value">{selectedPatient.patient_memo}</span>
-                                </div>
-                            )}
-                        </div>
-                        <div className="modal-footer">
-                            <button className="submit-button" onClick={() => setShowDetailModal(false)}>
-                                확인
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* 수정 모달 */}
-            {showEditForm && editingPatient && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h2>환자 정보 수정</h2>
-                            <button className="close-button" onClick={() => setShowEditForm(false)}>
-                                <X size={20} />
-                            </button>
-                        </div>
-                        <form onSubmit={handleEditPatient} className="modal-form">
-                            <div className="form-grid">
-                                <div className="form-group">
-                                    <label>이름</label>
-                                    <input
-                                        type="text"
-                                        name="patient_name"
-                                        value={editingPatient.patient_name}
-                                        onChange={(e) =>
-                                            setEditingPatient({ ...editingPatient, patient_name: e.target.value })
-                                        }
-                                        required
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>생년월일</label>
-                                    <input
-                                        type="date"
-                                        name="patient_birth"
-                                        value={editingPatient.patient_birth}
-                                        onChange={(e) =>
-                                            setEditingPatient({ ...editingPatient, patient_birth: e.target.value })
-                                        }
-                                        required
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>키 (cm)</label>
-                                    <input
-                                        type="number"
-                                        name="patient_height"
-                                        value={editingPatient.patient_height}
-                                        onChange={(e) =>
-                                            setEditingPatient({ ...editingPatient, patient_height: e.target.value })
-                                        }
-                                        required
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>몸무게 (kg)</label>
-                                    <input
-                                        type="number"
-                                        name="patient_weight"
-                                        value={editingPatient.patient_weight}
-                                        onChange={(e) =>
-                                            setEditingPatient({ ...editingPatient, patient_weight: e.target.value })
-                                        }
-                                        required
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>혈액형</label>
-                                    <select
-                                        name="patient_blood"
-                                        value={editingPatient.patient_blood}
-                                        onChange={(e) =>
-                                            setEditingPatient({ ...editingPatient, patient_blood: e.target.value })
-                                        }
-                                        required
-                                    >
-                                        <option value="">선택하세요</option>
-                                        <option value="A">A형</option>
-                                        <option value="B">B형</option>
-                                        <option value="O">O형</option>
-                                        <option value="AB">AB형</option>
-                                    </select>
-                                </div>
-                                <div className="form-group">
-                                    <label>보호자 ID</label>
-                                    <input
-                                        type="text"
-                                        name="guardian_id"
-                                        value={editingPatient.guardian_id || ''}
-                                        onChange={(e) =>
-                                            setEditingPatient({ ...editingPatient, guardian_id: e.target.value })
-                                        }
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>침대 ID</label>
-                                    <input
-                                        type="text"
-                                        name="bed_id"
-                                        value={editingPatient.bed_id || ''}
-                                        onChange={(e) =>
-                                            setEditingPatient({ ...editingPatient, bed_id: e.target.value })
-                                        }
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>상태</label>
-                                    <select
-                                        name="patient_status"
-                                        value={editingPatient.patient_status || 'active'}
-                                        onChange={(e) =>
-                                            setEditingPatient({ ...editingPatient, patient_status: e.target.value })
-                                        }
-                                    >
-                                        <option value="고위험군">고위험군</option>
-                                        <option value="저위험군">저위험군</option>
-                                        <option value="무위험군">무위험군</option>
-                                    </select>
-                                </div>
-                                <div className="form-group">
-                                    <label>이미지 URL</label>
-                                    <input
-                                        type="text"
-                                        name="patient_img"
-                                        value={editingPatient.patient_img || ''}
-                                        onChange={(e) =>
-                                            setEditingPatient({ ...editingPatient, patient_img: e.target.value })
-                                        }
-                                        placeholder="이미지 URL을 입력하세요"
-                                    />
-                                </div>
-                                <div className="form-group full-width">
-                                    <label>메모</label>
-                                    <textarea
-                                        name="patient_memo"
-                                        value={editingPatient.patient_memo || ''}
-                                        onChange={(e) =>
-                                            setEditingPatient({ ...editingPatient, patient_memo: e.target.value })
-                                        }
-                                        rows="3"
-                                        placeholder="환자에 대한 메모를 입력하세요"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>환자 사진</label>
-                                    <div className="file-upload-container">
-                                        {editingPatient.patient_img && (
-                                            <div className="image-preview">
-                                                <img
-                                                    src={editingPatient.patient_img}
-                                                    alt="미리보기"
-                                                    className="preview-image"
-                                                />
-                                            </div>
-                                        )}
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={(e) => handleImageUpload(e, 'edit')}
-                                            className="file-input"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="modal-footer">
-                                <button type="button" className="cancel-button" onClick={() => setShowEditForm(false)}>
-                                    취소
-                                </button>
-                                <button type="submit" className="submit-button">
-                                    수정
-                                </button>
-                            </div>
-                        </form>
                     </div>
                 </div>
             )}
@@ -879,7 +642,7 @@ const PatientManagement = () => {
                                     <td>
                                         <span className="status-badge blood-type">{patient.patient_blood}형</span>
                                     </td>
-                                    <td>{patient.room_name ? `${patient.room_name}호 / ${patient.bed_num}` : '-'}</td>
+                                    <td>{patient.room_name ? `${patient.room_name}호 - ${patient.bed_num}` : '-'}</td>
                                     <td>
                                         <span className={`status-badge ${getStatusClass(patient.patient_status)}`}>
                                             {patient.patient_status}

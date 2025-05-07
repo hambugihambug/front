@@ -19,7 +19,7 @@ export default function ActiveAlerts() {
                 const json = await res.json();
                 const data = json.data || [];
                 const active = data
-                    .filter((a) => a.accident_YN === 'Y')
+                    .filter((a) => a.accident_YN === 'Y' && a.accident_chYN !== 'Y')
                     .map((a) => ({
                         id: a.accident_id,
                         patientName: a.patient_name,
