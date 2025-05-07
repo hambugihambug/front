@@ -272,7 +272,7 @@ const FallIncidents = () => {
             setSendingAlert(true);
             setAlertStatus(null);
 
-            const response = await axios.post(`${API_BASE_URL}/api/notifications/broadcast-latest-alert`);
+            const response = await axios.post(`${API_BASE_URL}/notifications/broadcast-latest-alert`);
 
             if (response.data.code === 0) {
                 setAlertStatus({ success: true, message: '최근 낙상 사고 알림이 성공적으로 전송되었습니다.' });
