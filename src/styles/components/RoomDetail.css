@@ -195,6 +195,10 @@
     color: #1e293b;
 }
 
+.data-table td:last-child {
+    text-align: center;
+}
+
 .status-badge {
     display: inline-block;
     padding: 4px 8px;
@@ -252,4 +256,20 @@
     font-size: 12px;
     color: #94a3b8;
     margin-top: 8px;
+}
+
+/* 상세 버튼 스타일 */
+.detail-button {
+    padding: 0.5rem 1rem;
+    background-color: #e3f2fd;
+    color: #1976d2;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: background-color 0.2s;
+}
+
+.detail-button:hover {
+    background-color: #bbdefb;
 }

@@ -55,13 +55,16 @@ export default function RoomGrid() {
             temperature: `${Number(r.room_temp).toFixed(1)}°C`,
             humidity: `${r.humidity}%`,
             patients: patientCount,
+            floor: Math.floor(parseInt(r.room_name) / 100),
         };
     });
     const floors = Array.from(new Set(roomsEnv.map((r) => Math.floor(parseInt(r.room_name) / 100))));
-    const floorCards = roomCards.filter((c) => Math.floor(parseInt(c.roomName) / 100) === selectedFloor);
-    const itemsPerPage = 4;
-    const totalPages = Math.ceil(floorCards.length / itemsPerPage) || 1;
-    const paginatedCards = floorCards.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
+    const itemsPerPage = 4; // 한 페이지당 보여줄 아이템 수를 4개로 수정 (2열 x 2행)
+    const filteredCards = roomCards
+        .filter((card) => selectedFloor === 'all' || card.floor === selectedFloor)
+        .sort((a, b) => a.roomName.localeCompare(b.roomName));
+    const totalPages = Math.ceil(filteredCards.length / itemsPerPage);
+    const paginatedCards = filteredCards.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
     const isSingle = paginatedCards.length === 1;
 
     return (
@@ -80,7 +83,7 @@ export default function RoomGrid() {
                     </button>
                 ))}
             </div>
-            <div className={`room-grid${isSingle ? ' single' : ''}`}>
+            <div className="room-grid">
                 {paginatedCards.map((card) => (
                     <div key={card.roomId} className="room-card">
                         <div className="room-header">

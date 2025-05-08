@@ -39,6 +39,10 @@ const RoomDetail = () => {
         return '정상';
     };
 
+    const handlePatientDetail = (patientId) => {
+        navigate(`/patients/${patientId}`);
+    };
+
     if (loading) return <div className="loading-text">병실 정보를 불러오는 중...</div>;
     if (error) return <div className="error-text">{error}</div>;
     if (!room) return <div className="error-text">병실을 찾을 수 없습니다.</div>;
@@ -158,11 +162,12 @@ const RoomDetail = () => {
                             <table className="data-table">
                                 <thead>
                                     <tr>
-                                        <th>환자명</th>
+                                        <th>이름</th>
                                         <th>생년월일</th>
                                         <th>혈액형</th>
                                         <th>침상 번호</th>
                                         <th>상태</th>
+                                        <th>작업</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -174,6 +179,14 @@ const RoomDetail = () => {
                                             <td>{patient.bed_id}</td>
                                             <td>
                                                 <span className="status-badge 정상">안정</span>
+                                            </td>
+                                            <td>
+                                                <button
+                                                    className="detail-button"
+                                                    onClick={() => handlePatientDetail(patient.patient_id)}
+                                                >
+                                                    상세보기
+                                                </button>
                                             </td>
                                         </tr>
                                     ))}

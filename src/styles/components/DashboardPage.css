@@ -120,26 +120,39 @@
     margin-bottom: 16px;
 }
 .room-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
+    display: grid !important; /* 강제 적용을 위해 !important 사용 */
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1.5rem;
+    padding: 1rem;
 }
+
+/* 반응형 디자인 수정 */
+@media (max-width: 768px) {
+    .room-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
 .room-card {
-    background: #fff;
-    border-radius: 8px;
-    padding: 16px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s;
-    cursor: pointer;
+    width: 100%;
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 .room-card:hover {
     transform: translateY(-2px);
 }
-.room-card .room-header {
+.room-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: 1rem;
+}
+.room-header h3 {
+    font-size: 1.25rem; /* 텍스트 크기 증가 */
+    font-weight: 600;
+    color: #1e293b;
 }
 .room-card .room-name {
     font-size: 16px;
@@ -165,16 +178,41 @@
     background-color: #fee2e2;
     color: #991b1b;
 }
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
 
+.room-info {
+    padding-left: 1rem; /* 들여쓰기 0.5rem에서 1rem으로 증가 */
+}
 .room-card .room-info {
     font-size: 14px;
     color: #64748b;
+}
+.room-info .info-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem; /* 행간 간격도 살짝 증가 */
+    font-size: 1rem;
+    color: #475569;
 }
 .room-card .room-info .info-row {
     margin-bottom: 8px;
     display: flex;
     align-items: center;
     gap: 8px;
+}
+.room-info .info-row:last-child {
+    margin-bottom: 0;
+}
+
+/* info-row 내부 아이콘 스타일 */
+.room-info .info-row svg {
+    min-width: 16px; /* 아이콘 크기 고정 */
 }
 
 /* Chart Section reuse RiskDistributionChart styles */

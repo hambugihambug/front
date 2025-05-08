@@ -111,36 +111,8 @@ const RoomManagement = () => {
         }
     };
 
-    const fetchPatientDetail = async (patientId) => {
-        try {
-            const response = await axios.get(`${API_BASE_URL}/patients/${patientId}`);
-            if (response.data.code === 0) {
-                const patientData = response.data.data;
-
-                if (!patientData.patient_height || !patientData.patient_weight || !patientData.patient_status) {
-                    try {
-                        const detailResponse = await axios.get(`${API_BASE_URL}/patients/${patientId}/detail`);
-                        if (detailResponse.data.code === 0) {
-                            setSelectedPatient({
-                                ...patientData,
-                                ...detailResponse.data.data,
-                            });
-                        } else {
-                            setSelectedPatient(patientData);
-                        }
-                    } catch (error) {
-                        console.error('환자 상세 정보 조회 실패:', error);
-                        setSelectedPatient(patientData);
-                    }
-                } else {
-                    setSelectedPatient(patientData);
-                }
-
-                setShowPatientDetailModal(true);
-            }
-        } catch (error) {
-            console.error('환자 정보 조회 실패:', error);
-        }
+    const fetchPatientDetail = (patientId) => {
+        navigate(`/patients/${patientId}`); // 팝업 대신 페이지 이동
     };
 
     const groupRoomsByFloor = () => {
@@ -484,10 +456,10 @@ const RoomManagement = () => {
                                         {selectedPatient.patient_status === 'active'
                                             ? '입원중'
                                             : selectedPatient.patient_status === 'discharged'
-                                            ? '퇴원'
-                                            : selectedPatient.patient_status === 'deceased'
-                                            ? '사망'
-                                            : '-'}
+                                              ? '퇴원'
+                                              : selectedPatient.patient_status === 'deceased'
+                                                ? '사망'
+                                                : '-'}
                                     </span>
                                 </div>
                                 <div className="detail-row">
