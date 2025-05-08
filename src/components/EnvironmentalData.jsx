@@ -313,7 +313,7 @@ const EnvironmentalData = () => {
                         <h3 className="stats-label">CCTV 실시간 모니터링</h3>
                         <div className="cctv-video-wrapper">
                             <img
-                                src="http://localhost:5050/stream"
+                                src="http://192.168.1.112:5050/stream"
                                 alt="실시간 CCTV 스트리밍"
                                 className="cctv-stream-image"
                             />
