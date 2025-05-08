@@ -366,8 +366,8 @@ const PatientAdd = () => {
                             <span>보호자 전화</span>
                             <input
                                 type="tel"
-                                name="guardian_tel"
-                                value={newPatient.guardian_tel}
+                                name="guardian_id"
+                                value={newPatient.guardian_id}
                                 onChange={handleInputChange}
                                 placeholder="010-0000-0000"
                                 pattern="[0-9]{3}-[0-9]{4}-[0-9]{4}"
