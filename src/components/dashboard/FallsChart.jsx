@@ -15,30 +15,51 @@ export default function FallsChart() {
         async function loadChart() {
             setIsLoading(true);
             try {
-                // fetch all incidents
                 const res = await fetch(`${API_BASE_URL}/fall-incidents`);
                 const json = await res.json();
                 const all = json.data || [];
                 let data = [];
                 const now = new Date();
+
                 if (timeRange === 'daily') {
-                    // hourly stats via API
-                    const r = await fetch(`${API_BASE_URL}/fall-incidents/stats`);
-                    const js = await r.json();
-                    data = js.data.map((d) => ({ name: `${d.hour}`, fallsDetected: d.count }));
+                    // 오늘 날짜에 해당되는 낙상사고만 필터링
+                    const today = now.toISOString().split('T')[0]; // YYYY-MM-DD 형식
+                    const hourlyCounts = Array(24).fill(0); // 24시간 초기화
+
+                    all.filter((f) => f.accident_YN === 'Y' && f.accident_date.startsWith(today)).forEach((f) => {
+                        const hour = new Date(f.accident_date).getHours();
+                        hourlyCounts[hour]++;
+                    });
+
+                    data = hourlyCounts.map((count, hour) => ({
+                        name: `${hour}시`,
+                        fallsDetected: count,
+                    }));
                 } else if (timeRange === 'weekly') {
-                    // fixed order Mon-Sun
+                    // 현재 주차에 해당되는 낙상사고만 필터링
+                    const startOfWeek = new Date(now);
+                    startOfWeek.setDate(now.getDate() - now.getDay() + 1); // 월요일
+                    startOfWeek.setHours(0, 0, 0, 0);
+
+                    const endOfWeek = new Date(startOfWeek);
+                    endOfWeek.setDate(startOfWeek.getDate() + 6); // 일요일
+                    endOfWeek.setHours(23, 59, 59, 999);
+
                     const days = ['월', '화', '수', '목', '금', '토', '일'];
                     const counts = days.reduce((obj, day) => {
                         obj[day] = 0;
                         return obj;
                     }, {});
-                    all.filter((f) => f.accident_YN === 'Y').forEach((f) => {
-                        const d = new Date(f.accident_date);
-                        const names = ['일', '월', '화', '수', '목', '금', '토'];
-                        const key = names[d.getDay()];
-                        if (counts[key] !== undefined) counts[key]++;
+
+                    all.filter((f) => {
+                        const accidentDate = new Date(f.accident_date);
+                        return f.accident_YN === 'Y' && accidentDate >= startOfWeek && accidentDate <= endOfWeek;
+                    }).forEach((f) => {
+                        const accidentDate = new Date(f.accident_date);
+                        const dayName = days[accidentDate.getDay() - 1]; // 월요일부터 시작
+                        if (counts[dayName] !== undefined) counts[dayName]++;
                     });
+
                     data = days.map((name) => ({ name, fallsDetected: counts[name] }));
                 } else if (timeRange === 'monthly') {
                     // group by week numbers for current month
@@ -68,6 +89,9 @@ export default function FallsChart() {
         }
         loadChart();
     }, [timeRange]);
+
+    // X축의 3시간 간격 ticks 생성
+    const xAxisTicks = Array.from({ length: 9 }, (_, i) => i * 3); // [0, 3, 6, 9, 12, 15, 18, 21, 24]
 
     return (
         <Card className="overflow-hidden">
@@ -111,7 +135,7 @@ export default function FallsChart() {
                         <ResponsiveContainer width="100%" height="100%">
                             <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="name" />
+                                <XAxis dataKey="name" ticks={xAxisTicks} />
                                 <YAxis allowDecimals={false} />
                                 <Tooltip />
                                 <Legend />
