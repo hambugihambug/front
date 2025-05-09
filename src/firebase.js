@@ -19,7 +19,7 @@ const messaging = getMessaging(app);
 
 // 토큰 저장 함수로 분리
 export const saveTokenToServer = (currentToken, userId = '간병사1') => {
-    return axios.post(`http://localhost:3000/api/save-token`, {
+    return axios.post(`/notifications/save-token`, {
         token: currentToken,
         userId: userId,
     });
