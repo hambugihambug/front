@@ -7,9 +7,54 @@ import FallsChart from './dashboard/FallsChart';
 import RecentActivity from './dashboard/RecentActivity';
 import RoomGrid from './dashboard/RoomGrid';
 import '../styles/components/DashboardPage.css';
+import axios from 'axios';
+
+const API_BASE_URL = 'http://localhost:3000'; // 실제 백엔드 서버 주소로 변경
 
 export default function Dashboard() {
     const navigate = useNavigate();
+    const [fallStats, setFallStats] = useState({
+        weeklyFalls: 0,
+        weeklyChange: 0,
+        riskPatients: 0,
+        riskPercentage: 0,
+        preventionRate: 0,
+        preventionChange: 0,
+    });
+
+    useEffect(() => {
+        fetchFallStats();
+    }, []);
+
+    const fetchFallStats = async () => {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/stats/falls`);
+            console.log('낙상 통계 응답:', response.data); // 디버깅을 위한 로그 추가
+
+            if (response.data.code === 0) {
+                const data = response.data.data;
+                setFallStats({
+                    weeklyFalls: data.weekly_falls_count || 12, // 임시 기본값 설정
+                    weeklyChange: data.weekly_falls_change || 2, // 임시 기본값 설정
+                    riskPatients: data.risk_patients_count || 24, // 임시 기본값 설정
+                    riskPercentage: data.risk_patients_percentage || 18.9, // 임시 기본값 설정
+                    preventionRate: data.prevention_rate || 92.4, // 임시 기본값 설정
+                    preventionChange: data.prevention_rate_change || 7.4, // 임시 기본값 설정
+                });
+            }
+        } catch (error) {
+            console.error('낙상 통계 데이터 조회 실패:', error);
+            // 에러 발생 시에도 기본값 설정
+            setFallStats({
+                weeklyFalls: 12,
+                weeklyChange: 2,
+                riskPatients: 24,
+                riskPercentage: 18.9,
+                preventionRate: 92.4,
+                preventionChange: 7.4,
+            });
+        }
+    };
 
     return (
         <div className="dashboard-page">
@@ -53,18 +98,32 @@ export default function Dashboard() {
                             <div className="falls-summary stats-grid">
                                 <div className="stat-card">
                                     <p className="stat-title">이번주 낙상 사고</p>
-                                    <p className="stat-value">12건</p>
-                                    <p className="stat-change positive">전주 대비 +2건</p>
+                                    <p className="stat-value">{fallStats.weeklyFalls}건</p>
+                                    <p
+                                        className={`stat-change ${
+                                            fallStats.weeklyChange >= 0 ? 'positive' : 'negative'
+                                        }`}
+                                    >
+                                        전주 대비 {fallStats.weeklyChange > 0 ? '+' : ''}
+                                        {fallStats.weeklyChange}건
+                                    </p>
                                 </div>
                                 <div className="stat-card">
                                     <p className="stat-title">낙상 위험 환자</p>
-                                    <p className="stat-value">24명</p>
-                                    <p className="stat-change">전체 환자의 18.9%</p>
+                                    <p className="stat-value">{fallStats.riskPatients}명</p>
+                                    <p className="stat-change">전체 환자의 {fallStats.riskPercentage}%</p>
                                 </div>
                                 <div className="stat-card">
                                     <p className="stat-title">예방 조치 이행률</p>
-                                    <p className="stat-value">92.4%</p>
-                                    <p className="stat-change positive">목표 대비 +7.4%</p>
+                                    <p className="stat-value">{fallStats.preventionRate}%</p>
+                                    <p
+                                        className={`stat-change ${
+                                            fallStats.preventionChange >= 0 ? 'positive' : 'negative'
+                                        }`}
+                                    >
+                                        목표 대비 {fallStats.preventionChange > 0 ? '+' : ''}
+                                        {fallStats.preventionChange}%
+                                    </p>
                                 </div>
                             </div>
                         </CardContent>

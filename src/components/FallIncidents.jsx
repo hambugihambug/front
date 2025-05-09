@@ -14,6 +14,8 @@ import {
     Clock,
     PlusCircle,
     AlertCircle,
+    ChevronLeft,
+    ChevronRight,
 } from 'lucide-react';
 import { Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import '../styles/components/FallIncidents.css';
@@ -37,6 +39,8 @@ const FallIncidents = () => {
     const [statsTab, setStatsTab] = useState('일간');
     const [sendingAlert, setSendingAlert] = useState(false);
     const [alertStatus, setAlertStatus] = useState(null);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [currentPage, setCurrentPage] = useState(1);
 
     useEffect(() => {
         const fetchAllData = async () => {
@@ -291,6 +295,15 @@ const FallIncidents = () => {
         }
     };
 
+    const handleRowsPerPageChange = (e) => {
+        setRowsPerPage(Number(e.target.value));
+        setCurrentPage(1);
+    };
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
     if (loading) {
         return <div className="loading-text">낙상 감지 정보를 불러오는 중...</div>;
     }
@@ -534,44 +547,90 @@ const FallIncidents = () => {
                         {incidents.length === 0 ? (
                             <div className="no-data-message">사고 데이터가 없습니다.</div>
                         ) : (
-                            <table className="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>사고 ID</th>
-                                        <th>환자 정보</th>
-                                        <th>발생 일시</th>
-                                        <th>사고 여부</th>
-                                        <th>병실</th>
-                                        <th>상세정보</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {incidents.map((incident) => (
-                                        <tr key={incident.accident_id}>
-                                            <td>{incident.accident_id}</td>
-                                            <td>
-                                                {incident.patient_name} ({incident.patient_id})
-                                            </td>
-                                            <td>{new Date(incident.accident_date).toLocaleString('ko-KR')}</td>
-                                            <td>
-                                                <span
-                                                    className={`status-badge ${
-                                                        incident.accident_YN === 'Y' ? '높음' : '정상'
-                                                    }`}
-                                                >
-                                                    {incident.accident_YN === 'Y' ? '발생' : '미발생'}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                {incident.room_name} ({incident.bed_num})
-                                            </td>
-                                            <td>
-                                                <button className="link-button">상세정보</button>
-                                            </td>
+                            <>
+                                <table className="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>사고 ID</th>
+                                            <th>환자 정보</th>
+                                            <th>발생 일시</th>
+                                            <th>사고 여부</th>
+                                            <th>병실</th>
+                                            <th>상세정보</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {incidents
+                                            .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+                                            .map((incident) => (
+                                                <tr key={incident.accident_id}>
+                                                    <td>{incident.accident_id}</td>
+                                                    <td>
+                                                        {incident.patient_name} ({incident.patient_id})
+                                                    </td>
+                                                    <td>{new Date(incident.accident_date).toLocaleString('ko-KR')}</td>
+                                                    <td>
+                                                        <span
+                                                            className={`status-badge ${
+                                                                incident.accident_YN === 'Y' ? '높음' : '정상'
+                                                            }`}
+                                                        >
+                                                            {incident.accident_YN === 'Y' ? '발생' : '미발생'}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        {incident.room_name} ({incident.bed_num})
+                                                    </td>
+                                                    <td>
+                                                        <button className="link-button">상세정보</button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                    </tbody>
+                                </table>
+
+                                {/* 페이지네이션 추가 */}
+                                <div className="table-footer">
+                                    <div className="rows-per-page">
+                                        <span>Rows per page:</span>
+                                        <select
+                                            value={rowsPerPage}
+                                            onChange={handleRowsPerPageChange}
+                                            className="rows-select"
+                                        >
+                                            <option value={10}>10</option>
+                                            <option value={20}>20</option>
+                                            <option value={30}>30</option>
+                                        </select>
+                                    </div>
+                                    <div className="pagination-info">
+                                        {`${(currentPage - 1) * rowsPerPage + 1}-${Math.min(
+                                            currentPage * rowsPerPage,
+                                            incidents.length
+                                        )} of ${incidents.length}`}
+                                    </div>
+                                    <div className="pagination-buttons">
+                                        <button
+                                            className="pagination-button"
+                                            onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                                            disabled={currentPage === 1}
+                                        >
+                                            <ChevronLeft size={16} />
+                                        </button>
+                                        <button
+                                            className="pagination-button"
+                                            onClick={() =>
+                                                handlePageChange(
+                                                    Math.min(currentPage + 1, Math.ceil(incidents.length / rowsPerPage))
+                                                )
+                                            }
+                                            disabled={currentPage * rowsPerPage >= incidents.length}
+                                        >
+                                            <ChevronRight size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+                            </>
                         )}
                     </div>
                 </div>
