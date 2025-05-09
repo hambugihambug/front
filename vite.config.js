@@ -18,59 +18,14 @@ export default defineConfig({
             strict: false,
         },
         cors: true,
+        // SPA 새로고침 문제 해결을 위한 historyApiFallback 설정
+        historyApiFallback: {
+            disableDotRule: true,
+            rewrites: [{ from: /./, to: '/index.html' }],
+        },
         // Proxy API requests to backend server
         proxy: {
-            '/users': {
-                target: 'http://localhost:3000',
-                changeOrigin: true,
-                secure: false,
-            },
-            '/patients': {
-                target: 'http://localhost:3000',
-                changeOrigin: true,
-                secure: false,
-            },
-            '/rooms': {
-                target: 'http://localhost:3000',
-                changeOrigin: true,
-                secure: false,
-            },
-            '/fall-incidents': {
-                target: 'http://localhost:3000',
-                changeOrigin: true,
-                secure: false,
-            },
-            '/environmental': {
-                target: 'http://localhost:3000',
-                changeOrigin: true,
-                secure: false,
-            },
-            '/weather': {
-                target: 'http://localhost:3000',
-                changeOrigin: true,
-                secure: false,
-            },
-            '/alerts': {
-                target: 'http://localhost:3000',
-                changeOrigin: true,
-                secure: false,
-            },
-            '/notifications': {
-                target: 'http://localhost:3000',
-                changeOrigin: true,
-                secure: false,
-            },
-            '/firebase': {
-                target: 'http://localhost:3000',
-                changeOrigin: true,
-                secure: false,
-            },
-            '/floors': {
-                target: 'http://localhost:3000',
-                changeOrigin: true,
-                secure: false,
-            },
-            '/uploads': {
+            '/api': {
                 target: 'http://localhost:3000',
                 changeOrigin: true,
                 secure: false,
@@ -87,5 +42,18 @@ export default defineConfig({
             'repl.it',
             '*',
         ],
+    },
+    // 빌드 및 미리보기 모드에서도 historyApiFallback 적용
+    build: {
+        outDir: 'dist',
+        assetsDir: 'assets',
+    },
+    preview: {
+        port: 5000,
+        // SPA 라우팅을 위한 historyApiFallback 설정
+        historyApiFallback: {
+            disableDotRule: true,
+            rewrites: [{ from: /./, to: '/index.html' }],
+        },
     },
 });
