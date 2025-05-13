@@ -44,6 +44,12 @@ const initialFormState = {
     bed_id: '',
 };
 
+// 성별 아이콘 매핑 상수 수정
+const GENDER_ICONS = {
+    Male: '♂', // 남성 심볼
+    Female: '♀', // 여성 심볼
+};
+
 const PatientManagement = () => {
     const [patients, setPatients] = useState([]);
     const [showFilterModal, setShowFilterModal] = useState(false);
@@ -51,7 +57,7 @@ const PatientManagement = () => {
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [filters, setFilters] = useState({
-        ageRange: { min: '', max: '' },
+        gender: '', // 성별 필터 추가
         bloodType: '',
         hasGuardian: null,
         room: '',
@@ -270,24 +276,21 @@ const PatientManagement = () => {
         }
     };
 
-    // 필터 초기화 함수 추가
+    // 필터 초기화 함수 수정
     const resetFilters = () => {
         setFilters({
-            ageRange: { min: '', max: '' },
+            gender: '', // 성별 필터 초기화 추가
             bloodType: '',
             hasGuardian: null,
             room: '',
-            status: '', // 상태 필터 초기화
+            status: '',
         });
     };
 
     // 필터링 함수 수정
     const applyFilters = (patients) => {
         return patients.filter((patient) => {
-            const age = patient.age; // TIMESTAMPDIFF로 계산된 나이 사용
-            const matchesAge =
-                (!filters.ageRange.min || age >= parseInt(filters.ageRange.min)) &&
-                (!filters.ageRange.max || age <= parseInt(filters.ageRange.max));
+            const matchesGender = !filters.gender || patient.patient_sex === filters.gender; // 성별 필터링 추가
             const matchesBlood = !filters.bloodType || patient.patient_blood === filters.bloodType;
             const matchesGuardian =
                 filters.hasGuardian === null ||
@@ -296,7 +299,7 @@ const PatientManagement = () => {
             const matchesRoom = !filters.room || patient.room_name === filters.room;
             const matchesStatus = !filters.status || patient.patient_status === filters.status;
 
-            return matchesAge && matchesBlood && matchesGuardian && matchesRoom && matchesStatus;
+            return matchesGender && matchesBlood && matchesGuardian && matchesRoom && matchesStatus;
         });
     };
 
@@ -506,24 +509,12 @@ const PatientManagement = () => {
                         <div className="filter-modal-body">
                             <div className="filter-panel">
                                 <div className="form-group">
-                                    <label>나이 범위</label>
-                                    <div className="flex">
-                                        <input
-                                            type="number"
-                                            name="ageRange.min"
-                                            placeholder="최소"
-                                            value={filters.ageRange.min}
-                                            onChange={handleFilterChange}
-                                        />
-                                        <span>~</span>
-                                        <input
-                                            type="number"
-                                            name="ageRange.max"
-                                            placeholder="최대"
-                                            value={filters.ageRange.max}
-                                            onChange={handleFilterChange}
-                                        />
-                                    </div>
+                                    <label>성별</label>
+                                    <select name="gender" value={filters.gender} onChange={handleFilterChange}>
+                                        <option value="">전체</option>
+                                        <option value="Male">남성</option>
+                                        <option value="Female">여성</option>
+                                    </select>
                                 </div>
                                 <div className="form-group">
                                     <label>혈액형</label>
@@ -560,11 +551,11 @@ const PatientManagement = () => {
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button className="cancel-button" onClick={() => setShowFilterModal(false)}>
-                                취소
-                            </button>
                             <button className="submit-button" onClick={() => setShowFilterModal(false)}>
                                 적용
+                            </button>
+                            <button className="cancel-button" onClick={() => setShowFilterModal(false)}>
+                                취소
                             </button>
                         </div>
                     </div>
@@ -603,6 +594,7 @@ const PatientManagement = () => {
                             <th className="header-label">ID</th>
                             <th className="header-label">사진</th>
                             <th className="header-label">이름</th>
+                            <th className="header-label">성별</th> {/* 성별 헤더 추가 */}
                             <th className="header-label">생년월일</th>
                             <th className="header-label">신체 정보</th>
                             <th className="header-label">혈액형</th>
@@ -634,6 +626,15 @@ const PatientManagement = () => {
                                     </td>
                                     <td>
                                         <span className="patient-name">{patient.patient_name}</span>
+                                    </td>
+                                    <td>
+                                        <span
+                                            className={`gender-icon ${
+                                                patient.patient_sex === 'Male' ? 'male' : 'female'
+                                            }`}
+                                        >
+                                            {GENDER_ICONS[patient.patient_sex]}
+                                        </span>
                                     </td>
                                     <td>{formatBirthDate(patient.patient_birth)}</td>
                                     <td>

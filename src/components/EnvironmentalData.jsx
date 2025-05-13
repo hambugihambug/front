@@ -190,7 +190,9 @@ const EnvironmentalData = () => {
                                     {floorRooms.map((room) => (
                                         <div
                                             key={room.roomId}
-                                            className={`room-item ${selectedRoomId === room.roomId ? 'selected' : ''}`}
+                                            className={`room-item ${selectedRoomId === room.roomId ? 'selected' : ''} ${
+                                                room.status === '경고' ? 'warning' : ''
+                                            }`}
                                             onClick={() => setSelectedRoomId(room.roomId)}
                                         >
                                             <div className="room-header">
@@ -229,7 +231,9 @@ const EnvironmentalData = () => {
 
                 <div className="main-detail">
                     <div className="detail-header">
-                        <h1 className="detail-title">{selectedRoom.roomName}호 환경 상태</h1>
+                        <div className="detail-title">
+                            <h1>{selectedRoom.roomName}호 환경 상태</h1>
+                        </div>
                         <div className="toggle-input-group">
                             <div
                                 className={`toggle-input ${metric === 'temperature' ? 'active' : ''}`}

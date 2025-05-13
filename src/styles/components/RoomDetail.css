@@ -273,3 +273,132 @@
 .detail-button:hover {
     background-color: #bbdefb;
 }
+
+/* 병실 레이아웃 스타일 */
+.room-layout {
+    padding: 24px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.room-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.room-info {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.room-image {
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.room-layout-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.room-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.bed-space {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.bed-space.occupied {
+    border-color: #2563eb;
+    background: #f0f9ff;
+}
+
+.bed-space.occupied:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.bed-space.empty {
+    background: #f9fafb;
+}
+
+.bed-icon {
+    margin-right: 16px;
+}
+
+.bed-info {
+    flex: 1;
+}
+
+.bed-number {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 4px;
+}
+
+.patient-brief {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.patient-details {
+    display: flex;
+    gap: 8px;
+    font-size: 0.875rem;
+}
+
+.patient-blood {
+    color: #4b5563;
+}
+
+.patient-name {
+    font-size: 14px;
+    color: #1f2937;
+    font-weight: 500;
+}
+
+.patient-status {
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.patient-status.고위험군 {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.patient-status.저위험군 {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
+.patient-status.무위험군 {
+    background-color: #dcfce7;
+    color: #15803d;
+}
+
+.bed-status.empty {
+    font-size: 14px;
+    color: #9ca3af;
+    font-style: italic;
+}

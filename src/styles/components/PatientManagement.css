@@ -180,64 +180,28 @@
 
 .modal-footer {
     display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    padding: 1.5rem;
-    border-top: 1px solid #e2e8f0;
+    justify-content: flex-end; /* 오른쪽 정렬 */
+    gap: 8px; /* 버튼 사이 간격 */
+    padding: 16px;
+    border-top: 1px solid #e5e7eb;
 }
 
-.modal-footer .cancel-button,
-.modal-footer .submit-button {
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: all 0.2s;
-    height: 50px;
-    line-height: 50px;
-    box-sizing: border-box;
+.modal-footer button {
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: 500;
 }
 
 .modal-footer .cancel-button {
-    background-color: #f1f5f9;
-    color: #64748b;
-    border: 1px solid #e2e8f0;
-}
-
-.modal-footer .reset-button {
-    background-color: #f8fafc;
-    color: #475569;
-    border: 1px solid #e2e8f0;
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: all 0.2s ease;
-    margin: 0 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
-}
-
-.modal-footer .reset-button:hover {
-    background-color: #f1f5f9;
-    border-color: #cbd5e1;
-    transform: rotate(-15deg);
+    background-color: #f3f4f6;
+    color: #4b5563;
+    border: 1px solid #e5e7eb;
 }
 
 .modal-footer .submit-button {
     background-color: #3b82f6;
     color: white;
     border: none;
-    transition: all 0.2s ease;
-}
-
-.modal-footer .submit-button:hover {
-    background-color: var(--primary-hover);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(30, 64, 175, 0.1);
 }
 
 /* Stats Overview */
@@ -501,6 +465,7 @@
     background-color: var(--primary-color);
     border: none;
     color: white;
+    margin: 0;
 }
 
 .cancel-button:hover {
@@ -1172,6 +1137,11 @@
     background-color: #f9fafb;
 }
 
+/* 고위험군 환자의 행 전체 배경색 설정 */
+.data-table tbody tr:has(.status-badge.high-risk) {
+    background-color: #fecaca;
+}
+
 .status-badge {
     display: inline-block;
     padding: 0.25rem 0.75rem;
@@ -1373,4 +1343,34 @@
     background-color: #f1f5f9;
     border-color: #cbd5e1;
     color: #1e293b;
+}
+
+/* Gender Icon Styles */
+.gender-icon {
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+}
+
+.gender-icon.male {
+    color: #2563eb !important; /* 파란색 계열 */
+}
+
+.gender-icon.female {
+    color: #db2777 !important; /* 분홍색 계열 */
+}
+
+/* 헤더 텍스트 중앙 정렬 및 특정 컬럼 너비 조정 */
+.data-table th.header-label {
+    text-align: center; /* 헤더 텍스트 중앙 정렬 */
+    vertical-align: middle; /* 수직 중앙 정렬 */
+    color: #ffffff;
+    padding: 12px 16px;
+}
+
+.data-table th.header-label:nth-child(4) {
+    /* 성별 컬럼 */
+    width: 80px; /* 성별 컬럼 너비 고정 */
 }
