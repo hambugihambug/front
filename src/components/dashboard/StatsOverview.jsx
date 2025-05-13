@@ -3,7 +3,7 @@ import { Card, CardContent } from '../ui/card';
 import { Clock, Users, AlertTriangle, Activity } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 
-const API_BASE_URL = '/api';
+const API_BASE_URL = 'http://localhost:3000';
 
 export default function StatsOverview() {
     const [stats, setStats] = useState({

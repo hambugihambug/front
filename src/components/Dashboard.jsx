@@ -9,7 +9,7 @@ import RoomGrid from './dashboard/RoomGrid';
 import '../styles/components/DashboardPage.css';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3000'; // 실제 백엔드 서버 주소로 변경
+const API_BASE_URL = 'http://localhost:3000'; // API 경로 수정 (/api 프리픽스 제거)
 
 export default function Dashboard() {
     const navigate = useNavigate();
@@ -28,7 +28,7 @@ export default function Dashboard() {
 
     const fetchFallStats = async () => {
         try {
-            const response = await axios.get(`${API_BASE_URL}/stats/falls`);
+            const response = await axios.get(`${API_BASE_URL}/fall-incidents/stats`); // 경로 수정 (/api 제거)
             console.log('낙상 통계 응답:', response.data); // 디버깅을 위한 로그 추가
 
             if (response.data.code === 0) {
