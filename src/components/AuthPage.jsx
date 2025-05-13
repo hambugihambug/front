@@ -211,9 +211,9 @@ const AuthPage = () => {
     return (
         <div className="auth-container">
             <div className="auth-left">
-                <button type="button" className="home-button" onClick={() => navigate('/')}>
+                {/* <button type="button" className="home-button" onClick={() => navigate('/')}>
                     홈으로 이동
-                </button>
+                </button> */}
                 <h1>병원 안전 관리 시스템</h1>
                 <p>로그인 또는 계정을 생성하세요</p>
                 <div className="auth-tabs">

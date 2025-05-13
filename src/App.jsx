@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { messaging, getToken, onMessage, saveTokenToServer } from './firebase';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { AuthContext } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
 import AuthPage from './components/AuthPage';
 import Dashboard from './components/Dashboard';
@@ -35,6 +36,24 @@ const AlertNotification = ({ notification, onClose }) => {
             </div>
         </div>
     );
+};
+
+// 인증이 필요한 라우트를 위한 컴포넌트
+const PrivateRoute = ({ element }) => {
+    const { isLoggedIn, loading } = useContext(AuthContext);
+
+    // 로딩 중일 때는 아직 리다이렉트하지 않음
+    if (loading) {
+        return (
+            <div className="loading-container">
+                <div className="loading-spinner"></div>
+                <p className="loading-text">사용자 인증 확인 중...</p>
+            </div>
+        );
+    }
+
+    // 로그인 상태가 아니면 로그인 페이지로 리다이렉트
+    return isLoggedIn ? element : <Navigate to="/login" replace />;
 };
 
 function App() {
@@ -169,18 +188,20 @@ function AppContent({ notification, onCloseNotification, isLoading, setIsLoading
                     <Route path="/login" element={<AuthPage />} />
                     <Route path="/signup" element={<AuthPage />} />
                     <Route path="/register" element={<AuthPage />} />
-                    <Route path="/" element={<Home />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/rooms" element={<RoomManagement />} />
-                    <Route path="/rooms/:roomName" element={<RoomDetail />} />
-                    <Route path="/patients" element={<PatientManagement />} />
-                    <Route path="/patients/add" element={<PatientAdd />} />
-                    <Route path="/patients/:id" element={<PatientDetail />} />
-                    <Route path="/beds" element={<BedManagement />} />
-                    <Route path="/fall-incidents" element={<FallIncidents />} />
-                    <Route path="/environmental" element={<EnvironmentalData />} />
-                    <Route path="/notifications" element={<Notifications />} />
-                    <Route path="/schedule" element={<Schedule />} />
+
+                    {/* 인증이 필요한 라우트 */}
+                    <Route path="/" element={<PrivateRoute element={<Home />} />} />
+                    <Route path="/dashboard" element={<PrivateRoute element={<Dashboard />} />} />
+                    <Route path="/rooms" element={<PrivateRoute element={<RoomManagement />} />} />
+                    <Route path="/rooms/:roomName" element={<PrivateRoute element={<RoomDetail />} />} />
+                    <Route path="/patients" element={<PrivateRoute element={<PatientManagement />} />} />
+                    <Route path="/patients/add" element={<PrivateRoute element={<PatientAdd />} />} />
+                    <Route path="/patients/:id" element={<PrivateRoute element={<PatientDetail />} />} />
+                    <Route path="/beds" element={<PrivateRoute element={<BedManagement />} />} />
+                    <Route path="/fall-incidents" element={<PrivateRoute element={<FallIncidents />} />} />
+                    <Route path="/environmental" element={<PrivateRoute element={<EnvironmentalData />} />} />
+                    <Route path="/notifications" element={<PrivateRoute element={<Notifications />} />} />
+                    <Route path="/schedule" element={<PrivateRoute element={<Schedule />} />} />
                 </Routes>
             </main>
             <AlertNotification notification={notification} onClose={onCloseNotification} />
